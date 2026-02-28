@@ -85,9 +85,9 @@ const path = require('path');
     console.log(`Captured slide ${i + 1}/${totalSlides}`);
   }
 
-  // PDF page = 2560pt x 1440pt for a larger, more zoomed-in feel
-  const pageWIn = 2560 / 72;  // 35.556in
-  const pageHIn = 1440 / 72;  // 20in
+  // PDF page = 3840pt x 2160pt for max zoom
+  const pageWIn = 3840 / 72;  // 53.333in
+  const pageHIn = 2160 / 72;  // 30in
 
   const pdfPage = await browser.newPage();
   // Viewport must match: 26.667in * 96dpi = 2560px CSS
