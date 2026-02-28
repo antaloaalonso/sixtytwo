@@ -14,7 +14,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>62</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after {
     margin: 0;
@@ -23,125 +23,79 @@
   }
 
   :root {
-    --bg: #edece4;
-    --text: #3a3a36;
-    --text-dark: #1e1e1c;
-    --text-dim: #8a897e;
-    --emerald: #1a6b42;
-    --copper: #b07830;
-    --rule: #d0cfc6;
+    --bg: #0b0c0b;
+    --text: #d4d3cb;
+    --text-bright: #e8e7e0;
+    --text-dim: #7a7970;
+    --copper: #c4873a;
+    --rule: #1f201f;
   }
 
   html {
-    font-size: 17px;
+    font-size: 16px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'IBM Plex Mono', monospace;
     font-weight: 300;
-    font-size: 1rem;
-    line-height: 1.8;
+    font-size: 0.9rem;
+    line-height: 1.75;
     color: var(--text);
     background: var(--bg);
     padding: 0 1.5rem;
   }
 
-  /* thin copper accent at very top */
-  body::before {
-    content: '';
-    display: block;
-    width: 100%;
-    height: 2px;
-    background: linear-gradient(90deg, var(--emerald), var(--copper));
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 10;
-  }
-
   main {
-    max-width: 620px;
+    max-width: 640px;
     margin: 0 auto;
     padding: 6rem 0 4rem;
   }
 
-  .header {
-    display: flex;
-    align-items: baseline;
-    gap: 1rem;
-    margin-bottom: 3.5rem;
-  }
-
   h1 {
-    font-family: 'Newsreader', serif;
+    font-family: 'Cormorant Garamond', serif;
     font-weight: 400;
-    font-size: 1.9rem;
-    color: var(--text-dark);
-    letter-spacing: -0.01em;
-  }
-
-  .tagline {
-    font-size: 0.72rem;
-    font-weight: 400;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--text-dim);
+    font-size: 2.1rem;
+    color: var(--text-bright);
+    letter-spacing: 0.01em;
+    margin-bottom: 3rem;
   }
 
   .opening {
-    font-family: 'Newsreader', serif;
-    font-weight: 400;
-    font-size: 1.35rem;
-    line-height: 1.5;
-    color: var(--text-dark);
-    margin-bottom: 2rem;
+    font-weight: 500;
+    color: var(--text-bright);
+    margin-bottom: 1.6rem;
   }
 
   p {
-    margin-bottom: 1.3rem;
+    margin-bottom: 1.4rem;
   }
 
   .closer {
-    font-family: 'Newsreader', serif;
-    font-weight: 400;
-    font-size: 1.1rem;
-    color: var(--text-dark);
-    margin-top: 0.6rem;
+    font-weight: 500;
+    color: var(--text-bright);
+    margin-top: 0.4rem;
     margin-bottom: 0;
-    line-height: 1.55;
   }
 
   hr {
     border: none;
     height: 1px;
     background: var(--rule);
-    margin: 2.5rem 0;
+    margin: 2.8rem 0;
   }
 
   h2 {
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    margin-bottom: 0.8rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: var(--text-bright);
+    margin-bottom: 1rem;
   }
 
   .team-names {
-    color: var(--text);
-    font-weight: 400;
-  }
-
-  .team-names span {
-    display: inline;
-  }
-
-  .team-names span + span::before {
-    content: '\00a0\00a0\00b7\00a0\00a0';
-    color: var(--rule);
+    color: var(--text-dim);
   }
 
   footer {
@@ -149,38 +103,31 @@
   }
 
   a {
-    color: var(--emerald);
+    color: var(--copper);
     text-decoration: none;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 
   a:hover {
-    border-bottom-color: var(--emerald);
+    opacity: 0.7;
   }
 
   .copyright {
-    margin-top: 1.8rem;
+    margin-top: 2rem;
     font-size: 0.78rem;
     color: var(--text-dim);
   }
 
   @media (max-width: 480px) {
-    html { font-size: 16px; }
     main { padding: 4rem 0 3rem; }
-    h1 { font-size: 1.6rem; }
-    .opening { font-size: 1.15rem; }
-    .header { flex-direction: column; gap: 0.3rem; }
+    h1 { font-size: 1.7rem; }
   }
 </style>
 </head>
 <body>
 <main>
 
-<div class="header">
-  <h1>sixty two</h1>
-  <span class="tagline">Breakthrough Ventures</span>
-</div>
+<h1>sixty two</h1>
 
 <p class="opening">The AI infrastructure gap is widening.</p>
 
@@ -202,7 +149,7 @@
 
 <section>
 <h2>Team</h2>
-<p class="team-names"><span>Sonnet Xu</span><span>Antonio Alonso-Stepanov</span><span>Jessie Dong</span></p>
+<p class="team-names">Sonnet Xu, Antonio Alonso-Stepanov, Jessie Dong</p>
 </section>
 
 <hr>
