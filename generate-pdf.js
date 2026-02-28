@@ -5,15 +5,12 @@ const path = require('path');
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
-  // Standard 16:9 presentation at 1x scale
   const width = 1920;
   const height = 1080;
   await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
   const filePath = 'file://' + path.resolve(__dirname, 'index.html');
   await page.goto(filePath, { waitUntil: 'networkidle0' });
-
-  // Wait for fonts to load
   await page.evaluate(() => document.fonts.ready);
   await new Promise(r => setTimeout(r, 2000));
 
@@ -21,7 +18,6 @@ const path = require('path');
   const screenshots = [];
 
   for (let i = 0; i < totalSlides; i++) {
-    // Navigate to slide
     if (i > 0) {
       await page.evaluate((idx) => {
         document.querySelectorAll('.slide').forEach(s => {
@@ -36,10 +32,8 @@ const path = require('path');
       }, i);
     }
 
-    // Wait for slide animations
     await new Promise(r => setTimeout(r, 2500));
 
-    // Force all animated elements visible
     await page.evaluate((idx) => {
       const slide = document.querySelectorAll('.slide')[idx];
 
@@ -73,7 +67,6 @@ const path = require('path');
         el.classList.add('animate');
       });
 
-      // Hide nav UI
       document.querySelector('.nav-fixed').style.display = 'none';
       document.querySelector('.nav-dots').style.display = 'none';
       document.querySelector('.nav-arrows').style.display = 'none';
@@ -92,16 +85,14 @@ const path = require('path');
     console.log(`Captured slide ${i + 1}/${totalSlides}`);
   }
 
-  // Create PDF: use a new page at 1x scale with inch-based dimensions
-  // Standard widescreen: 13.333in x 7.5in (same as PowerPoint 16:9)
-  const pdfPage = await browser.newPage();
-  const slideW = 13.333;
-  const slideH = 7.5;
+  // PDF page = 1920pt x 1080pt so at 100% zoom it fills a 1080p screen
+  // 1920pt / 72dpi = 26.667in, 1080pt / 72dpi = 15in
+  const pageWIn = 1920 / 72;  // 26.667in
+  const pageHIn = 1080 / 72;  // 15in
 
-  // Viewport in pixels at 96dpi CSS
-  const pdfViewW = Math.round(slideW * 96);  // ~1280
-  const pdfViewH = Math.round(slideH * 96);  // ~720
-  await pdfPage.setViewport({ width: pdfViewW, height: pdfViewH, deviceScaleFactor: 1 });
+  const pdfPage = await browser.newPage();
+  // Viewport must match: 26.667in * 96dpi = 2560px CSS
+  await pdfPage.setViewport({ width: Math.round(pageWIn * 96), height: Math.round(pageHIn * 96), deviceScaleFactor: 1 });
 
   const imagesHtml = screenshots.map((buf) =>
     `<div class="page"><img src="data:image/png;base64,${buf.toString('base64')}" /></div>`
@@ -112,22 +103,18 @@ const path = require('path');
 <head>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  @page { size: ${slideW}in ${slideH}in; margin: 0; }
-  html, body { margin: 0; padding: 0; }
+  @page { size: ${pageWIn}in ${pageHIn}in; margin: 0; }
+  html, body { margin: 0; padding: 0; background: #000; }
   .page {
-    width: ${slideW}in;
-    height: ${slideH}in;
+    width: ${pageWIn}in;
+    height: ${pageHIn}in;
     page-break-after: always;
     overflow: hidden;
-    position: relative;
   }
   .page:last-child { page-break-after: avoid; }
   .page img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: ${slideW}in;
-    height: ${slideH}in;
+    width: ${pageWIn}in;
+    height: ${pageHIn}in;
     display: block;
   }
 </style>
@@ -140,8 +127,8 @@ const path = require('path');
 
   await pdfPage.pdf({
     path: path.resolve(__dirname, 'sixty-two-pitch-deck.pdf'),
-    width: `${slideW}in`,
-    height: `${slideH}in`,
+    width: `${pageWIn}in`,
+    height: `${pageHIn}in`,
     printBackground: true,
     margin: { top: '0', right: '0', bottom: '0', left: '0' },
     preferCSSPageSize: true,
