@@ -6,8 +6,8 @@ const path = require('path');
   const page = await browser.newPage();
 
   // Smaller viewport = content fills more of the frame
-  const width = 1024;
-  const height = 576;
+  const width = 1120;
+  const height = 630;
   await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
   const filePath = 'file://' + path.resolve(__dirname, 'index.html');
