@@ -5,14 +5,29 @@ const path = require('path');
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
-  const width = 1920;
-  const height = 1080;
+  // Smaller viewport = content fills more of the frame
+  const width = 1024;
+  const height = 576;
   await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
   const filePath = 'file://' + path.resolve(__dirname, 'index.html');
   await page.goto(filePath, { waitUntil: 'networkidle0' });
   await page.evaluate(() => document.fonts.ready);
   await new Promise(r => setTimeout(r, 2000));
+
+  // Override padding/spacing to be tighter for PDF
+  await page.evaluate(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      .slide-inner { padding: 2rem 2.5rem !important; }
+      .title-founders { margin-top: 2rem !important; }
+      .challenge-header { margin-bottom: 2rem !important; }
+      .provide-header { margin-bottom: 2rem !important; }
+      .whynow-header { margin-bottom: 2rem !important; }
+      .business-content { gap: 2.5rem !important; }
+    `;
+    document.head.appendChild(style);
+  });
 
   const totalSlides = 8;
   const screenshots = [];
@@ -85,12 +100,11 @@ const path = require('path');
     console.log(`Captured slide ${i + 1}/${totalSlides}`);
   }
 
-  // PDF page = 3840pt x 2160pt for max zoom
-  const pageWIn = 3840 / 72;  // 53.333in
-  const pageHIn = 2160 / 72;  // 30in
+  // Standard 16:9 widescreen PDF (10in x 5.625in like Google Slides/PowerPoint)
+  const pageWIn = 10;
+  const pageHIn = 5.625;
 
   const pdfPage = await browser.newPage();
-  // Viewport must match: 26.667in * 96dpi = 2560px CSS
   await pdfPage.setViewport({ width: Math.round(pageWIn * 96), height: Math.round(pageHIn * 96), deviceScaleFactor: 1 });
 
   const imagesHtml = screenshots.map((buf) =>
@@ -103,7 +117,7 @@ const path = require('path');
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   @page { size: ${pageWIn}in ${pageHIn}in; margin: 0; }
-  html, body { margin: 0; padding: 0; background: #000; }
+  html, body { margin: 0; padding: 0; }
   .page {
     width: ${pageWIn}in;
     height: ${pageHIn}in;
