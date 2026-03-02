@@ -1,0 +1,8 @@
+ONE-LINER:
+Operational intelligence for on-prem AI infrastructure
+
+MARKET OPPORTUNITY:
+Every company running AI on its own hardware needs software to operate it. That market barely exists. Cloud observability is a $60B+ category but there is no equivalent for on-prem AI. The tools companies use are disconnected point solutions with no integration layer. As open-source models mature and data regulations tighten, on-prem AI is accelerating. Sixtytwo builds the operational intelligence layer connecting GPU metrics, scheduler decisions, and model serving behavior in one place. This category does not exist yet.
+
+BUSINESS MODEL:
+We sell enterprise software subscriptions, deployed on-prem, to the infrastructure and platform teams running GPU clusters. These are the same buyers who pay for Datadog, Splunk, or PagerDuty today, but for their AI infrastructure. Pricing scales with cluster size by number of GPUs monitored. Because the product runs entirely on the customer's own hardware, there are no cloud compute costs on our end, which means software margins in the 80-90% range.
