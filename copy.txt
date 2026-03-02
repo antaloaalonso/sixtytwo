@@ -9,3 +9,6 @@ We sell enterprise software subscriptions, deployed on-prem, to the infrastructu
 
 WHY NOW:
 Companies are realizing their data is their most valuable asset, and sending it to third-party AI APIs is a risk they no longer want to take. The shift to on-prem is accelerating. Open-source models are good enough that companies no longer need to trade data control for quality. Regulations like the EU AI Act are making this even more urgent. But while the demand for on-prem AI has exploded, the tooling to actually operate it has not kept up. Every company making this move is stitching together the same fragile stack of disconnected open-source tools. The infrastructure layer is years behind the hardware.
+
+WHY NFX:
+NFX's thesis is network effects. Sixtytwo has a natural one: the more clusters we monitor, the better our baselines and anomaly detection become. Data from diverse on-prem environments compounds into a moat no single-company tool can build.
