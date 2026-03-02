@@ -6,3 +6,6 @@ Every company running AI on its own hardware needs software to operate it. That 
 
 BUSINESS MODEL:
 We sell enterprise software subscriptions, deployed on-prem, to the infrastructure and platform teams running GPU clusters. These are the same buyers who pay for Datadog, Splunk, or PagerDuty today, but for their AI infrastructure. Pricing scales with cluster size by number of GPUs monitored. Because the product runs entirely on the customer's own hardware, there are no cloud compute costs on our end, which means software margins in the 80-90% range.
+
+WHY NOW:
+Open-source models crossed the quality threshold where running your own inference makes economic sense. Data sovereignty regulations like the EU AI Act (enforcement August 2026) are forcing companies off cloud AI APIs. GPU hardware is getting cheaper and more available as supply catches up. Meanwhile the tooling gap is getting worse, not better. NVIDIA open-sourced DCGM and acquired Run:ai, but these are single-layer tools that don't talk to each other. Every company moving on-prem is rebuilding the same fragile integration from scratch. The infrastructure need is new because the on-prem AI market itself is new, and it is growing faster than the tooling to support it.
