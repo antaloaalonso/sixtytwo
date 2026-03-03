@@ -131,17 +131,15 @@
 
 <p class="opening">Infrastructure software for on-prem AI.</p>
 
-<p>Companies are moving AI on-prem because data control is non-negotiable and the economics make sense. But going on-prem means taking on everything a cloud provider does invisibly: automated recovery, node health management, scheduling, capacity planning. With none of their tooling.</p>
+<p>Companies are moving AI on-prem because the economics make sense and data control is non-negotiable. But going on-prem means taking on everything a cloud provider does invisibly: scheduling, fault detection, capacity planning, cost management. With none of their tooling.</p>
 
-<p>On cloud, when a GPU fails 3 days into a 2-week training run, the system automatically checkpoints, replaces the node, and resumes. On-prem, most teams end up building custom scripts around DCGM and Slurm to handle this, and it breaks. You can assemble open-source equivalents for almost everything the cloud provides, but the operational burden is significantly higher and nothing ties it together.</p>
+<p>Cloud providers absorb hardware failure and capacity volatility. Nodes die, disks fail, demand spikes, and the platform still runs. On-prem, teams have to build the automation for health detection, quarantine, rollouts, spares, and capacity planning to get cloud-level reliability. Most end up stitching together DCGM, Slurm, and custom scripts that break.</p>
 
-<p>Sixtytwo closes this gap with one platform that handles automated resilience for long training runs, integrated health management across the cluster, and connected visibility from GPU metrics to scheduler decisions to model serving behavior, so teams stop firefighting and start shipping.</p>
-
-<p>Everything runs on your infrastructure with no telemetry leaving your network, and it works whether you're on Kubernetes, Slurm, or bare metal.</p>
+<p>Sixtytwo is the operational intelligence layer for on-prem AI infrastructure. We connect data at all layers of the cluster so on-prem gets the same system-wide visibility that cloud providers surface automatically.</p>
 
 <p>We are a small team of engineers who have operated GPU infrastructure at scale.</p>
 
-<p class="closer">The future of AI runs on-prem. We're building the software to make it work.</p>
+<p class="closer">The future of AI runs on-prem.</p>
 
 <hr>
 
