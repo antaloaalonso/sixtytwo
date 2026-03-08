@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sixtytwo v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  :root {
+    --bg: #f3efe7;
+    --paper: #fbf9f4;
+    --ink: #171614;
+    --muted: #66635d;
+    --line: #d8d2c4;
+    --accent: #166245;
+    --accent-soft: #edf5f0;
+    --rust: #9c6730;
+    --shadow: 0 18px 60px rgba(15, 15, 12, 0.08);
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background:
+      linear-gradient(to right, rgba(23, 22, 20, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(23, 22, 20, 0.03) 1px, transparent 1px),
+      var(--bg);
+    background-size: 32px 32px, 32px 32px, auto;
+    color: var(--ink);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--accent);
+    width: 10%;
+    z-index: 20;
+    transition: width 0.3s ease;
+  }
+
+  .nav-fixed {
+    position: fixed;
+    top: 24px;
+    left: 40px;
+    right: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .nav-brand,
+  .slide-counter {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .presentation {
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 76px 64px 56px;
+    background: transparent;
+  }
+
+  .slide.active {
+    display: block;
+  }
+
+  .slide-inner {
+    width: 100%;
+    height: 100%;
+    background: rgba(251, 249, 244, 0.74);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(216, 210, 196, 0.9);
+    box-shadow: var(--shadow);
+    border-radius: 28px;
+    padding: 42px 42px 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .slide-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 20px;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+  }
+
+  .section-note {
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: 'Newsreader', serif;
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+  }
+
+  h1 {
+    font-size: clamp(3.9rem, 7vw, 6.3rem);
+  }
+
+  h2 {
+    font-size: clamp(2.3rem, 4vw, 4rem);
+  }
+
+  h3 {
+    font-size: 1.7rem;
+  }
+
+  p,
+  li,
+  td,
+  th {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .muted {
+    color: var(--muted);
+  }
+
+  .title-grid,
+  .two-col,
+  .split-grid,
+  .market-grid,
+  .status-grid,
+  .closing-grid {
+    display: grid;
+    gap: 24px;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .title-grid {
+    grid-template-columns: 1.25fr 0.75fr;
+    align-items: stretch;
+  }
+
+  .two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .split-grid {
+    grid-template-columns: 1.1fr 0.9fr;
+  }
+
+  .market-grid {
+    grid-template-columns: 0.9fr 1.1fr;
+  }
+
+  .status-grid {
+    grid-template-columns: 0.95fr 1.05fr;
+  }
+
+  .closing-grid {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: end;
+  }
+
+  .hero-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 28px;
+  }
+
+  .hero-subtitle {
+    max-width: 9.5em;
+    font-size: 1.35rem;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  .founders-line {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+  }
+
+  .panel,
+  .card,
+  .metric-card,
+  .timeline-step,
+  .team-card,
+  .status-card,
+  .price-card,
+  .contact-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+  }
+
+  .panel,
+  .card,
+  .metric-card,
+  .timeline-step,
+  .team-card,
+  .status-card,
+  .price-card,
+  .contact-card {
+    padding: 24px;
+  }
+
+  .hero-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 22px;
+    background: linear-gradient(180deg, #fffdf9 0%, #f7f2e8 100%);
+  }
+
+  .hero-panel h3 {
+    font-size: 2rem;
+  }
+
+  .hero-kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--rust);
+    font-size: 0.76rem;
+  }
+
+  .big-statement {
+    max-width: 11.5em;
+  }
+
+  .bullet-list {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .bullet-list li {
+    padding-left: 16px;
+    position: relative;
+  }
+
+  .bullet-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.68em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .problem-grid,
+  .why-grid,
+  .team-grid {
+    display: grid;
+    gap: 18px;
+    flex: 1;
+  }
+
+  .problem-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .why-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .team-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .card h3,
+  .metric-card h3,
+  .team-card h3,
+  .status-card h3,
+  .price-card h3 {
+    margin-bottom: 12px;
+    font-size: 1.65rem;
+  }
+
+  .card p,
+  .metric-card p,
+  .team-card p,
+  .status-card p,
+  .price-card p {
+    color: var(--muted);
+  }
+
+  .number {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 18px;
+  }
+
+  .timeline {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+  }
+
+  .timeline-step {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .timeline-step .step-no {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--accent);
+  }
+
+  .timeline-step h4 {
+    font-size: 1.28rem;
+  }
+
+  .timeline-step p {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .chip {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 9px 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .subhead {
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.76rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .price-stack,
+  .contact-stack {
+    display: grid;
+    gap: 16px;
+  }
+
+  .price-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .price-card .gpu-band {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .price-card .arr {
+    font-family: 'Newsreader', serif;
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    overflow: hidden;
+  }
+
+  th,
+  td {
+    border-bottom: 1px solid var(--line);
+    padding: 16px 14px;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.75rem;
+    color: var(--muted);
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+
+  td:first-child {
+    font-weight: 500;
+    width: 28%;
+  }
+
+  .yes,
+  .partial,
+  .no {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.84rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .yes { color: var(--accent); }
+  .partial { color: var(--rust); }
+  .no { color: var(--muted); }
+
+  .status-card ul,
+  .team-card ul {
+    list-style: none;
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .status-card li,
+  .team-card li {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .status-card li strong,
+  .team-card li strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  .team-card .role {
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.76rem;
+    color: var(--accent);
+    margin-bottom: 10px;
+  }
+
+  .closing-title {
+    max-width: 8.3em;
+  }
+
+  .contact-card {
+    display: grid;
+    gap: 14px;
+  }
+
+  .contact-card a {
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 10px;
+  }
+
+  .contact-card a:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .nav-arrows {
+    position: fixed;
+    right: 40px;
+    bottom: 28px;
+    display: flex;
+    gap: 10px;
+    z-index: 20;
+  }
+
+  .nav-arrow {
+    width: 42px;
+    height: 42px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: rgba(251, 249, 244, 0.88);
+    color: var(--ink);
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .nav-dot {
+    display: none;
+  }
+
+  @media (max-width: 1100px) {
+    .slide { padding: 68px 28px 46px; }
+    .slide-inner { padding: 28px; gap: 20px; }
+    .title-grid,
+    .two-col,
+    .split-grid,
+    .market-grid,
+    .status-grid,
+    .closing-grid,
+    .problem-grid,
+    .why-grid,
+    .team-grid,
+    .timeline {
+      grid-template-columns: 1fr;
+    }
+
+    body { overflow: auto; }
+    .slide { position: static; height: auto; min-height: 100vh; }
+    .slide:not(.active) { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="nav-fixed">
+  <div class="nav-brand">Sixtytwo</div>
+  <div class="slide-counter" id="slideCounter">01 / 10</div>
+</div>
+<div class="nav-dots"></div>
+<div class="nav-arrows">
+  <button class="nav-arrow" id="prevBtn" aria-label="Previous slide">&larr;</button>
+  <button class="nav-arrow" id="nextBtn" aria-label="Next slide">&rarr;</button>
+</div>
+
+<div class="presentation" id="presentation">
+  <section class="slide active" data-slide="0">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Sixtytwo / v3</div>
+        <div class="section-note">YC-style draft focused on product, market, and competition</div>
+      </div>
+      <div class="title-grid">
+        <div class="hero-stack">
+          <div>
+            <h1>Sixtytwo</h1>
+            <p class="hero-subtitle">Reliability infrastructure for on-prem AI training.</p>
+          </div>
+          <h2 class="big-statement">When a GPU dies three days into a two-week run, the job should recover instead of restart.</h2>
+          <div class="founders-line">
+            <span>Sonnet Xu</span>
+            <span>Antonio Alonso-Stepanov</span>
+            <span>Jessie Dong</span>
+          </div>
+        </div>
+        <div class="panel hero-panel">
+          <div>
+            <div class="hero-kicker">What breaks today</div>
+            <h3>On-prem teams still do training reliability by hand.</h3>
+          </div>
+          <ul class="bullet-list">
+            <li>A single unhealthy node can kill a multi-day training run.</li>
+            <li>Engineers debug across PyTorch, Slurm, Kubernetes, DCGM, and custom scripts.</li>
+            <li>Cloud platforms absorb this operational work. On-prem stacks do not.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="1">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Problem</div>
+        <div class="section-note">Training workloads fail for infrastructure reasons, not model reasons.</div>
+      </div>
+      <h2>What on-prem training teams are dealing with now</h2>
+      <div class="problem-grid">
+        <div class="card">
+          <div class="number">01</div>
+          <h3>Long-running jobs</h3>
+          <p>Training runs last for days or weeks. One bad GPU, storage path, or network issue can wipe out expensive compute.</p>
+        </div>
+        <div class="card">
+          <div class="number">02</div>
+          <h3>Fragmented tooling</h3>
+          <p>The stack spans frameworks, schedulers, metrics, and infra tools that were not built to recover one workflow together.</p>
+        </div>
+        <div class="card">
+          <div class="number">03</div>
+          <h3>Manual recovery</h3>
+          <p>When something goes wrong, engineers inspect logs, replace nodes, restart jobs, and lose utilization while the cluster waits.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="subhead">Typical stack today</div>
+        <div class="chip-row">
+          <span class="chip">PyTorch</span>
+          <span class="chip">Ray</span>
+          <span class="chip">Slurm</span>
+          <span class="chip">Kubernetes</span>
+          <span class="chip">NVIDIA DCGM</span>
+          <span class="chip">Prometheus</span>
+          <span class="chip">OpenTelemetry</span>
+          <span class="chip">Internal scripts</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="2">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Product</div>
+        <div class="section-note">Monitor the training stack and automate recovery.</div>
+      </div>
+      <h2>Sixtytwo handles the failure path.</h2>
+      <div class="timeline">
+        <div class="timeline-step">
+          <div class="step-no">01</div>
+          <h4>Detect</h4>
+          <p>Watch GPU telemetry, scheduler state, framework health, and checkpoint status.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="step-no">02</div>
+          <h4>Checkpoint</h4>
+          <p>Capture model state before the failure cascades across the run.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="step-no">03</div>
+          <h4>Replace</h4>
+          <p>Quarantine the bad machine and swap in healthy cluster capacity.</p>
+        </div>
+        <div class="timeline-step">
+          <div class="step-no">04</div>
+          <h4>Resume</h4>
+          <p>Restart the job from a known good point instead of from scratch.</p>
+        </div>
+      </div>
+      <div class="split-grid">
+        <div class="panel">
+          <div class="subhead">Core product</div>
+          <ul class="bullet-list">
+            <li>Training-aware observability across the full stack.</li>
+            <li>Failure detection tied to automated recovery actions.</li>
+            <li>Integrations with training frameworks and cluster schedulers.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <div class="subhead">Initial integrations from the application</div>
+          <div class="chip-row">
+            <span class="chip">Python</span>
+            <span class="chip">PyTorch</span>
+            <span class="chip">Kubernetes</span>
+            <span class="chip">NVIDIA DCGM</span>
+            <span class="chip">Prometheus</span>
+            <span class="chip">OpenTelemetry</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="3">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Why now</div>
+        <div class="section-note">The workload is moving on-prem before the tooling exists.</div>
+      </div>
+      <h2>Why this category opens now</h2>
+      <div class="why-grid">
+        <div class="metric-card">
+          <h3>More owned clusters</h3>
+          <p>At sustained utilization, companies increasingly want to own the hardware instead of paying cloud margins forever.</p>
+        </div>
+        <div class="metric-card">
+          <h3>More custom training</h3>
+          <p>Open weights and proprietary data push teams to train, fine-tune, and distill models in private environments.</p>
+        </div>
+        <div class="metric-card">
+          <h3>Failure cost is rising</h3>
+          <p>The bigger and longer the run, the more expensive each avoidable infrastructure failure becomes.</p>
+        </div>
+        <div class="metric-card">
+          <h3>Tooling gap is still open</h3>
+          <p>Observability tools exist, but they are not built to coordinate checkpointing, node replacement, and resume for AI training.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="4">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Market</div>
+        <div class="section-note">Enterprise software sold to infra and platform teams running training clusters.</div>
+      </div>
+      <h2>Target customers and pricing scale with GPU count</h2>
+      <div class="market-grid">
+        <div class="panel">
+          <div class="subhead">Who buys</div>
+          <ul class="bullet-list">
+            <li>AI companies training large models on owned GPU clusters.</li>
+            <li>Enterprises moving sensitive training workloads off the public cloud.</li>
+            <li>Infrastructure and platform teams responsible for cluster uptime and utilization.</li>
+          </ul>
+          <div class="subhead" style="margin-top:22px;">Pricing model from the YC application</div>
+          <p class="muted">Annual enterprise software, priced at roughly <strong>$100 per GPU per month</strong>.</p>
+        </div>
+        <div class="price-stack">
+          <div class="price-card">
+            <div>
+              <div class="gpu-band">1,000 GPUs</div>
+              <p class="muted">Early large cluster</p>
+            </div>
+            <div class="arr">$1.2M ARR</div>
+          </div>
+          <div class="price-card">
+            <div>
+              <div class="gpu-band">10,000 GPUs</div>
+              <p class="muted">Scaled deployment</p>
+            </div>
+            <div class="arr">$12M ARR</div>
+          </div>
+          <div class="price-card">
+            <div>
+              <div class="gpu-band">100,000 GPUs</div>
+              <p class="muted">Category-scale footprint</p>
+            </div>
+            <div class="arr">$120M ARR</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="5">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Competition</div>
+        <div class="section-note">The alternatives are cloud-only, incomplete, or manual.</div>
+      </div>
+      <h2>Competitive landscape</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>On-prem focus</th>
+            <th>Training-aware</th>
+            <th>Automated recovery</th>
+            <th>Unified stack view</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Cloud training platforms<br><span class="muted">AWS SageMaker / HyperPod</span></td>
+            <td><span class="no">No</span></td>
+            <td><span class="partial">Partial</span></td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="partial">Partial</span></td>
+          </tr>
+          <tr>
+            <td>DIY stack<br><span class="muted">Slurm + Kubernetes + DCGM + scripts</span></td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="partial">Partial</span></td>
+            <td><span class="no">No</span></td>
+            <td><span class="no">No</span></td>
+          </tr>
+          <tr>
+            <td>Generic observability</td>
+            <td><span class="partial">Partial</span></td>
+            <td><span class="no">No</span></td>
+            <td><span class="no">No</span></td>
+            <td><span class="partial">Partial</span></td>
+          </tr>
+          <tr>
+            <td>Sixtytwo</td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="yes">Yes</span></td>
+            <td><span class="yes">Yes</span></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="muted">The gap is not raw monitoring. It is reliable recovery for training workloads on owned clusters.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="6">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Go to market</div>
+        <div class="section-note">Start with the team that already feels the operational pain.</div>
+      </div>
+      <h2>Wedge, buyer, expansion</h2>
+      <div class="problem-grid">
+        <div class="card">
+          <div class="number">Wedge</div>
+          <h3>Observability + recovery</h3>
+          <p>Start with the narrow pain point: long-running jobs failing and wasting cluster time.</p>
+        </div>
+        <div class="card">
+          <div class="number">Buyer</div>
+          <h3>Infra / platform teams</h3>
+          <p>Sell to the operators already responsible for uptime, scheduling, and GPU utilization.</p>
+        </div>
+        <div class="card">
+          <div class="number">Expansion</div>
+          <h3>Broader cluster control</h3>
+          <p>Expand into scheduler integrations, fleet health, spare capacity planning, and cluster operations.</p>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="subhead">Current motion from the YC application</div>
+        <p class="muted">The team is currently talking to companies running or considering on-prem AI infrastructure, with the goal of shipping an initial prototype in the next few weeks and testing it with a small number of teams running GPU clusters.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="7">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Current status</div>
+        <div class="section-note">Early stage, pre-launch, with a clear product direction.</div>
+      </div>
+      <h2>Where the company is today</h2>
+      <div class="status-grid">
+        <div class="status-card">
+          <h3>Now</h3>
+          <ul>
+            <li><strong>Stage:</strong> pre-launch, no revenue yet.</li>
+            <li><strong>Work underway:</strong> customer discovery with teams running or considering on-prem AI clusters.</li>
+            <li><strong>Near term:</strong> initial prototype and pilot testing with a small number of GPU-cluster teams.</li>
+          </ul>
+        </div>
+        <div class="status-card">
+          <h3>Why this team can start here</h3>
+          <ul>
+            <li><strong>Training systems:</strong> distributed LLM dataloaders and large-scale training work at DatologyAI.</li>
+            <li><strong>Cluster ops:</strong> GPU provisioning, job scheduling, telemetry, and heartbeat recovery work at Mithril.</li>
+            <li><strong>Production systems:</strong> product and ML systems shipped at Meta and other engineering roles.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="8">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Team</div>
+        <div class="section-note">Relevant backgrounds across distributed training, GPU orchestration, and production ML systems.</div>
+      </div>
+      <h2>Founding team</h2>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="role">Sonnet Xu</div>
+          <h3>Training systems</h3>
+          <ul>
+            <li><strong>DatologyAI:</strong> high-performance dataloader for large-scale distributed LLM training.</li>
+            <li><strong>Stanford:</strong> research background across ML systems and model evaluation.</li>
+            <li><strong>Why it matters:</strong> understands where training throughput and reliability break down.</li>
+          </ul>
+        </div>
+        <div class="team-card">
+          <div class="role">Jessie Dong</div>
+          <h3>GPU infrastructure</h3>
+          <ul>
+            <li><strong>Mithril:</strong> GPU provisioning, job scheduling, telemetry, worker discovery, and heartbeat-based recovery.</li>
+            <li><strong>Sago:</strong> founding engineer building production AI systems.</li>
+            <li><strong>Why it matters:</strong> has worked close to the cluster control plane already.</li>
+          </ul>
+        </div>
+        <div class="team-card">
+          <div class="role">Antonio Alonso-Stepanov</div>
+          <h3>Product + systems</h3>
+          <ul>
+            <li><strong>Meta:</strong> shipped production software including LLM-related internal tooling.</li>
+            <li><strong>Meta:</strong> prior full-stack product engineering internship shipping user-facing systems.</li>
+            <li><strong>Why it matters:</strong> can build the operator product around the infrastructure layer.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-slide="9">
+    <div class="slide-inner">
+      <div class="slide-top">
+        <div class="eyebrow">Close</div>
+        <div class="section-note">Simple summary of the thesis</div>
+      </div>
+      <div class="closing-grid">
+        <div class="hero-stack">
+          <h2 class="closing-title">The cloud has a reliability layer for training. On-prem needs one too.</h2>
+          <p class="hero-subtitle">Sixtytwo is building the reliability infrastructure for teams training models on owned GPU clusters.</p>
+        </div>
+        <div class="contact-stack">
+          <div class="contact-card">
+            <div class="subhead">Contact</div>
+            <a href="mailto:ajalonso@stanford.edu">ajalonso@stanford.edu</a>
+            <a href="mailto:sonnet@stanford.edu">sonnet@stanford.edu</a>
+            <a href="mailto:jessiedong@stanford.edu">jessiedong@stanford.edu</a>
+          </div>
+          <div class="contact-card">
+            <div class="subhead">One-line description</div>
+            <p class="muted">Reliability infrastructure for on-prem AI training.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  class SimpleDeck {
+    constructor() {
+      this.slides = Array.from(document.querySelectorAll('.slide'));
+      this.totalSlides = this.slides.length;
+      this.currentSlide = 0;
+      this.counter = document.getElementById('slideCounter');
+      this.progress = document.getElementById('progressBar');
+      this.prevBtn = document.getElementById('prevBtn');
+      this.nextBtn = document.getElementById('nextBtn');
+      this.bind();
+      this.render();
+    }
+
+    bind() {
+      this.prevBtn.addEventListener('click', () => this.goTo(this.currentSlide - 1));
+      this.nextBtn.addEventListener('click', () => this.goTo(this.currentSlide + 1));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          this.goTo(this.currentSlide + 1);
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          this.goTo(this.currentSlide - 1);
+        }
+      });
+    }
+
+    goTo(index) {
+      if (index < 0 || index >= this.totalSlides) return;
+      this.currentSlide = index;
+      this.render();
+    }
+
+    render() {
+      this.slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === this.currentSlide);
+      });
+
+      const current = String(this.currentSlide + 1).padStart(2, '0');
+      const total = String(this.totalSlides).padStart(2, '0');
+      this.counter.textContent = `${current} / ${total}`;
+      this.progress.style.width = `${((this.currentSlide + 1) / this.totalSlides) * 100}%`;
+      this.prevBtn.disabled = this.currentSlide === 0;
+      this.nextBtn.disabled = this.currentSlide === this.totalSlides - 1;
+    }
+  }
+
+  new SimpleDeck();
+</script>
+</body>
+</html>

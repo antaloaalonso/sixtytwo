@@ -2,6 +2,8 @@ const puppeteer = require('puppeteer');
 const path = require('path');
 
 (async () => {
+  const inputFile = process.argv[2] || 'index.html';
+  const outputFile = process.argv[3] || 'sixty-two-pitch-deck.pdf';
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
@@ -10,7 +12,7 @@ const path = require('path');
   const height = 675;
   await page.setViewport({ width, height, deviceScaleFactor: 2 });
 
-  const filePath = 'file://' + path.resolve(__dirname, 'index.html');
+  const filePath = 'file://' + path.resolve(__dirname, inputFile);
   await page.goto(filePath, { waitUntil: 'networkidle0' });
   await page.evaluate(() => document.fonts.ready);
   await new Promise(r => setTimeout(r, 2000));
@@ -29,7 +31,7 @@ const path = require('path');
     document.head.appendChild(style);
   });
 
-  const totalSlides = 8;
+  const totalSlides = await page.evaluate(() => document.querySelectorAll('.slide').length);
   const screenshots = [];
 
   for (let i = 0; i < totalSlides; i++) {
@@ -82,12 +84,22 @@ const path = require('path');
         el.classList.add('animate');
       });
 
-      document.querySelector('.nav-fixed').style.display = 'none';
-      document.querySelector('.nav-dots').style.display = 'none';
-      document.querySelector('.nav-arrows').style.display = 'none';
-      document.querySelector('.progress-bar').style.display = 'none';
-      document.getElementById('cursorDot').style.display = 'none';
-      document.getElementById('cursorRing').style.display = 'none';
+      const hideIfPresent = (selector) => {
+        const el = document.querySelector(selector);
+        if (el) el.style.display = 'none';
+      };
+
+      const hideByIdIfPresent = (id) => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      };
+
+      hideIfPresent('.nav-fixed');
+      hideIfPresent('.nav-dots');
+      hideIfPresent('.nav-arrows');
+      hideIfPresent('.progress-bar');
+      hideByIdIfPresent('cursorDot');
+      hideByIdIfPresent('cursorRing');
     }, i);
 
     await new Promise(r => setTimeout(r, 500));
@@ -139,7 +151,7 @@ const path = require('path');
   await new Promise(r => setTimeout(r, 1500));
 
   await pdfPage.pdf({
-    path: path.resolve(__dirname, 'sixty-two-pitch-deck.pdf'),
+    path: path.resolve(__dirname, outputFile),
     width: `${pageWIn}in`,
     height: `${pageHIn}in`,
     printBackground: true,
@@ -147,6 +159,6 @@ const path = require('path');
     preferCSSPageSize: true,
   });
 
-  console.log('PDF generated: sixty-two-pitch-deck.pdf');
+  console.log(`PDF generated: ${outputFile}`);
   await browser.close();
 })();
