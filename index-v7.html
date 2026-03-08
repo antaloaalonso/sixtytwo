@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sixtytwo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500&family=Hanken+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --bg:#0a0a0a;
+  --card:#111;
+  --text:#e8e8e8;
+  --text-2:#999;
+  --text-3:#555;
+  --blue:#94b8d0;
+  --red:#d46a6a;
+  --green:#7ec4a8;
+  --rule:#1e1e1e;
+  --font:'Hanken Grotesk',sans-serif;
+  --mono:'Geist Mono',monospace;
+  --title:clamp(2.2rem,5vw,4rem);
+  --h2:clamp(1.5rem,3.5vw,2.6rem);
+  --h3:clamp(0.85rem,1.3vw,1.05rem);
+  --body:clamp(0.75rem,1.1vw,0.92rem);
+  --sm:clamp(0.62rem,0.9vw,0.78rem);
+  --xs:clamp(0.52rem,0.75vw,0.65rem);
+  --pad:clamp(2rem,4.5vw,4.5rem);
+  --ease:cubic-bezier(0.16,1,0.3,1);
+}
+
+html,body{height:100%;overflow-x:hidden}
+html{scroll-snap-type:y mandatory;scroll-behavior:smooth;font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font);font-weight:400;font-size:var(--body);line-height:1.6;color:var(--text);background:var(--bg)}
+
+.slide{width:100vw;height:100vh;height:100dvh;overflow:hidden;scroll-snap-align:start;display:flex;flex-direction:column;position:relative}
+.sc{flex:1;display:flex;flex-direction:column;justify-content:center;max-height:100%;overflow:hidden;padding:var(--pad)}
+
+/* progress */
+#prog{position:fixed;top:0;left:0;height:1px;background:var(--blue);z-index:1000;transition:width .3s ease;width:0}
+
+/* nav dots */
+#dots{position:fixed;right:clamp(.6rem,1.2vw,1rem);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:5px;z-index:1000}
+.dot{width:4px;height:4px;border-radius:50%;background:var(--text-3);border:none;padding:0;cursor:pointer;transition:all .3s ease;opacity:.5}
+.dot.on{opacity:1;background:var(--text)}
+
+/* animations */
+.r{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.slide.visible .r{opacity:1;transform:translateY(0)}
+.slide.visible .r:nth-child(1){transition-delay:.05s}
+.slide.visible .r:nth-child(2){transition-delay:.12s}
+.slide.visible .r:nth-child(3){transition-delay:.2s}
+.slide.visible .r:nth-child(4){transition-delay:.28s}
+.slide.visible .r:nth-child(5){transition-delay:.36s}
+.slide.visible .r:nth-child(6){transition-delay:.44s}
+.slide.visible .r:nth-child(7){transition-delay:.52s}
+.d1{transition-delay:.12s!important}.d2{transition-delay:.2s!important}.d3{transition-delay:.28s!important}.d4{transition-delay:.36s!important}.d5{transition-delay:.44s!important}
+
+/* typography */
+.label{font-family:var(--mono);font-size:var(--xs);font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--text-3);margin-bottom:clamp(.6rem,1.2vh,1rem)}
+h2{font-family:var(--font);font-size:var(--h2);font-weight:300;line-height:1.2;letter-spacing:-.02em;color:var(--text)}
+h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;color:var(--text)}
+.sub{font-size:var(--body);line-height:1.65;color:var(--text-2);font-weight:300;max-width:48ch}
+.rule{width:100%;height:1px;background:var(--rule)}
+
+/* layouts */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:clamp(2rem,4vw,4.5rem);align-items:center;height:100%}
+
+/* ═══ TITLE ═══ */
+.title-c{display:flex;flex-direction:column;align-items:center;text-align:center;height:100%;justify-content:center}
+.title-name{font-family:var(--font);font-size:clamp(3rem,7vw,5.5rem);font-weight:700;letter-spacing:-.05em;color:var(--text);line-height:1}
+.title-sub{font-family:var(--font);font-size:clamp(.9rem,1.4vw,1.15rem);font-weight:300;color:var(--text-2);margin-top:clamp(.5rem,1vh,.8rem)}
+.title-team{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);letter-spacing:.08em;margin-top:clamp(2rem,4vh,3.5rem)}
+
+/* ═══ THESIS ═══ */
+.thesis-c{display:flex;flex-direction:column;align-items:center;text-align:center;height:100%;justify-content:center}
+.thesis-q{font-family:var(--font);font-size:clamp(1.6rem,3.5vw,2.8rem);font-weight:300;line-height:1.3;color:var(--text);max-width:20ch;margin-bottom:clamp(1.2rem,2.5vh,2rem);letter-spacing:-.01em}
+.thesis-body{font-size:var(--body);color:var(--text-2);font-weight:300;max-width:46ch;line-height:1.7}
+
+/* ═══ PROBLEM ═══ */
+.stat-row{display:flex;flex-direction:column;gap:clamp(.6rem,1.2vh,1rem);margin-top:clamp(.8rem,1.5vh,1.2rem)}
+.stat{display:flex;align-items:baseline;gap:clamp(.5rem,1vw,.8rem)}
+.stat-n{font-family:var(--font);font-size:clamp(1.6rem,3vw,2.4rem);font-weight:300;color:var(--red);line-height:1;white-space:nowrap}
+.stat-l{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);line-height:1.5}
+.src{font-family:var(--mono);font-size:clamp(.45rem,.65vw,.55rem);color:var(--text-3);opacity:.6;margin-top:clamp(.3rem,.5vh,.4rem)}
+
+/* log panel */
+.log{padding:clamp(.8rem,1.5vw,1.4rem);background:var(--card);border:1px solid var(--rule);border-radius:4px;font-family:var(--mono);font-size:clamp(.5rem,.72vw,.62rem);line-height:1.9;color:var(--text-3)}
+.log .e{color:var(--red)}.log .w{color:#c9a85a}.log .t{opacity:.3;margin-right:.4em}
+
+/* ═══ TIMELINE ═══ */
+.tl-section{display:flex;flex-direction:column;gap:clamp(1rem,2vh,1.6rem);margin-top:clamp(.6rem,1.2vh,1rem)}
+.tl-label{font-family:var(--mono);font-size:var(--xs);letter-spacing:.1em;text-transform:uppercase;margin-bottom:clamp(.2rem,.4vh,.3rem)}
+.tl-label.bad{color:var(--text-3)}.tl-label.good{color:var(--green)}
+.tl-track{position:relative;width:100%;height:clamp(32px,4.5vh,44px);background:var(--card);border-radius:3px;overflow:hidden;border:1px solid var(--rule)}
+.ts{position:absolute;top:0;height:100%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:clamp(.4rem,.6vw,.5rem);letter-spacing:.03em;color:rgba(232,232,232,.5)}
+.ts-t{background:rgba(126,196,168,.1);border-right:1px solid rgba(126,196,168,.12)}
+.ts-f{background:rgba(212,106,106,.18);border-left:2px solid var(--red);border-right:2px solid var(--red)}
+.ts-d{background:repeating-linear-gradient(-45deg,rgba(212,106,106,.03),rgba(212,106,106,.03) 3px,rgba(212,106,106,.07) 3px,rgba(212,106,106,.07) 6px)}
+.ts-db{background:rgba(180,160,100,.06);border-left:1px dashed rgba(180,160,100,.15)}
+.ts-r{background:rgba(148,184,208,.05);border-left:1px dashed rgba(148,184,208,.12)}
+.ts-ck{background:rgba(126,196,168,.18);border-left:2px solid var(--green)}
+.ts-au{background:rgba(148,184,208,.08);border-left:2px solid var(--blue)}
+.ts-re{background:rgba(126,196,168,.08);border-left:1px solid rgba(126,196,168,.1)}
+.ts-ok{background:rgba(126,196,168,.18);color:var(--green)}
+.tl-badge{position:absolute;top:clamp(-14px,-1.8vh,-16px);font-family:var(--mono);font-size:clamp(.38rem,.55vw,.47rem);padding:1px 4px;border-radius:2px;white-space:nowrap}
+.tl-badge.red{color:var(--red);opacity:.7}.tl-badge.grn{color:var(--green);opacity:.7}
+.tl-days{display:flex;justify-content:space-between;font-family:var(--mono);font-size:clamp(.38rem,.55vw,.45rem);color:var(--text-3);opacity:.4;padding-top:clamp(.15rem,.3vh,.25rem)}
+.tl-note{display:flex;align-items:center;gap:clamp(.35rem,.7vw,.6rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3);margin-top:clamp(.1rem,.2vh,.15rem)}
+.tl-line{width:2px;height:clamp(14px,2vh,20px);flex-shrink:0}
+.tl-line.red{background:var(--red)}.tl-line.grn{background:var(--green)}
+.tl-note .hr{color:var(--red)}.tl-note .hg{color:var(--green)}
+.eff{display:inline-flex;align-items:center;gap:clamp(.3rem,.6vw,.5rem);padding:clamp(.25rem,.5vh,.4rem) clamp(.5rem,1vw,.8rem);border:1px solid rgba(126,196,168,.15);border-radius:3px;font-family:var(--mono);font-size:var(--xs);color:var(--green);align-self:flex-end;margin-top:clamp(.4rem,.8vh,.6rem)}
+.eff .big{font-family:var(--font);font-size:clamp(1rem,1.6vw,1.3rem);font-weight:500}
+
+/* ═══ SOLUTION ═══ */
+.steps{display:flex;flex-direction:column}
+.step{display:grid;grid-template-columns:clamp(28px,3.5vw,36px) 1fr;gap:clamp(.5rem,1vw,.8rem);padding:clamp(.5rem,.8vh,.7rem) 0;position:relative}
+.step-con{position:absolute;left:clamp(13px,1.7vw,17px);top:clamp(32px,4vh,40px);width:1px;bottom:0;background:var(--rule)}
+.step:last-child .step-con{display:none}
+.step-n{width:clamp(28px,3.5vw,36px);height:clamp(28px,3.5vw,36px);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:var(--xs);font-weight:400;flex-shrink:0;position:relative;z-index:1;border:1px solid var(--rule);color:var(--text-3)}
+.step-n.s1{border-color:rgba(212,106,106,.2);color:var(--red)}
+.step-n.s2{border-color:rgba(201,168,90,.18);color:#c9a85a}
+.step-n.s3{border-color:rgba(148,184,208,.18);color:var(--blue)}
+.step-n.s4{border-color:rgba(126,196,168,.18);color:var(--green)}
+.step h3{margin-bottom:clamp(.05rem,.1vh,.1rem)}.step p{font-size:var(--sm);color:var(--text-3);line-height:1.5;font-weight:300}
+
+/* ═══ PRODUCT ═══ */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:clamp(.6rem,1.2vw,1rem);flex:1;margin-top:clamp(.8rem,1.5vh,1.2rem);max-height:clamp(280px,52vh,460px)}
+.pc{padding:clamp(.8rem,1.5vw,1.3rem);border-radius:4px;background:var(--card);border:1px solid var(--rule);display:flex;flex-direction:column;overflow:hidden}
+.pc h3{margin-bottom:clamp(.15rem,.3vh,.25rem)}
+.pc p{font-size:var(--sm);color:var(--text-3);line-height:1.5;font-weight:300}
+.pc .tags{margin-top:auto;padding-top:clamp(.35rem,.6vh,.5rem);display:flex;flex-wrap:wrap;gap:clamp(.15rem,.3vw,.25rem)}
+.tag{font-family:var(--mono);font-size:clamp(.4rem,.55vw,.48rem);padding:clamp(.08rem,.15vh,.12rem) clamp(.25rem,.4vw,.35rem);border-radius:2px;background:rgba(255,255,255,.03);color:var(--text-3);border:1px solid var(--rule)}
+.pc-bar{width:100%;height:1px;margin-bottom:clamp(.6rem,1vh,.8rem)}
+.pc:nth-child(1) .pc-bar{background:var(--blue)}
+.pc:nth-child(2) .pc-bar{background:var(--green)}
+.pc:nth-child(3) .pc-bar{background:#c9a85a}
+.pc:nth-child(4) .pc-bar{background:var(--text-3)}
+
+/* ═══ WHY NOW ═══ */
+.wc{display:flex;flex-direction:column;gap:clamp(.5rem,1vh,.75rem)}
+.wcard{padding:clamp(.6rem,1.2vh,.9rem) clamp(.8rem,1.5vw,1.1rem);border-radius:3px;border:1px solid var(--rule);display:flex;gap:clamp(.6rem,1.2vw,1rem);align-items:flex-start}
+.wnum{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);opacity:.5;flex-shrink:0;width:clamp(16px,2vw,22px);padding-top:2px}
+.wcard h3{margin-bottom:clamp(.05rem,.1vh,.1rem)}.wcard p{font-size:var(--sm);color:var(--text-3);line-height:1.5;font-weight:300}
+
+/* ═══ MARKET ═══ */
+.mstats{display:flex;flex-direction:column;gap:clamp(1rem,2vh,1.6rem);margin-top:clamp(.6rem,1.2vh,1rem)}
+.mv{font-family:var(--font);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;color:var(--text);line-height:1;margin-bottom:clamp(.1rem,.2vh,.15rem)}
+.md{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);line-height:1.45}
+.mbars{display:flex;flex-direction:column;gap:clamp(.7rem,1.4vh,1rem)}
+.mb-l{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);display:flex;justify-content:space-between;margin-bottom:clamp(.15rem,.3vh,.2rem)}
+.mb-t{width:100%;height:clamp(16px,2.5vh,22px);background:var(--card);border-radius:2px;overflow:hidden;border:1px solid var(--rule)}
+.mb-f{height:100%;border-radius:1px;width:0;transition:width 1.2s var(--ease)}
+.slide.visible .mb-f{width:var(--fill)}
+.mb-f.a{background:linear-gradient(90deg,rgba(148,184,208,.2),rgba(148,184,208,.08));border-right:1px solid var(--blue)}
+.mb-f.b{background:linear-gradient(90deg,rgba(126,196,168,.18),rgba(126,196,168,.06));border-right:1px solid var(--green)}
+.mb-f.c{background:linear-gradient(90deg,rgba(200,200,200,.12),rgba(200,200,200,.04));border-right:1px solid var(--text-3)}
+
+/* ═══ BUSINESS ═══ */
+.btier{padding:clamp(.7rem,1.3vh,1rem) clamp(.8rem,1.5vw,1.2rem);border-radius:3px;border:1px solid var(--rule);background:var(--card);margin-top:clamp(.6rem,1.2vh,.8rem)}
+.bt-l{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:clamp(.1rem,.2vh,.15rem)}
+.bt-v{font-family:var(--font);font-size:clamp(1.2rem,2vw,1.6rem);font-weight:400;color:var(--text)}
+.bt-v .u{font-family:var(--mono);font-size:var(--sm);color:var(--text-3)}
+.brows{display:flex;flex-direction:column;gap:clamp(.4rem,.8vh,.6rem)}
+.brow{display:flex;align-items:center;gap:clamp(.6rem,1.2vw,1rem);padding:clamp(.4rem,.8vh,.6rem) clamp(.6rem,1.2vw,.9rem);background:var(--card);border-radius:3px;border:1px solid var(--rule)}
+.bg{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);width:clamp(60px,7vw,80px);flex-shrink:0}
+.ba{color:var(--text-3);opacity:.2;font-size:var(--sm)}
+.br{font-family:var(--font);font-size:clamp(.9rem,1.4vw,1.15rem);color:var(--green);font-weight:400}
+.barr{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);margin-left:auto}
+
+/* ═══ COMPETITION ═══ */
+.ctbl{width:100%;border-collapse:collapse;margin-top:clamp(.6rem,1.2vh,1rem)}
+.ctbl th{font-family:var(--mono);font-size:var(--xs);font-weight:400;color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:clamp(.25rem,.5vh,.4rem) clamp(.4rem,.8vw,.6rem);border-bottom:1px solid var(--rule)}
+.ctbl td{font-size:var(--sm);color:var(--text-2);padding:clamp(.3rem,.6vh,.5rem) clamp(.4rem,.8vw,.6rem);border-bottom:1px solid var(--rule);font-weight:300;vertical-align:top}
+.ctbl tr:last-child td{border-bottom:none}
+.ctbl .us td{color:var(--text);font-weight:400}.ctbl .us td:first-child{color:var(--blue)}
+.ck{color:var(--green)}.cx{color:var(--red);opacity:.4}
+
+/* ═══ TEAM ═══ */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(.6rem,1.2vw,1rem);margin-top:clamp(1rem,2vh,1.5rem)}
+.tc{padding:clamp(.8rem,1.5vw,1.2rem);border-radius:4px;border:1px solid var(--rule);background:var(--card);display:flex;flex-direction:column}
+.tc-name{font-family:var(--font);font-size:var(--h3);font-weight:500;color:var(--text);margin-bottom:clamp(.02rem,.05vh,.05rem)}
+.tc-role{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);letter-spacing:.06em;text-transform:uppercase;margin-bottom:clamp(.35rem,.6vh,.5rem)}
+.tc-creds{display:flex;flex-direction:column;gap:clamp(.1rem,.2vh,.15rem)}
+.tc-cred{font-size:var(--sm);color:var(--text-2);font-weight:300;line-height:1.4;padding-left:clamp(.4rem,.6vw,.5rem);position:relative}
+.tc-cred::before{content:'';position:absolute;left:0;top:.5em;width:2px;height:2px;border-radius:50%;background:var(--text-3)}
+.tf{margin-top:clamp(.8rem,1.5vh,1.2rem);display:flex;justify-content:center;gap:clamp(1.2rem,2.5vw,2rem)}
+.tb{display:flex;align-items:center;gap:clamp(.25rem,.4vw,.3rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3)}
+.tb-d{width:3px;height:3px;border-radius:50%;background:var(--text-3);opacity:.4}
+
+/* ═══ CLOSING ═══ */
+.close-c{display:flex;flex-direction:column;align-items:center;text-align:center;height:100%;justify-content:center}
+.close-name{font-family:var(--font);font-size:clamp(2rem,4.5vw,3.5rem);font-weight:700;letter-spacing:-.05em;color:var(--text);margin-bottom:clamp(.3rem,.6vh,.5rem)}
+.close-tag{font-family:var(--font);font-size:clamp(.85rem,1.3vw,1.05rem);font-weight:300;color:var(--text-2);margin-bottom:clamp(1.5rem,3vh,2.5rem)}
+.close-contact{display:flex;gap:clamp(1rem,2.5vw,2rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-height:700px){:root{--pad:clamp(.75rem,3vw,2rem);--title:clamp(1.5rem,4.5vw,2.8rem);--h2:clamp(1.2rem,3vw,1.8rem)}}
+@media(max-height:600px){:root{--pad:clamp(.5rem,2.5vw,1.5rem);--title:clamp(1.2rem,4vw,2rem);--body:clamp(.65rem,1vw,.85rem)}#dots{display:none}}
+@media(max-height:500px){:root{--pad:clamp(.4rem,2vw,1rem);--title:clamp(1rem,3.5vw,1.5rem);--h2:clamp(.85rem,2.5vw,1.2rem);--body:clamp(.58rem,.9vw,.75rem)}}
+@media(max-width:600px){:root{--title:clamp(1.5rem,8vw,2.5rem)}.two{grid-template-columns:1fr}.pgrid,.tgrid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.2s!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div id="prog"></div>
+<nav id="dots" aria-label="Slide navigation"></nav>
+
+<!-- ═══ 0: TITLE ═══ -->
+<section class="slide" aria-label="Title">
+<div class="sc">
+<div class="title-c">
+<div class="title-name r">sixtytwo</div>
+<div class="title-sub r">Reliability infrastructure for AI pretraining</div>
+<div class="title-team r">Antonio Alonso-Stepanov · Jessie Dong · Sonnet Xu</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 1: THESIS ═══ -->
+<section class="slide" aria-label="Thesis">
+<div class="sc">
+<div class="thesis-c">
+<div class="label r">Our thesis</div>
+<p class="thesis-q r">A growing number of companies are pretraining their own models.</p>
+<p class="thesis-body r">Data control and GPU economics are pushing companies on-prem. But going on-prem means taking on everything a cloud provider does invisibly — with none of their tooling.</p>
+</div>
+</div>
+</section>
+
+<!-- ═══ 2: PROBLEM ═══ -->
+<section class="slide" aria-label="Problem">
+<div class="sc">
+<div class="two">
+<div>
+<div class="label r">The problem</div>
+<h2 class="r">Pretraining runs<br>are fragile</h2>
+<p class="sub r" style="margin-top:clamp(.4rem,.8vh,.6rem)">A single node failure days into a multi-week run can mean lost compute, manual debugging, and restarted training from stale checkpoints.</p>
+<div class="stat-row">
+<div class="stat r d1"><div class="stat-n">419</div><div class="stat-l">failures in 54 days on Meta's<br>16,384-GPU Llama 3 cluster</div></div>
+<div class="stat r d2"><div class="stat-n">1 / 3hrs</div><div class="stat-l">failure frequency at that scale</div></div>
+<div class="stat r d3"><div class="stat-n">~9%</div><div class="stat-l">annualized GPU failure rate</div></div>
+</div>
+<div class="src r d4">Source: Meta HPCA 2025, arXiv 2410.21680</div>
+</div>
+<div class="r d3">
+<div class="log">
+<div><span class="t">03:14:22</span> <span style="opacity:.3">node-047</span> step 48,291 <span style="opacity:.3">loss: 2.847</span></div>
+<div><span class="t">03:14:23</span> <span style="opacity:.3">node-047</span> step 48,292 <span style="opacity:.3">loss: 2.843</span></div>
+<div><span class="t">03:14:24</span> <span class="e">node-012 NCCL TIMEOUT — allreduce hang</span></div>
+<div><span class="t">03:14:24</span> <span class="e">node-012 GPU 3: Xid 79 — fallen off bus</span></div>
+<div><span class="t">03:14:25</span> <span class="w">ALERT training stalled — rank 12 unresponsive</span></div>
+<div><span class="t">03:14:25</span> <span class="e">all ranks NCCL watchdog timeout — aborting</span></div>
+<div><span class="t">03:14:26</span> <span class="e">FATAL run terminated — 72h compute lost</span></div>
+<div style="margin-top:clamp(.25rem,.4vh,.35rem)"><span class="t">07:22:00</span> <span class="w">eng-oncall paged — investigation begins</span></div>
+<div><span class="t">09:41:00</span> <span style="opacity:.3">root cause: GPU HBM3 ECC error</span></div>
+<div><span class="t">11:30:00</span> <span style="opacity:.3">node replaced, run restarted from scratch</span></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 3: PRETRAINING TIMELINE ═══ -->
+<section class="slide" aria-label="Pretraining deep dive">
+<div class="sc">
+<div class="label r">Pretraining deep dive</div>
+<h2 class="r">Anatomy of a failed training run</h2>
+<div class="tl-section">
+<div class="r d1">
+<div class="tl-label bad">Without Sixtytwo — 14-day run</div>
+<div style="position:relative">
+<div class="tl-track">
+<div class="ts ts-t" style="left:0;width:21%">training</div>
+<div class="ts ts-f" style="left:21%;width:3%">!</div>
+<div class="ts ts-d" style="left:24%;width:9%"></div>
+<div class="ts ts-db" style="left:33%;width:10%">debug</div>
+<div class="ts ts-r" style="left:43%;width:4%">restart</div>
+<div class="ts ts-t" style="left:47%;width:22%">re-training</div>
+<div class="ts ts-f" style="left:69%;width:2.5%">!</div>
+<div class="ts ts-d" style="left:71.5%;width:6%"></div>
+<div class="ts ts-db" style="left:77.5%;width:7%">debug</div>
+<div class="ts ts-r" style="left:84.5%;width:3%">restart</div>
+<div class="ts ts-t" style="left:87.5%;width:12.5%">training...</div>
+</div>
+<div class="tl-badge red" style="left:24%">3 days lost</div>
+<div class="tl-badge red" style="left:71.5%">1.5 days lost</div>
+</div>
+<div class="tl-days"><span>Day 0</span><span>Day 3</span><span>Day 7</span><span>Day 10</span><span>Day 14</span></div>
+<div class="tl-note"><div class="tl-line red"></div><span><span class="hr">~30% compute wasted.</span> Run still incomplete at day 14.</span></div>
+</div>
+<div class="r d3">
+<div class="tl-label good">With Sixtytwo — same workload, same hardware</div>
+<div style="position:relative">
+<div class="tl-track" style="border-color:rgba(126,196,168,.1)">
+<div class="ts ts-t" style="left:0;width:21%">training</div>
+<div class="ts ts-ck" style="left:21%;width:2%">✓</div>
+<div class="ts ts-au" style="left:23%;width:3%">auto</div>
+<div class="ts ts-re" style="left:26%;width:30%">resumed from checkpoint</div>
+<div class="ts ts-ck" style="left:56%;width:1.5%">✓</div>
+<div class="ts ts-au" style="left:57.5%;width:2.5%">auto</div>
+<div class="ts ts-re" style="left:60%;width:30%">resumed → complete</div>
+<div class="ts ts-ok" style="left:90%;width:10%">✓ done</div>
+</div>
+<div class="tl-badge grn" style="left:21%">auto-recovered</div>
+<div class="tl-badge grn" style="left:56%">auto-recovered</div>
+</div>
+<div class="tl-days"><span>Day 0</span><span>Day 3</span><span>Day 7</span><span>Day 10</span><span style="color:var(--green)">Day 12 ✓</span></div>
+<div class="tl-note"><div class="tl-line grn"></div><span><span class="hg">&lt;5% overhead.</span> Failures auto-detected, checkpointed, recovered. Finished 2 days early.</span></div>
+</div>
+<div class="eff r d5"><span>Compute utilization:</span><span class="big">95%+</span><span>vs ~65% without</span></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 4: SOLUTION ═══ -->
+<section class="slide" aria-label="Solution">
+<div class="sc">
+<div class="two">
+<div>
+<div class="label r">Our solution</div>
+<h2 class="r">Self-healing<br>training infrastructure</h2>
+<p class="sub r" style="margin-top:clamp(.4rem,.8vh,.6rem)">Sixtytwo monitors every layer of the training stack — hardware, network, framework — and automatically recovers from failures. No pager. No manual restarts.</p>
+</div>
+<div class="steps">
+<div class="step r d1"><div class="step-n s1">01</div><div><h3>Detect</h3><p>Continuous health monitoring across GPU, NIC, NVLink, NCCL. Sub-second anomaly detection.</p></div><div class="step-con"></div></div>
+<div class="step r d2"><div class="step-n s2">02</div><div><h3>Checkpoint</h3><p>Automatically saves training state when issues are detected. No progress lost.</p></div><div class="step-con"></div></div>
+<div class="step r d3"><div class="step-n s3">03</div><div><h3>Replace</h3><p>Quarantines failing node, provisions a healthy spare. Handles topology reconfiguration.</p></div><div class="step-con"></div></div>
+<div class="step r d4"><div class="step-n s4">04</div><div><h3>Resume</h3><p>Restores from checkpoint on new topology. Recovery in minutes, not days.</p></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 5: PRODUCT ═══ -->
+<section class="slide" aria-label="Product">
+<div class="sc">
+<div class="label r">What we build</div>
+<h2 class="r">The on-prem training platform</h2>
+<div class="pgrid">
+<div class="pc r d1"><div class="pc-bar"></div><h3>Observability</h3><p>Unified monitoring across GPU health, training metrics, network fabric, and thermals. Purpose-built for pretraining.</p><div class="tags"><span class="tag">Prometheus</span><span class="tag">DCGM</span><span class="tag">OpenTelemetry</span></div></div>
+<div class="pc r d2"><div class="pc-bar"></div><h3>Fleet Management</h3><p>Inventory tracking, health scoring, automatic quarantine. Know which nodes are reliable and which are degrading.</p><div class="tags"><span class="tag">Node health</span><span class="tag">Spare pool</span><span class="tag">Topology</span></div></div>
+<div class="pc r d3"><div class="pc-bar"></div><h3>Orchestration</h3><p>Intelligent scheduling with automatic checkpointing, failure recovery, and run resumption for distributed training.</p><div class="tags"><span class="tag">PyTorch</span><span class="tag">Kubernetes</span><span class="tag">Slurm</span></div></div>
+<div class="pc r d4"><div class="pc-bar"></div><h3>Container &amp; Image Mgmt</h3><p>Reproducible training environments with version-controlled containers. Fast distribution across hundreds of nodes.</p><div class="tags"><span class="tag">Docker</span><span class="tag">NCCL</span><span class="tag">CUDA</span></div></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 6: WHY NOW ═══ -->
+<section class="slide" aria-label="Why now">
+<div class="sc">
+<div class="two">
+<div>
+<div class="label r">Why now</div>
+<h2 class="r">The shift to on-prem<br>is accelerating</h2>
+<p class="sub r" style="margin-top:clamp(.4rem,.8vh,.6rem)">79% of enterprises have already repatriated some AI workloads from public cloud. The infrastructure to operate those clusters reliably doesn't exist yet.</p>
+<div class="src r">Source: Feb 2026 enterprise IT survey (n=203)</div>
+</div>
+<div class="wc">
+<div class="wcard r d1"><div class="wnum">01</div><div><h3>Data sovereignty</h3><p>73% of enterprises cite data privacy as top AI risk. 120+ countries now have data protection laws, up from 76 in 2011.</p></div></div>
+<div class="wcard r d2"><div class="wnum">02</div><div><h3>Cost at scale</h3><p>On-prem breaks even vs cloud in under 4 months at high utilization. 8–18x cheaper per token for sustained workloads.</p></div></div>
+<div class="wcard r d3"><div class="wnum">03</div><div><h3>Regulation</h3><p>EU AI Act high-risk rules take effect Aug 2026. Emerging US and global policy requires data residency and auditability.</p></div></div>
+<div class="wcard r d4"><div class="wnum">04</div><div><h3>Open-source models</h3><p>Llama, Mistral, DeepSeek mean companies can pretrain on their own data. The workloads are here — the tooling isn't.</p></div></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 7: MARKET ═══ -->
+<section class="slide" aria-label="Market">
+<div class="sc">
+<div class="two">
+<div>
+<div class="label r">Market</div>
+<h2 class="r">A massive, growing<br>opportunity</h2>
+<div class="mstats">
+<div class="r d1"><div class="mv">$758B</div><div class="md">AI infrastructure spending by 2029 (IDC)</div></div>
+<div class="r d2"><div class="mv">75%</div><div class="md">of enterprise AI workloads on hybrid infra by 2028 (IDC)</div></div>
+<div class="r d3"><div class="mv">$700M</div><div class="md">NVIDIA paid for Run:ai — validating GPU orchestration software</div></div>
+</div>
+</div>
+<div class="r d2">
+<div class="mbars">
+<div><div class="mb-l"><span>Enterprises repatriating AI from cloud</span><span style="color:var(--blue)">79%</span></div><div class="mb-t"><div class="mb-f a" style="--fill:79%"></div></div></div>
+<div><div class="mb-l"><span>Enterprise data privacy as top AI risk</span><span style="color:var(--green)">73%</span></div><div class="mb-t"><div class="mb-f b" style="--fill:73%"></div></div></div>
+<div><div class="mb-l"><span>GPU cluster failures causing run restarts</span><span>68%</span></div><div class="mb-t"><div class="mb-f c" style="--fill:68%"></div></div></div>
+</div>
+<div style="margin-top:clamp(.8rem,1.5vh,1.2rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3);line-height:1.6">Samsung building 50,000-GPU on-prem AI factory.<br>Private sector owns 80% of global AI compute (Epoch AI).</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 8: BUSINESS MODEL ═══ -->
+<section class="slide" aria-label="Business model">
+<div class="sc">
+<div class="two">
+<div>
+<div class="label r">Business model</div>
+<h2 class="r">Enterprise SaaS,<br>per GPU</h2>
+<p class="sub r" style="margin-top:clamp(.4rem,.8vh,.6rem)">Software-only. Deployed on customer hardware. 80–90% gross margins.</p>
+<div class="btier r d1"><div class="bt-l">Platform license</div><div class="bt-v">~$100 <span class="u">/GPU/month</span></div></div>
+<div style="margin-top:clamp(.5rem,1vh,.7rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3)" class="r d2">B2B SaaS · AI Infrastructure · 80–90% margins</div>
+</div>
+<div>
+<div class="brows">
+<div style="margin-bottom:clamp(.15rem,.3vh,.25rem)"><span style="font-family:var(--mono);font-size:var(--xs);color:var(--text-3);letter-spacing:.08em;text-transform:uppercase">Revenue projections</span></div>
+<div class="brow r d1"><div class="bg">1,000 GPUs</div><div class="ba">→</div><div class="br">$100K/mo</div><div class="barr">$1.2M ARR</div></div>
+<div class="brow r d2"><div class="bg">10,000 GPUs</div><div class="ba">→</div><div class="br">$1M/mo</div><div class="barr">$12M ARR</div></div>
+<div class="brow r d3"><div class="bg">100,000 GPUs</div><div class="ba">→</div><div class="br">$10M/mo</div><div class="barr">$120M ARR</div></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 9: COMPETITION ═══ -->
+<section class="slide" aria-label="Competition">
+<div class="sc">
+<div class="label r">Competitive landscape</div>
+<h2 class="r">No one owns on-prem training reliability</h2>
+<p class="sub r" style="margin-top:clamp(.2rem,.4vh,.3rem);margin-bottom:clamp(.6rem,1.2vh,.8rem)">Cloud platforms handle this invisibly. On-prem teams piece together scripts that break.</p>
+<table class="ctbl r d1">
+<thead><tr><th></th><th>On-prem</th><th>Training-aware</th><th>Auto-recovery</th><th>Observability</th></tr></thead>
+<tbody>
+<tr><td>AWS SageMaker / HyperPod</td><td><span class="cx">✗</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+<tr><td>Run:ai (NVIDIA)</td><td><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td>Partial</td></tr>
+<tr><td>Slurm + DCGM + scripts</td><td><span class="ck">✓</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td><td><span class="cx">✗</span></td></tr>
+<tr class="us"><td>Sixtytwo</td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td><td><span class="ck">✓</span></td></tr>
+</tbody>
+</table>
+</div>
+</section>
+
+<!-- ═══ 10: TEAM ═══ -->
+<section class="slide" aria-label="Team">
+<div class="sc" style="align-items:center">
+<div class="label r" style="text-align:center">Team</div>
+<h2 class="r" style="text-align:center">Built by engineers who<br>know this stack</h2>
+<div class="tgrid">
+<div class="tc r d1">
+<div class="tc-name">Antonio Alonso-Stepanov</div>
+<div class="tc-role">Co-founder</div>
+<div class="tc-creds">
+<div class="tc-cred">Stanford CS '26</div>
+<div class="tc-cred">SWE Intern, Meta — LLM content integrity</div>
+<div class="tc-cred">Research Asst., NCSU — DNA data storage</div>
+<div class="tc-cred">VP Growth, Stanford BASES</div>
+<div class="tc-cred">TreeHacks 1st Place, OpenAI Prize</div>
+</div>
+</div>
+<div class="tc r d2">
+<div class="tc-name">Jessie Dong</div>
+<div class="tc-role">Co-founder</div>
+<div class="tc-creds">
+<div class="tc-cred">Stanford CS '27</div>
+<div class="tc-cred">Stanford OVAL AI Lab — NLP research</div>
+<div class="tc-cred">Founding Engineer, Sago — LLM pipelines</div>
+<div class="tc-cred">Embedded Systems Intern, Tesla</div>
+<div class="tc-cred">Kleiner Perkins Fellow</div>
+</div>
+</div>
+<div class="tc r d3">
+<div class="tc-name">Sonnet Xu</div>
+<div class="tc-role">Co-founder</div>
+<div class="tc-creds">
+<div class="tc-cred">Stanford CS '27</div>
+<div class="tc-cred">ML Intern, DatologyAI — distributed training</div>
+<div class="tc-cred">Published at NeurIPS, MICCAI</div>
+<div class="tc-cred">SWE Intern, Amazon — LLM guardrails</div>
+<div class="tc-cred">Research Fellow, Hoover Institution</div>
+</div>
+</div>
+</div>
+<div class="tf r d4">
+<div class="tb"><div class="tb-d"></div><span>All technical founders</span></div>
+<div class="tb"><div class="tb-d"></div><span>3 years building together</span></div>
+<div class="tb"><div class="tb-d"></div><span>Full-time committed</span></div>
+</div>
+</div>
+</section>
+
+<!-- ═══ 11: CLOSING ═══ -->
+<section class="slide" aria-label="Closing">
+<div class="sc">
+<div class="close-c">
+<div class="close-name r">sixtytwo</div>
+<div class="close-tag r">The future of AI runs on-prem.</div>
+<div class="close-contact r">
+<span>antaloaalonso@gmail.com</span>
+<span>jessiesagedong@gmail.com</span>
+<span>sonnet@stanford.edu</span>
+</div>
+</div>
+</div>
+</section>
+
+<script>
+class SP{
+constructor(){this.slides=document.querySelectorAll('.slide');this.cur=0;this.total=this.slides.length;this.io();this.keys();this.touch();this.prog();this.dots()}
+io(){const o=new IntersectionObserver(e=>{e.forEach(en=>{if(en.isIntersecting){en.target.classList.add('visible');const i=Array.from(this.slides).indexOf(en.target);if(i!==-1){this.cur=i;this.uprog();this.udots()}}})},{threshold:.5});this.slides.forEach(s=>o.observe(s))}
+keys(){document.addEventListener('keydown',e=>{if(['ArrowDown','ArrowRight',' ','PageDown'].includes(e.key)){e.preventDefault();this.go(this.cur+1)}else if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();this.go(this.cur-1)}})}
+touch(){let y=0;document.addEventListener('touchstart',e=>{y=e.touches[0].clientY});document.addEventListener('touchend',e=>{const d=e.changedTouches[0].clientY-y;if(Math.abs(d)>50){d<0?this.go(this.cur+1):this.go(this.cur-1)}})}
+prog(){this.pb=document.getElementById('prog');this.uprog()}
+uprog(){this.pb.style.width=(this.cur/(this.total-1))*100+'%'}
+dots(){const n=document.getElementById('dots');this.slides.forEach((_,i)=>{const d=document.createElement('button');d.className='dot'+(i===0?' on':'');d.setAttribute('aria-label','Slide '+(i+1));d.addEventListener('click',()=>this.go(i));n.appendChild(d)});this.ds=n.querySelectorAll('.dot')}
+udots(){this.ds.forEach((d,i)=>d.classList.toggle('on',i===this.cur))}
+go(i){if(i<0||i>=this.total)return;this.slides[i].scrollIntoView({behavior:'smooth'})}
+}
+new SP();
+</script>
+</body>
+</html>

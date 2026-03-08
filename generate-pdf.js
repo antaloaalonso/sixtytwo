@@ -33,8 +33,37 @@ const path = require('path');
     document.head.appendChild(style);
   });
 
+  // Detect if this is a scroll-snap deck (v6+) or absolute-positioned (v4/v5)
+  const isScrollDeck = await page.evaluate(() => {
+    const html = document.documentElement;
+    const style = window.getComputedStyle(html);
+    return style.scrollSnapType && style.scrollSnapType !== 'none';
+  });
+
   const totalSlides = await page.evaluate(() => document.querySelectorAll('.slide').length);
   const screenshots = [];
+
+  // For scroll-snap decks, switch to absolute positioning for PDF capture
+  if (isScrollDeck) {
+    await page.evaluate(() => {
+      document.documentElement.style.scrollSnapType = 'none';
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+      document.querySelectorAll('.slide').forEach(s => {
+        s.style.position = 'absolute';
+        s.style.inset = '0';
+        s.style.scrollSnapAlign = 'unset';
+        s.style.height = '100vh';
+        s.style.opacity = '0';
+        s.style.visibility = 'hidden';
+      });
+      // Show first slide
+      const first = document.querySelectorAll('.slide')[0];
+      first.style.opacity = '1';
+      first.style.visibility = 'visible';
+      first.classList.add('visible');
+    });
+  }
 
   for (let i = 0; i < totalSlides; i++) {
     if (i > 0) {
@@ -45,7 +74,7 @@ const path = require('path');
           s.style.visibility = 'hidden';
         });
         const target = document.querySelectorAll('.slide')[idx];
-        target.classList.add('active');
+        target.classList.add('active', 'visible');
         target.style.opacity = '1';
         target.style.visibility = 'visible';
       }, i);
@@ -56,13 +85,30 @@ const path = require('path');
     await page.evaluate((idx) => {
       const slide = document.querySelectorAll('.slide')[idx];
 
+      // Force all .reveal elements visible (scroll-snap decks use this)
+      slide.querySelectorAll('.reveal').forEach(el => {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+        el.style.transitionDelay = '0s';
+        el.style.filter = 'none';
+      });
+
+      // Force animated bar fills to their target width
+      slide.querySelectorAll('.m-bar-fill, .market-bar-fill').forEach(el => {
+        const fill = el.style.getPropertyValue('--fill');
+        if (fill) el.style.width = fill;
+      });
+
+      // Legacy deck elements
       slide.querySelectorAll('[style]').forEach(el => {
         const computed = window.getComputedStyle(el);
         if (parseFloat(computed.opacity) < 0.9 && !el.classList.contains('noise-overlay') &&
             !el.classList.contains('particles-canvas') && !el.classList.contains('geo-line') &&
             !el.closest('.corner-accent') && !el.classList.contains('frontier-glow') &&
             !el.classList.contains('closing-glow') && !el.classList.contains('closing-glow-2') &&
-            !el.classList.contains('mission-watermark') && !el.classList.contains('frontier-grid-accent')) {
+            !el.classList.contains('mission-watermark') && !el.classList.contains('frontier-grid-accent') &&
+            !el.classList.contains('title-glow') && !el.classList.contains('glow-cyan') &&
+            !el.classList.contains('glow-signal')) {
           el.style.opacity = '1';
           el.style.transform = 'none';
         }
@@ -102,6 +148,9 @@ const path = require('path');
       hideIfPresent('.progress-bar');
       hideByIdIfPresent('cursorDot');
       hideByIdIfPresent('cursorRing');
+      hideByIdIfPresent('progressBar');
+      hideByIdIfPresent('navDots');
+      hideByIdIfPresent('slideCounter');
     }, i);
 
     await new Promise(r => setTimeout(r, 500));
