@@ -11,24 +11,24 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
 :root{
-  --bg:#0a0a0a;
-  --card:#131313;
-  --text:#f0f0f0;
-  --text-2:#b0b0b0;
-  --text-3:#707070;
-  --blue:#a8ccdf;
-  --red:#e07070;
-  --green:#85cdb0;
-  --rule:#222;
+  --bg:#09090b;
+  --card:#141416;
+  --text:#fff;
+  --text-2:#ccc;
+  --text-3:#888;
+  --blue:#b4d4e8;
+  --red:#ef8080;
+  --green:#8fd8b8;
+  --rule:#252525;
   --font:'Hanken Grotesk',sans-serif;
   --mono:'Geist Mono',monospace;
-  --title:clamp(2.4rem,5.5vw,4.4rem);
-  --h2:clamp(1.7rem,4vw,2.8rem);
-  --h3:clamp(0.95rem,1.5vw,1.15rem);
-  --body:clamp(0.82rem,1.25vw,1.02rem);
-  --sm:clamp(0.7rem,1vw,0.85rem);
-  --xs:clamp(0.58rem,0.85vw,0.72rem);
-  --pad:clamp(2rem,4.5vw,4.5rem);
+  --title:clamp(2.8rem,6.5vw,5rem);
+  --h2:clamp(2rem,4.5vw,3.2rem);
+  --h3:clamp(1.05rem,1.6vw,1.3rem);
+  --body:clamp(0.95rem,1.4vw,1.12rem);
+  --sm:clamp(0.82rem,1.15vw,0.95rem);
+  --xs:clamp(0.68rem,0.95vw,0.82rem);
+  --pad:clamp(2.5rem,5vw,5rem);
   --ease:cubic-bezier(0.16,1,0.3,1);
 }
 
@@ -124,13 +124,13 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 .step-n.s2{border-color:rgba(201,168,90,.18);color:#c9a85a}
 .step-n.s3{border-color:rgba(148,184,208,.18);color:var(--blue)}
 .step-n.s4{border-color:rgba(126,196,168,.18);color:var(--green)}
-.step h3{margin-bottom:clamp(.05rem,.1vh,.1rem)}.step p{font-size:var(--sm);color:var(--text-3);line-height:1.5;font-weight:300}
+.step h3{margin-bottom:clamp(.05rem,.1vh,.1rem)}.step p{font-size:var(--sm);color:var(--text-2);line-height:1.5;font-weight:300}
 
 /* ═══ PRODUCT ═══ */
 .pgrid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:clamp(.6rem,1.2vw,1rem);flex:1;margin-top:clamp(.8rem,1.5vh,1.2rem);max-height:clamp(280px,52vh,460px)}
 .pc{padding:clamp(.8rem,1.5vw,1.3rem);border-radius:4px;background:var(--card);border:1px solid var(--rule);display:flex;flex-direction:column;overflow:hidden}
 .pc h3{margin-bottom:clamp(.15rem,.3vh,.25rem)}
-.pc p{font-size:var(--sm);color:var(--text-3);line-height:1.5;font-weight:300}
+.pc p{font-size:var(--sm);color:var(--text-2);line-height:1.5;font-weight:300}
 .pc .tags{margin-top:auto;padding-top:clamp(.35rem,.6vh,.5rem);display:flex;flex-wrap:wrap;gap:clamp(.15rem,.3vw,.25rem)}
 .tag{font-family:var(--mono);font-size:clamp(.4rem,.55vw,.48rem);padding:clamp(.08rem,.15vh,.12rem) clamp(.25rem,.4vw,.35rem);border-radius:2px;background:rgba(255,255,255,.03);color:var(--text-3);border:1px solid var(--rule)}
 .pc-bar{width:100%;height:1px;margin-bottom:clamp(.6rem,1vh,.8rem)}
@@ -143,12 +143,12 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 .wc{display:flex;flex-direction:column;gap:clamp(.5rem,1vh,.75rem)}
 .wcard{padding:clamp(.6rem,1.2vh,.9rem) clamp(.8rem,1.5vw,1.1rem);border-radius:3px;border:1px solid var(--rule);display:flex;gap:clamp(.6rem,1.2vw,1rem);align-items:flex-start}
 .wnum{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);opacity:.5;flex-shrink:0;width:clamp(16px,2vw,22px);padding-top:2px}
-.wcard h3{margin-bottom:clamp(.05rem,.1vh,.1rem)}.wcard p{font-size:var(--sm);color:var(--text-3);line-height:1.5;font-weight:300}
+.wcard h3{margin-bottom:clamp(.05rem,.1vh,.1rem)}.wcard p{font-size:var(--sm);color:var(--text-2);line-height:1.5;font-weight:300}
 
 /* ═══ MARKET ═══ */
 .mstats{display:flex;flex-direction:column;gap:clamp(1rem,2vh,1.6rem);margin-top:clamp(.6rem,1.2vh,1rem)}
-.mv{font-family:var(--font);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:300;color:var(--text);line-height:1;margin-bottom:clamp(.1rem,.2vh,.15rem)}
-.md{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);line-height:1.45}
+.mv{font-family:var(--font);font-size:clamp(2.2rem,4.5vw,3.4rem);font-weight:300;color:var(--text);line-height:1;margin-bottom:clamp(.15rem,.3vh,.2rem)}
+.md{font-family:var(--mono);font-size:var(--sm);color:var(--text-2);line-height:1.45}
 .mbars{display:flex;flex-direction:column;gap:clamp(.7rem,1.4vh,1rem)}
 .mb-l{font-family:var(--mono);font-size:var(--xs);color:var(--text-3);display:flex;justify-content:space-between;margin-bottom:clamp(.15rem,.3vh,.2rem)}
 .mb-t{width:100%;height:clamp(16px,2.5vh,22px);background:var(--card);border-radius:2px;overflow:hidden;border:1px solid var(--rule)}
@@ -244,7 +244,6 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 <div class="stat r d2"><div class="stat-n">1 / 3hrs</div><div class="stat-l">failure frequency at that scale</div></div>
 <div class="stat r d3"><div class="stat-n">~9%</div><div class="stat-l">annualized GPU failure rate</div></div>
 </div>
-<div class="src r d4">Source: Meta HPCA 2025, arXiv 2410.21680</div>
 </div>
 <div class="r d3">
 <div class="log">
@@ -357,7 +356,6 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 <div class="label r">Why now</div>
 <h2 class="r">The shift to on-prem<br>is accelerating</h2>
 <p class="sub r" style="margin-top:clamp(.4rem,.8vh,.6rem)">79% of enterprises have already repatriated some AI workloads from public cloud. The infrastructure to operate those clusters reliably doesn't exist yet.</p>
-<div class="src r">Source: Feb 2026 enterprise IT survey (n=203)</div>
 </div>
 <div class="wc">
 <div class="wcard r d1"><div class="wnum">01</div><div><h3>Data sovereignty</h3><p>73% of enterprises cite data privacy as top AI risk. 120+ countries now have data protection laws, up from 76 in 2011.</p></div></div>
@@ -388,7 +386,6 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 <div><div class="mb-l"><span>Enterprise data privacy as top AI risk</span><span style="color:var(--green)">73%</span></div><div class="mb-t"><div class="mb-f b" style="--fill:73%"></div></div></div>
 <div><div class="mb-l"><span>GPU cluster failures causing run restarts</span><span>68%</span></div><div class="mb-t"><div class="mb-f c" style="--fill:68%"></div></div></div>
 </div>
-<div style="margin-top:clamp(.8rem,1.5vh,1.2rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3);line-height:1.6">Samsung building 50,000-GPU on-prem AI factory.<br>Private sector owns 80% of global AI compute (Epoch AI).</div>
 </div>
 </div>
 </div>
@@ -403,11 +400,9 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 <h2 class="r">Enterprise SaaS,<br>per GPU</h2>
 <p class="sub r" style="margin-top:clamp(.4rem,.8vh,.6rem)">Software-only. Deployed on customer hardware. 80–90% gross margins.</p>
 <div class="btier r d1"><div class="bt-l">Platform license</div><div class="bt-v">~$100 <span class="u">/GPU/month</span></div></div>
-<div style="margin-top:clamp(.5rem,1vh,.7rem);font-family:var(--mono);font-size:var(--xs);color:var(--text-3)" class="r d2">B2B SaaS · AI Infrastructure · 80–90% margins</div>
 </div>
 <div>
 <div class="brows">
-<div style="margin-bottom:clamp(.15rem,.3vh,.25rem)"><span style="font-family:var(--mono);font-size:var(--xs);color:var(--text-3);letter-spacing:.08em;text-transform:uppercase">Revenue projections</span></div>
 <div class="brow r d1"><div class="bg">1,000 GPUs</div><div class="ba">→</div><div class="br">$100K/mo</div><div class="barr">$1.2M ARR</div></div>
 <div class="brow r d2"><div class="bg">10,000 GPUs</div><div class="ba">→</div><div class="br">$1M/mo</div><div class="barr">$12M ARR</div></div>
 <div class="brow r d3"><div class="bg">100,000 GPUs</div><div class="ba">→</div><div class="br">$10M/mo</div><div class="barr">$120M ARR</div></div>
