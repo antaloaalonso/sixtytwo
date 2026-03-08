@@ -1,0 +1,1979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sixtytwo — Pitch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,300;1,6..72,400&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --night: #07131a;
+  --night-2: #0c1a24;
+  --night-3: #122737;
+  --cream: #f5f0e6;
+  --mist: #c8d4dc;
+  --fog: #6e8899;
+  --ink: #11171c;
+  --cyan: #7be0ff;
+  --signal: #63f0c9;
+  --orange: #ff8e46;
+  --rose: #ff6a6a;
+  --amber: #ffc857;
+  --line-dark: rgba(74, 108, 127, 0.25);
+  --slide-transition: 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--night);
+  color: var(--cream);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* ── PRESENTATION SHELL ── */
+.presentation {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--slide-transition), transform var(--slide-transition);
+  transform: translateY(12px);
+  will-change: opacity, transform;
+}
+
+.slide.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  z-index: 2;
+}
+
+.slide-frame {
+  position: relative;
+  width: calc(100vw - 2rem);
+  height: calc(100vh - 2rem);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slide-frame[data-theme="dark"] {
+  background: var(--night-2);
+  border: 1px solid var(--line-dark);
+}
+
+.slide-frame[data-theme="light"] {
+  background: var(--cream);
+  color: var(--ink);
+  border: 1px solid rgba(200, 190, 170, 0.4);
+}
+
+.slide-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 3.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 2;
+}
+
+/* ── PROGRESS BAR ── */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--signal));
+  z-index: 100;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ── SLIDE COUNTER ── */
+.slide-counter {
+  position: fixed;
+  bottom: 1.75rem;
+  right: 2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--fog);
+  letter-spacing: 0.08em;
+  z-index: 100;
+  opacity: 0.7;
+}
+
+/* ── NAV DOTS ── */
+.nav-dots {
+  position: fixed;
+  right: 1.2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 100;
+}
+
+.nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fog);
+  opacity: 0.3;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+  padding: 0;
+}
+
+.nav-dot.active {
+  opacity: 1;
+  background: var(--cyan);
+  box-shadow: 0 0 8px rgba(123, 224, 255, 0.4);
+}
+
+.nav-dot:hover { opacity: 0.7; }
+
+/* ── TYPOGRAPHY ── */
+.serif { font-family: 'Newsreader', serif; }
+.mono { font-family: 'IBM Plex Mono', monospace; }
+
+.overline {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-bottom: 1.25rem;
+}
+
+.overline-cyan { color: var(--cyan); opacity: 0.8; }
+
+h1 {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(2.4rem, 4.2vw, 3.6rem);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  font-weight: 400;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+}
+
+h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1rem, 1.4vw, 1.2rem);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.body-text {
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  line-height: 1.65;
+  color: var(--mist);
+  font-weight: 300;
+  max-width: 52ch;
+}
+
+.body-text-dark {
+  color: var(--fog);
+}
+
+/* ── GRAIN OVERLAY ── */
+.grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px;
+}
+
+/* ── GRID BG ── */
+.grid-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.grid-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line-dark) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line-dark) 1px, transparent 1px);
+  background-size: 60px 60px;
+  opacity: 0.3;
+}
+
+.grid-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, transparent 0%, var(--night-2) 100%);
+}
+
+/* ── GLOW EFFECTS ── */
+.glow-cyan {
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(123, 224, 255, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.glow-signal {
+  position: absolute;
+  width: 350px;
+  height: 350px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 240, 201, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── ANIMATION CLASSES ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.slide.active .reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.d1 { transition-delay: 0.1s; }
+.d2 { transition-delay: 0.2s; }
+.d3 { transition-delay: 0.3s; }
+.d4 { transition-delay: 0.4s; }
+.d5 { transition-delay: 0.5s; }
+.d6 { transition-delay: 0.6s; }
+.d7 { transition-delay: 0.7s; }
+.d8 { transition-delay: 0.8s; }
+.d9 { transition-delay: 0.9s; }
+.d10 { transition-delay: 1.0s; }
+
+/* ══════════════════════════════════════════
+   SLIDE 0 — TITLE
+   ══════════════════════════════════════════ */
+
+.title-logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(3.2rem, 6vw, 5rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--cream);
+  margin-bottom: 0.4rem;
+}
+
+.title-logo span {
+  color: var(--cyan);
+}
+
+.title-tagline {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(1.1rem, 1.8vw, 1.5rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--mist);
+  margin-bottom: 3rem;
+}
+
+.title-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  display: flex;
+  gap: 2rem;
+}
+
+.title-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.title-rule {
+  width: 60px;
+  height: 1px;
+  background: var(--cyan);
+  margin-bottom: 2rem;
+  opacity: 0.5;
+}
+
+.title-founders {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--fog);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 1rem;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 1 — PROBLEM
+   ══════════════════════════════════════════ */
+
+.problem-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  height: 100%;
+  align-items: center;
+}
+
+.problem-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.stat-block {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.stat-number {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 400;
+  color: var(--rose);
+  line-height: 1;
+}
+
+.stat-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--fog);
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  max-width: 22ch;
+}
+
+.problem-visual {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 2rem;
+  background: rgba(255, 106, 106, 0.03);
+  border: 1px solid rgba(255, 106, 106, 0.12);
+  border-radius: 10px;
+}
+
+.failure-log {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  line-height: 1.9;
+  color: var(--fog);
+}
+
+.failure-log .err {
+  color: var(--rose);
+}
+
+.failure-log .warn {
+  color: var(--amber);
+}
+
+.failure-log .ts {
+  opacity: 0.4;
+  margin-right: 0.5em;
+}
+
+.failure-log .dim {
+  opacity: 0.35;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 2 — PRETRAINING DEEP DIVE
+   ══════════════════════════════════════════ */
+
+.pretrain-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+}
+
+.pretrain-header {
+  margin-bottom: 2.5rem;
+}
+
+.timeline-container {
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.timeline-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.timeline-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* WITHOUT SIXTYTWO */
+.timeline-track {
+  position: relative;
+  width: 100%;
+  height: 52px;
+  background: var(--night-3);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--line-dark);
+}
+
+.track-segment {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+  color: rgba(245, 240, 230, 0.7);
+}
+
+.seg-training {
+  background: linear-gradient(90deg, rgba(99, 240, 201, 0.18), rgba(99, 240, 201, 0.12));
+  border-right: 1px solid rgba(99, 240, 201, 0.2);
+}
+
+.seg-failure {
+  background: rgba(255, 106, 106, 0.25);
+  border-left: 2px solid var(--rose);
+  border-right: 2px solid var(--rose);
+}
+
+.seg-failure .failure-icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--rose);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.5rem;
+  color: white;
+  font-weight: 700;
+  margin-right: 0.4em;
+  flex-shrink: 0;
+}
+
+.seg-dead {
+  background: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 106, 106, 0.06),
+    rgba(255, 106, 106, 0.06) 4px,
+    rgba(255, 106, 106, 0.12) 4px,
+    rgba(255, 106, 106, 0.12) 8px
+  );
+}
+
+.seg-debug {
+  background: rgba(255, 200, 87, 0.12);
+  border-left: 1px dashed rgba(255, 200, 87, 0.3);
+}
+
+.seg-restart {
+  background: rgba(123, 224, 255, 0.08);
+  border-left: 1px dashed rgba(123, 224, 255, 0.2);
+}
+
+/* Time markers */
+.timeline-markers {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0 0;
+}
+
+.timeline-marker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.5rem;
+  color: var(--fog);
+  opacity: 0.5;
+}
+
+/* Annotation */
+.timeline-annotation {
+  position: relative;
+  margin-top: 0.5rem;
+  padding: 0.6rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.annotation-line {
+  width: 2px;
+  height: 28px;
+  flex-shrink: 0;
+}
+
+.annotation-line.red { background: var(--rose); }
+.annotation-line.green { background: var(--signal); }
+
+.annotation-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  line-height: 1.6;
+  color: var(--fog);
+}
+
+.annotation-text strong {
+  font-weight: 500;
+}
+
+.annotation-text .rose { color: var(--rose); }
+.annotation-text .signal { color: var(--signal); }
+.annotation-text .cyan { color: var(--cyan); }
+
+/* WITH SIXTYTWO */
+.timeline-comparison {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 0.5rem;
+}
+
+.timeline-pair-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.58rem;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.timeline-pair-label.highlight {
+  color: var(--signal);
+}
+
+.seg-checkpoint {
+  background: rgba(99, 240, 201, 0.22);
+  border-left: 2px solid var(--signal);
+  border-right: 1px solid rgba(99, 240, 201, 0.3);
+}
+
+.seg-auto-recover {
+  background: linear-gradient(90deg, rgba(123, 224, 255, 0.15), rgba(99, 240, 201, 0.12));
+  border-left: 2px solid var(--cyan);
+}
+
+.seg-resumed {
+  background: linear-gradient(90deg, rgba(99, 240, 201, 0.12), rgba(99, 240, 201, 0.18));
+  border-left: 1px solid rgba(99, 240, 201, 0.2);
+}
+
+.waste-callout {
+  position: absolute;
+  top: -22px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.52rem;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.waste-callout.red {
+  background: rgba(255, 106, 106, 0.15);
+  color: var(--rose);
+  border: 1px solid rgba(255, 106, 106, 0.3);
+}
+
+.waste-callout.green {
+  background: rgba(99, 240, 201, 0.1);
+  color: var(--signal);
+  border: 1px solid rgba(99, 240, 201, 0.25);
+}
+
+.time-saved-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(99, 240, 201, 0.08);
+  border: 1px solid rgba(99, 240, 201, 0.2);
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--signal);
+  margin-top: 1rem;
+  align-self: flex-end;
+}
+
+.time-saved-badge .big {
+  font-size: 1.4rem;
+  font-family: 'Newsreader', serif;
+  font-weight: 500;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 3 — SOLUTION
+   ══════════════════════════════════════════ */
+
+.solution-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 4rem;
+  height: 100%;
+  align-items: center;
+}
+
+.solution-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.solution-step {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 1rem;
+  padding: 1rem 0;
+  position: relative;
+}
+
+.step-connector {
+  position: absolute;
+  left: 19px;
+  top: 40px;
+  width: 1px;
+  bottom: 0;
+  background: var(--line-dark);
+}
+
+.solution-step:last-child .step-connector { display: none; }
+
+.step-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.step-num.detect {
+  background: rgba(255, 106, 106, 0.12);
+  border: 1px solid rgba(255, 106, 106, 0.3);
+  color: var(--rose);
+}
+
+.step-num.checkpoint {
+  background: rgba(255, 200, 87, 0.1);
+  border: 1px solid rgba(255, 200, 87, 0.25);
+  color: var(--amber);
+}
+
+.step-num.replace {
+  background: rgba(123, 224, 255, 0.1);
+  border: 1px solid rgba(123, 224, 255, 0.25);
+  color: var(--cyan);
+}
+
+.step-num.resume {
+  background: rgba(99, 240, 201, 0.1);
+  border: 1px solid rgba(99, 240, 201, 0.25);
+  color: var(--signal);
+}
+
+.step-content h3 {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: var(--cream);
+}
+
+.step-content p {
+  font-size: 0.72rem;
+  color: var(--fog);
+  line-height: 1.55;
+  font-weight: 300;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 4 — PRODUCT
+   ══════════════════════════════════════════ */
+
+.product-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1.25rem;
+  flex: 1;
+  margin-top: 2rem;
+}
+
+.product-card {
+  position: relative;
+  padding: 1.75rem;
+  border-radius: 10px;
+  background: var(--night-3);
+  border: 1px solid var(--line-dark);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.product-card:nth-child(1)::before { background: var(--cyan); }
+.product-card:nth-child(2)::before { background: var(--signal); }
+.product-card:nth-child(3)::before { background: var(--orange); }
+.product-card:nth-child(4)::before { background: var(--amber); }
+
+.product-card-icon {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 500;
+}
+
+.product-card:nth-child(1) .product-card-icon {
+  background: rgba(123, 224, 255, 0.1);
+  color: var(--cyan);
+}
+.product-card:nth-child(2) .product-card-icon {
+  background: rgba(99, 240, 201, 0.1);
+  color: var(--signal);
+}
+.product-card:nth-child(3) .product-card-icon {
+  background: rgba(255, 142, 70, 0.1);
+  color: var(--orange);
+}
+.product-card:nth-child(4) .product-card-icon {
+  background: rgba(255, 200, 87, 0.1);
+  color: var(--amber);
+}
+
+.product-card h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  color: var(--cream);
+  font-weight: 500;
+}
+
+.product-card p {
+  font-size: 0.7rem;
+  color: var(--fog);
+  line-height: 1.6;
+  font-weight: 300;
+}
+
+.product-card .tech-tags {
+  margin-top: auto;
+  padding-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.tech-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  background: rgba(123, 224, 255, 0.06);
+  color: var(--fog);
+  border: 1px solid var(--line-dark);
+  letter-spacing: 0.03em;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 5 — WHY NOW
+   ══════════════════════════════════════════ */
+
+.whynow-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  height: 100%;
+  align-items: center;
+}
+
+.whynow-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.whynow-card {
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--line-dark);
+  background: rgba(18, 39, 55, 0.4);
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.whynow-card-num {
+  font-family: 'Newsreader', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--cyan);
+  opacity: 0.4;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 28px;
+}
+
+.whynow-card h3 {
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  color: var(--cream);
+}
+
+.whynow-card p {
+  font-size: 0.68rem;
+  color: var(--fog);
+  line-height: 1.55;
+  font-weight: 300;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 6 — MARKET
+   ══════════════════════════════════════════ */
+
+.market-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  height: 100%;
+  align-items: center;
+}
+
+.market-stat-row {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.market-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.market-stat-value {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 400;
+  color: var(--cyan);
+  line-height: 1;
+  margin-bottom: 0.35rem;
+}
+
+.market-stat-desc {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--fog);
+  letter-spacing: 0.04em;
+  line-height: 1.5;
+}
+
+.market-visual {
+  position: relative;
+  padding: 2rem;
+}
+
+.market-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.market-bar-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.market-bar-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  letter-spacing: 0.06em;
+  display: flex;
+  justify-content: space-between;
+}
+
+.market-bar-track {
+  width: 100%;
+  height: 28px;
+  background: var(--night-3);
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid var(--line-dark);
+}
+
+.market-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.slide.active .market-bar-fill { width: var(--fill); }
+
+.market-bar-fill.cyan {
+  background: linear-gradient(90deg, rgba(123, 224, 255, 0.3), rgba(123, 224, 255, 0.15));
+  border-right: 2px solid var(--cyan);
+}
+
+.market-bar-fill.signal {
+  background: linear-gradient(90deg, rgba(99, 240, 201, 0.25), rgba(99, 240, 201, 0.12));
+  border-right: 2px solid var(--signal);
+}
+
+.market-bar-fill.orange {
+  background: linear-gradient(90deg, rgba(255, 142, 70, 0.25), rgba(255, 142, 70, 0.12));
+  border-right: 2px solid var(--orange);
+}
+
+/* default 0 width for animation */
+.market-bar-fill { width: 0; }
+
+/* ══════════════════════════════════════════
+   SLIDE 7 — BUSINESS MODEL
+   ══════════════════════════════════════════ */
+
+.biz-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  height: 100%;
+  align-items: center;
+}
+
+.biz-tiers {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.biz-tier {
+  padding: 1.25rem 1.5rem;
+  border-radius: 8px;
+  border: 1px solid var(--line-dark);
+  background: var(--night-3);
+}
+
+.biz-tier-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+}
+
+.biz-tier-value {
+  font-family: 'Newsreader', serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  color: var(--cream);
+  margin-bottom: 0.25rem;
+}
+
+.biz-tier-desc {
+  font-size: 0.68rem;
+  color: var(--fog);
+  font-weight: 300;
+}
+
+.biz-projections {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.biz-projection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: rgba(18, 39, 55, 0.3);
+  border-radius: 8px;
+  border: 1px solid var(--line-dark);
+}
+
+.biz-projection-gpus {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--fog);
+  letter-spacing: 0.05em;
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.biz-projection-arrow {
+  color: var(--fog);
+  opacity: 0.3;
+  font-size: 0.8rem;
+}
+
+.biz-projection-rev {
+  font-family: 'Newsreader', serif;
+  font-size: 1.3rem;
+  color: var(--signal);
+  font-weight: 400;
+}
+
+.biz-projection-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.55rem;
+  color: var(--fog);
+  letter-spacing: 0.05em;
+  margin-left: auto;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 8 — TEAM
+   ══════════════════════════════════════════ */
+
+.team-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: center;
+}
+
+.team-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+
+.team-card {
+  padding: 1.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--line-dark);
+  background: var(--night-3);
+  display: flex;
+  flex-direction: column;
+}
+
+.team-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Newsreader', serif;
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+}
+
+.team-card:nth-child(1) .team-card-avatar {
+  background: rgba(123, 224, 255, 0.1);
+  border: 1px solid rgba(123, 224, 255, 0.25);
+  color: var(--cyan);
+}
+
+.team-card:nth-child(2) .team-card-avatar {
+  background: rgba(99, 240, 201, 0.1);
+  border: 1px solid rgba(99, 240, 201, 0.25);
+  color: var(--signal);
+}
+
+.team-card:nth-child(3) .team-card-avatar {
+  background: rgba(255, 142, 70, 0.1);
+  border: 1px solid rgba(255, 142, 70, 0.25);
+  color: var(--orange);
+}
+
+.team-card-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--cream);
+  margin-bottom: 0.15rem;
+}
+
+.team-card-role {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.team-card-creds {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.team-cred {
+  font-size: 0.68rem;
+  color: var(--mist);
+  font-weight: 300;
+  line-height: 1.45;
+  padding-left: 0.75rem;
+  position: relative;
+}
+
+.team-cred::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.45em;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--fog);
+  opacity: 0.5;
+}
+
+.team-shared {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+}
+
+.team-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.6rem;
+  color: var(--fog);
+  letter-spacing: 0.06em;
+}
+
+.team-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cyan);
+  opacity: 0.5;
+}
+
+/* ══════════════════════════════════════════
+   SLIDE 9 — CLOSING
+   ══════════════════════════════════════════ */
+
+.closing-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+}
+
+.closing-logo {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  color: var(--cream);
+  margin-bottom: 0.75rem;
+}
+
+.closing-logo span {
+  color: var(--cyan);
+}
+
+.closing-tagline {
+  font-family: 'Newsreader', serif;
+  font-size: clamp(1rem, 1.5vw, 1.25rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--mist);
+  margin-bottom: 2.5rem;
+}
+
+.closing-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 6px;
+  background: rgba(123, 224, 255, 0.08);
+  border: 1px solid rgba(123, 224, 255, 0.2);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--cyan);
+  letter-spacing: 0.06em;
+  margin-bottom: 3rem;
+}
+
+.closing-contact {
+  display: flex;
+  gap: 2.5rem;
+}
+
+.closing-contact-item {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  color: var(--fog);
+  letter-spacing: 0.05em;
+}
+
+/* ══════════════════════════════════════════
+   LIGHT THEME OVERRIDES
+   ══════════════════════════════════════════ */
+
+.slide-frame[data-theme="light"] .overline { color: var(--ink); }
+.slide-frame[data-theme="light"] h2 { color: var(--ink); }
+.slide-frame[data-theme="light"] h3 { color: var(--ink); }
+.slide-frame[data-theme="light"] .body-text { color: #5a5a52; }
+.slide-frame[data-theme="light"] .product-card {
+  background: rgba(17, 23, 28, 0.03);
+  border-color: rgba(200, 190, 170, 0.35);
+}
+.slide-frame[data-theme="light"] .product-card h3 { color: var(--ink); }
+.slide-frame[data-theme="light"] .product-card p { color: #6a6a60; }
+.slide-frame[data-theme="light"] .tech-tag {
+  background: rgba(17, 23, 28, 0.04);
+  border-color: rgba(200, 190, 170, 0.4);
+  color: #6a6a60;
+}
+
+/* light theme grid */
+.slide-frame[data-theme="light"] .grid-bg::before {
+  background-image:
+    linear-gradient(rgba(200, 190, 170, 0.25) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(200, 190, 170, 0.25) 1px, transparent 1px);
+}
+.slide-frame[data-theme="light"] .grid-bg::after {
+  background: radial-gradient(ellipse 70% 50% at 50% 50%, transparent 0%, var(--cream) 100%);
+}
+
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<div class="nav-dots" id="navDots"></div>
+
+<div class="slide-counter" id="slideCounter">01 / 10</div>
+
+<div class="presentation" id="presentation">
+
+  <!-- ════ SLIDE 0: TITLE ════ -->
+  <div class="slide active" data-slide="0">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="glow-cyan" style="top: 20%; left: 55%;"></div>
+      <div class="glow-signal" style="bottom: 15%; left: 25%;"></div>
+      <div class="slide-inner">
+        <div class="title-center">
+          <div class="reveal d1 title-rule"></div>
+          <div class="reveal d2 overline overline-cyan">On-prem AI infrastructure</div>
+          <h1 class="reveal d3 title-logo">sixty<span>two</span></h1>
+          <p class="reveal d4 title-tagline">Reliability infrastructure for AI pretraining</p>
+          <div class="reveal d5 title-founders">Antonio Alonso-Stepanov &nbsp;&middot;&nbsp; Jessie Dong &nbsp;&middot;&nbsp; Sonnet Xu</div>
+          <div class="reveal d6 title-meta" style="margin-top: 2.5rem;">
+            <span>Stanford CS '26 / '27</span>
+            <span>Spring 2026</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 1: PROBLEM ════ -->
+  <div class="slide" data-slide="1">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="problem-layout">
+          <div>
+            <div class="reveal d1 overline overline-cyan">The Problem</div>
+            <h2 class="reveal d2" style="margin-bottom: 1rem;">Pretraining runs<br>are fragile</h2>
+            <p class="reveal d3 body-text body-text-dark">
+              Companies spend millions on GPU clusters to pretrain large models. A single node failure three days into a two-week run can mean days of lost compute and manual intervention to get back on track.
+            </p>
+            <div class="reveal d4 problem-stats">
+              <div class="stat-block">
+                <div class="stat-number">5&ndash;10%</div>
+                <div class="stat-label">of GPU nodes fail per week in large clusters</div>
+              </div>
+              <div class="stat-block">
+                <div class="stat-number">47hrs</div>
+                <div class="stat-label">average time lost per failure on-prem without automation</div>
+              </div>
+              <div class="stat-block">
+                <div class="stat-number">$150k+</div>
+                <div class="stat-label">wasted compute per incident at scale</div>
+              </div>
+            </div>
+          </div>
+          <div class="reveal d5 problem-visual">
+            <div style="margin-bottom: 0.5rem;">
+              <span class="mono" style="font-size: 0.6rem; color: var(--fog); letter-spacing: 0.1em; text-transform: uppercase;">Cluster event log</span>
+            </div>
+            <div class="failure-log">
+              <div><span class="ts">03:14:22</span> <span class="dim">node-gpu-047</span> &nbsp;training step 48,291 &nbsp;<span class="dim">loss: 2.847</span></div>
+              <div><span class="ts">03:14:23</span> <span class="dim">node-gpu-047</span> &nbsp;training step 48,292 &nbsp;<span class="dim">loss: 2.843</span></div>
+              <div><span class="ts">03:14:24</span> <span class="err">node-gpu-012</span> &nbsp;<span class="err">NCCL TIMEOUT — allreduce hang detected</span></div>
+              <div><span class="ts">03:14:24</span> <span class="err">node-gpu-012</span> &nbsp;<span class="err">GPU 3: Xid 79 — fallen off the bus</span></div>
+              <div><span class="ts">03:14:25</span> <span class="warn">ALERT</span> &nbsp;<span class="warn">training run stalled — rank 12 unresponsive</span></div>
+              <div><span class="ts">03:14:25</span> <span class="dim">all ranks</span> &nbsp;&nbsp;<span class="err">NCCL watchdog timeout — aborting</span></div>
+              <div><span class="ts">03:14:26</span> <span class="err">FATAL</span> &nbsp;&nbsp;<span class="err">run terminated — 72h of compute lost</span></div>
+              <div style="margin-top: 0.5rem;"><span class="ts">07:22:00</span> <span class="warn">eng-oncall</span> &nbsp;<span class="warn">paged — manual investigation begins</span></div>
+              <div><span class="ts">09:41:00</span> <span class="dim">eng-oncall</span> &nbsp;root cause: GPU memory ECC error</div>
+              <div><span class="ts">11:30:00</span> <span class="dim">eng-oncall</span> &nbsp;node replaced, run restarted from scratch</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 2: PRETRAINING DEEP DIVE ════ -->
+  <div class="slide" data-slide="2">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="pretrain-layout">
+          <div class="pretrain-header">
+            <div class="reveal d1 overline overline-cyan">Pretraining deep dive</div>
+            <h2 class="reveal d2">The anatomy of a failed training run</h2>
+          </div>
+
+          <div class="timeline-comparison">
+            <!-- WITHOUT SIXTYTWO -->
+            <div class="reveal d3">
+              <div class="timeline-pair-label">Without Sixtytwo — typical 14-day pretraining run</div>
+              <div style="position: relative;">
+                <div class="timeline-track">
+                  <!-- Day 1-3: training -->
+                  <div class="track-segment seg-training" style="left: 0; width: 21%;">training</div>
+                  <!-- Day 3: failure -->
+                  <div class="track-segment seg-failure" style="left: 21%; width: 3.5%; display: flex; align-items: center; justify-content: center;">
+                    <span class="failure-icon">!</span>
+                  </div>
+                  <!-- Day 3-4: dead time -->
+                  <div class="track-segment seg-dead" style="left: 24.5%; width: 10%;">
+                  </div>
+                  <!-- Day 4-5: debug -->
+                  <div class="track-segment seg-debug" style="left: 34.5%; width: 10%;">debug</div>
+                  <!-- Day 5-5.5: restart setup -->
+                  <div class="track-segment seg-restart" style="left: 44.5%; width: 4%;">restart</div>
+                  <!-- Day 5.5-10: retraining (repeating lost work) -->
+                  <div class="track-segment seg-training" style="left: 48.5%; width: 22%;">re-training</div>
+                  <!-- Day 10: another failure -->
+                  <div class="track-segment seg-failure" style="left: 70.5%; width: 2.5%;">
+                    <span class="failure-icon">!</span>
+                  </div>
+                  <!-- More dead time + debug -->
+                  <div class="track-segment seg-dead" style="left: 73%; width: 6%;"></div>
+                  <div class="track-segment seg-debug" style="left: 79%; width: 7%;">debug</div>
+                  <div class="track-segment seg-restart" style="left: 86%; width: 3%;">restart</div>
+                  <div class="track-segment seg-training" style="left: 89%; width: 11%;">training...</div>
+                </div>
+                <div class="waste-callout red" style="left: 24.5%; top: -20px;">3 days lost</div>
+                <div class="waste-callout red" style="left: 73%; top: -20px;">1.5 days lost</div>
+              </div>
+              <div class="timeline-markers">
+                <span class="timeline-marker">Day 0</span>
+                <span class="timeline-marker">Day 3</span>
+                <span class="timeline-marker">Day 7</span>
+                <span class="timeline-marker">Day 10</span>
+                <span class="timeline-marker">Day 14</span>
+              </div>
+              <div class="timeline-annotation">
+                <div class="annotation-line red"></div>
+                <div class="annotation-text">
+                  <span class="rose">~30% of compute wasted</span> on failed runs, manual debug, and retraining from stale checkpoints. Run still incomplete at day 14.
+                </div>
+              </div>
+            </div>
+
+            <!-- WITH SIXTYTWO -->
+            <div class="reveal d5">
+              <div class="timeline-pair-label highlight">With Sixtytwo — same workload, same hardware</div>
+              <div style="position: relative;">
+                <div class="timeline-track" style="border-color: rgba(99, 240, 201, 0.15);">
+                  <!-- Day 1-3: training -->
+                  <div class="track-segment seg-training" style="left: 0; width: 21%;">training</div>
+                  <!-- Day 3: failure detected + auto checkpoint -->
+                  <div class="track-segment seg-checkpoint" style="left: 21%; width: 2%;">
+                    <span style="font-size: 0.65rem;">&#x2713;</span>
+                  </div>
+                  <!-- Quick auto-recovery -->
+                  <div class="track-segment seg-auto-recover" style="left: 23%; width: 3%;">
+                    <span style="font-size: 0.5rem;">auto</span>
+                  </div>
+                  <!-- Resume from checkpoint -->
+                  <div class="track-segment seg-resumed" style="left: 26%; width: 30%;">resumed from checkpoint</div>
+                  <!-- Second failure -->
+                  <div class="track-segment seg-checkpoint" style="left: 56%; width: 1.5%;">
+                    <span style="font-size: 0.65rem;">&#x2713;</span>
+                  </div>
+                  <div class="track-segment seg-auto-recover" style="left: 57.5%; width: 2.5%;">
+                    <span style="font-size: 0.5rem;">auto</span>
+                  </div>
+                  <!-- Continue to completion -->
+                  <div class="track-segment seg-resumed" style="left: 60%; width: 30%;">resumed &rarr; complete</div>
+                  <!-- Done indicator -->
+                  <div class="track-segment" style="left: 90%; width: 10%; background: rgba(99, 240, 201, 0.25); display: flex; align-items: center; justify-content: center; font-size: 0.55rem; color: var(--signal); font-family: 'IBM Plex Mono', monospace;">
+                    &#x2713; done
+                  </div>
+                </div>
+                <div class="waste-callout green" style="left: 21%; top: -20px;">auto-recovered</div>
+                <div class="waste-callout green" style="left: 56%; top: -20px;">auto-recovered</div>
+              </div>
+              <div class="timeline-markers">
+                <span class="timeline-marker">Day 0</span>
+                <span class="timeline-marker">Day 3</span>
+                <span class="timeline-marker">Day 7</span>
+                <span class="timeline-marker">Day 10</span>
+                <span class="timeline-marker" style="color: var(--signal);">Day 12 &#x2713;</span>
+              </div>
+              <div class="timeline-annotation">
+                <div class="annotation-line green"></div>
+                <div class="annotation-text">
+                  <span class="signal">&lt;5% compute overhead.</span> Failures detected in seconds, checkpoint saved, healthy node swapped in, run resumed automatically. <span class="cyan">Finished 2 days early.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal d7 time-saved-badge">
+            <span>Effective compute utilization:</span>
+            <span class="big">95%+</span>
+            <span>vs ~65% without</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 3: SOLUTION ════ -->
+  <div class="slide" data-slide="3">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="glow-signal" style="top: 30%; right: 10%;"></div>
+      <div class="slide-inner">
+        <div class="solution-layout">
+          <div>
+            <div class="reveal d1 overline overline-cyan">Our Solution</div>
+            <h2 class="reveal d2" style="margin-bottom: 0.75rem;">Self-healing<br>training infrastructure</h2>
+            <p class="reveal d3 body-text body-text-dark">
+              Sixtytwo monitors every layer of the training stack&mdash;hardware, network, framework&mdash;and automatically recovers from failures. No pager. No manual restarts. No lost compute.
+            </p>
+          </div>
+
+          <div class="solution-steps">
+            <div class="reveal d3 solution-step">
+              <div class="step-num detect">01</div>
+              <div class="step-content">
+                <h3>Detect</h3>
+                <p>Continuous health monitoring across GPU, NIC, NVLink, NCCL. Sub-second anomaly detection catches failures before runs crash.</p>
+              </div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="reveal d4 solution-step">
+              <div class="step-num checkpoint">02</div>
+              <div class="step-content">
+                <h3>Checkpoint</h3>
+                <p>Automatically saves training state when issues are detected. No progress lost beyond the last few steps.</p>
+              </div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="reveal d5 solution-step">
+              <div class="step-num replace">03</div>
+              <div class="step-content">
+                <h3>Replace</h3>
+                <p>Quarantines the failing node and provisions a healthy spare from the pool. Handles all topology and networking reconfiguration.</p>
+              </div>
+              <div class="step-connector"></div>
+            </div>
+            <div class="reveal d6 solution-step">
+              <div class="step-num resume">04</div>
+              <div class="step-content">
+                <h3>Resume</h3>
+                <p>Restores from checkpoint on the new topology and resumes training. The entire recovery takes minutes, not days.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 4: PRODUCT ════ -->
+  <div class="slide" data-slide="4">
+    <div class="slide-frame" data-theme="light">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="reveal d1 overline" style="color: #888;">What we build</div>
+        <h2 class="reveal d2" style="margin-bottom: 0.25rem;">The on-prem training platform</h2>
+        <p class="reveal d3 body-text" style="color: #777; margin-bottom: 0;">Four pillars that keep pretraining runs alive.</p>
+
+        <div class="product-grid">
+          <div class="reveal d4 product-card">
+            <div class="product-card-icon">&there4;</div>
+            <h3>Observability</h3>
+            <p>Unified monitoring across GPU health, training metrics, network fabric, and thermal data. Real-time dashboards purpose-built for pretraining workloads.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Prometheus</span>
+              <span class="tech-tag">DCGM</span>
+              <span class="tech-tag">OpenTelemetry</span>
+            </div>
+          </div>
+          <div class="reveal d5 product-card">
+            <div class="product-card-icon">&#x25A0;</div>
+            <h3>Fleet Management</h3>
+            <p>Inventory tracking, health scoring, and automatic quarantine for every node. Know exactly which machines are reliable and which are degrading.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Node health</span>
+              <span class="tech-tag">Spare pool</span>
+              <span class="tech-tag">Topology</span>
+            </div>
+          </div>
+          <div class="reveal d6 product-card">
+            <div class="product-card-icon">&#x21BB;</div>
+            <h3>Orchestration</h3>
+            <p>Intelligent job scheduling with automatic checkpointing, failure recovery, and run resumption. Built specifically for distributed pretraining.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">PyTorch</span>
+              <span class="tech-tag">Kubernetes</span>
+              <span class="tech-tag">Slurm</span>
+            </div>
+          </div>
+          <div class="reveal d7 product-card">
+            <div class="product-card-icon">&#x2338;</div>
+            <h3>Container &amp; Image Mgmt</h3>
+            <p>Reproducible training environments with version-controlled containers. Fast image distribution across hundreds of nodes.</p>
+            <div class="tech-tags">
+              <span class="tech-tag">Docker</span>
+              <span class="tech-tag">NCCL</span>
+              <span class="tech-tag">CUDA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 5: WHY NOW ════ -->
+  <div class="slide" data-slide="5">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="glow-cyan" style="bottom: 20%; right: 20%;"></div>
+      <div class="slide-inner">
+        <div class="whynow-layout">
+          <div>
+            <div class="reveal d1 overline overline-cyan">Why now</div>
+            <h2 class="reveal d2" style="margin-bottom: 1rem;">The shift to<br>on-prem is real</h2>
+            <p class="reveal d3 body-text body-text-dark">
+              Training in the cloud was the default. Now, the economics, regulations, and open-source ecosystem are pushing serious AI teams to own their compute.
+            </p>
+          </div>
+          <div class="whynow-cards">
+            <div class="reveal d3 whynow-card">
+              <div class="whynow-card-num">1</div>
+              <div>
+                <h3>Data sovereignty</h3>
+                <p>Enterprises need full control over training data. Sending proprietary datasets to cloud providers creates unacceptable risk for regulated industries.</p>
+              </div>
+            </div>
+            <div class="reveal d4 whynow-card">
+              <div class="whynow-card-num">2</div>
+              <div>
+                <h3>Cost at scale</h3>
+                <p>At 1,000+ GPUs running 24/7, owning hardware pays for itself in 12&ndash;18 months. Cloud costs compound; capex depreciates.</p>
+              </div>
+            </div>
+            <div class="reveal d5 whynow-card">
+              <div class="whynow-card-num">3</div>
+              <div>
+                <h3>Regulation</h3>
+                <p>EU AI Act and emerging US policy require data residency and auditability. On-prem gives compliance by default.</p>
+              </div>
+            </div>
+            <div class="reveal d6 whynow-card">
+              <div class="whynow-card-num">4</div>
+              <div>
+                <h3>Open-source models</h3>
+                <p>Llama, Mistral, and others mean companies can pretrain and fine-tune their own models. The workloads are here&mdash;the infrastructure isn't.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 6: MARKET ════ -->
+  <div class="slide" data-slide="6">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="market-layout">
+          <div>
+            <div class="reveal d1 overline overline-cyan">Market</div>
+            <h2 class="reveal d2">A massive, growing<br>opportunity</h2>
+            <div class="reveal d3 market-stat-row">
+              <div class="market-stat">
+                <div class="market-stat-value">$200B+</div>
+                <div class="market-stat-desc">AI infrastructure market by 2028</div>
+              </div>
+              <div class="market-stat">
+                <div class="market-stat-value">57%</div>
+                <div class="market-stat-desc">of enterprises want on-prem or hybrid AI infrastructure</div>
+              </div>
+            </div>
+          </div>
+          <div class="reveal d4 market-visual">
+            <div class="market-bars">
+              <div class="market-bar-item">
+                <div class="market-bar-label">
+                  <span>On-prem AI compute adoption</span>
+                  <span style="color: var(--cyan);">57%</span>
+                </div>
+                <div class="market-bar-track">
+                  <div class="market-bar-fill cyan" style="--fill: 57%;"></div>
+                </div>
+              </div>
+              <div class="market-bar-item">
+                <div class="market-bar-label">
+                  <span>Companies pretraining own models</span>
+                  <span style="color: var(--signal);">43%</span>
+                </div>
+                <div class="market-bar-track">
+                  <div class="market-bar-fill signal" style="--fill: 43%;"></div>
+                </div>
+              </div>
+              <div class="market-bar-item">
+                <div class="market-bar-label">
+                  <span>GPU cluster failures causing run restarts</span>
+                  <span style="color: var(--orange);">68%</span>
+                </div>
+                <div class="market-bar-track">
+                  <div class="market-bar-fill orange" style="--fill: 68%;"></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 2rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--fog); line-height: 1.7;">
+              Existing solutions (SageMaker, HyperPod) are<br>cloud-only. On-prem teams have nothing purpose-built.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 7: BUSINESS MODEL ════ -->
+  <div class="slide" data-slide="7">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="glow-signal" style="bottom: 25%; left: 30%;"></div>
+      <div class="slide-inner">
+        <div class="biz-layout">
+          <div>
+            <div class="reveal d1 overline overline-cyan">Business model</div>
+            <h2 class="reveal d2" style="margin-bottom: 0.5rem;">Enterprise SaaS<br>per GPU</h2>
+            <p class="reveal d3 body-text body-text-dark" style="margin-bottom: 0.5rem;">
+              Software-only. Deployed on customer hardware. Priced per managed GPU per month. 80&ndash;90% gross margins.
+            </p>
+            <div class="reveal d4 biz-tiers">
+              <div class="biz-tier">
+                <div class="biz-tier-label">Platform license</div>
+                <div class="biz-tier-value">~$100 <span style="font-size: 0.8rem; color: var(--fog); font-family: 'IBM Plex Mono', monospace;">/GPU/month</span></div>
+                <div class="biz-tier-desc">Full observability, fleet management, auto-recovery, orchestration</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <div class="reveal d5 biz-projections">
+              <div style="margin-bottom: 0.5rem;">
+                <span class="mono" style="font-size: 0.6rem; color: var(--fog); letter-spacing: 0.1em; text-transform: uppercase;">Revenue projections</span>
+              </div>
+              <div class="biz-projection">
+                <div class="biz-projection-gpus">1,000 GPUs</div>
+                <div class="biz-projection-arrow">&rarr;</div>
+                <div class="biz-projection-rev">$100K/mo</div>
+                <div class="biz-projection-sub">$1.2M ARR</div>
+              </div>
+              <div class="biz-projection">
+                <div class="biz-projection-gpus">10,000 GPUs</div>
+                <div class="biz-projection-arrow">&rarr;</div>
+                <div class="biz-projection-rev">$1M/mo</div>
+                <div class="biz-projection-sub">$12M ARR</div>
+              </div>
+              <div class="biz-projection">
+                <div class="biz-projection-gpus">100,000 GPUs</div>
+                <div class="biz-projection-arrow">&rarr;</div>
+                <div class="biz-projection-rev">$10M/mo</div>
+                <div class="biz-projection-sub">$120M ARR</div>
+              </div>
+              <div style="margin-top: 0.75rem; font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--fog); line-height: 1.7; opacity: 0.7;">
+                B2B SaaS &middot; Category: AI Infrastructure &middot; 80&ndash;90% margins
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 8: TEAM ════ -->
+  <div class="slide" data-slide="8">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="slide-inner">
+        <div class="team-layout">
+          <div style="text-align: center;">
+            <div class="reveal d1 overline overline-cyan">Team</div>
+            <h2 class="reveal d2">Built by engineers who<br>know this stack</h2>
+          </div>
+
+          <div class="team-cards">
+            <div class="reveal d3 team-card">
+              <div class="team-card-avatar">A</div>
+              <div class="team-card-name">Antonio Alonso-Stepanov</div>
+              <div class="team-card-role">Co-founder</div>
+              <div class="team-card-creds">
+                <div class="team-cred">Stanford CS '26</div>
+                <div class="team-cred">SWE Intern, Meta &mdash; LLM content integrity</div>
+                <div class="team-cred">Research Asst., NCSU &mdash; DNA data storage</div>
+                <div class="team-cred">VP Growth, Stanford BASES</div>
+                <div class="team-cred">TreeHacks 1st Place, OpenAI Prize</div>
+              </div>
+            </div>
+            <div class="reveal d4 team-card">
+              <div class="team-card-avatar">J</div>
+              <div class="team-card-name">Jessie Dong</div>
+              <div class="team-card-role">Co-founder</div>
+              <div class="team-card-creds">
+                <div class="team-cred">Stanford CS '27</div>
+                <div class="team-cred">Stanford OVAL AI Lab &mdash; NLP research</div>
+                <div class="team-cred">Founding Engineer, Sago &mdash; LLM pipelines</div>
+                <div class="team-cred">Embedded Systems Intern, Tesla</div>
+                <div class="team-cred">Kleiner Perkins Fellow</div>
+              </div>
+            </div>
+            <div class="reveal d5 team-card">
+              <div class="team-card-avatar">S</div>
+              <div class="team-card-name">Sonnet Xu</div>
+              <div class="team-card-role">Co-founder</div>
+              <div class="team-card-creds">
+                <div class="team-cred">Stanford CS '27</div>
+                <div class="team-cred">ML Intern, DatologyAI &mdash; distributed training dataloaders</div>
+                <div class="team-cred">Published at NeurIPS, MICCAI</div>
+                <div class="team-cred">SWE Intern, Amazon &mdash; LLM guardrails</div>
+                <div class="team-cred">Research Fellow, Hoover Institution</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="reveal d6 team-shared">
+            <div class="team-badge">
+              <div class="team-badge-dot"></div>
+              <span>All technical founders</span>
+            </div>
+            <div class="team-badge">
+              <div class="team-badge-dot"></div>
+              <span>3 years building together</span>
+            </div>
+            <div class="team-badge">
+              <div class="team-badge-dot"></div>
+              <span>Full-time committed</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 9: CLOSING ════ -->
+  <div class="slide" data-slide="9">
+    <div class="slide-frame" data-theme="dark">
+      <div class="grid-bg"></div>
+      <div class="glow-cyan" style="top: 35%; left: 45%;"></div>
+      <div class="glow-signal" style="bottom: 30%; left: 50%;"></div>
+      <div class="slide-inner">
+        <div class="closing-center">
+          <div class="reveal d1 title-rule"></div>
+          <h1 class="reveal d2 closing-logo">sixty<span>two</span></h1>
+          <p class="reveal d3 closing-tagline">Keep pretraining runs alive.</p>
+          <div class="reveal d4 closing-cta">
+            Reliability infrastructure for on-prem AI pretraining
+          </div>
+          <div class="reveal d5 closing-contact">
+            <div class="closing-contact-item">antaloaalonso@gmail.com</div>
+            <div class="closing-contact-item">jessiesagedong@gmail.com</div>
+            <div class="closing-contact-item">sonnet@stanford.edu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="grain"></div>
+
+<script>
+(() => {
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  let transitioning = false;
+
+  // Build nav dots
+  const dotsContainer = document.getElementById('navDots');
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+  });
+
+  function updateUI() {
+    // Progress
+    document.getElementById('progressBar').style.width =
+      ((current / (total - 1)) * 100) + '%';
+
+    // Counter
+    const c = String(current + 1).padStart(2, '0');
+    const t = String(total).padStart(2, '0');
+    document.getElementById('slideCounter').textContent = c + ' / ' + t;
+
+    // Dots
+    document.querySelectorAll('.nav-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+  }
+
+  function goTo(index) {
+    if (index === current || index < 0 || index >= total || transitioning) return;
+    transitioning = true;
+
+    slides[current].classList.remove('active');
+    current = index;
+    slides[current].classList.add('active');
+
+    updateUI();
+
+    setTimeout(() => { transitioning = false; }, 700);
+  }
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+      e.preventDefault();
+      goTo(current + 1);
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      goTo(current - 1);
+    }
+  });
+
+  // Click to advance (left third = back, right two-thirds = forward)
+  document.querySelector('.presentation').addEventListener('click', (e) => {
+    if (e.target.closest('.nav-dot') || e.target.closest('a') || e.target.closest('button')) return;
+    const x = e.clientX / window.innerWidth;
+    if (x < 0.33) {
+      goTo(current - 1);
+    } else {
+      goTo(current + 1);
+    }
+  });
+
+  // Touch
+  let touchStartX = 0;
+  document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  document.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goTo(current + 1);
+      else goTo(current - 1);
+    }
+  });
+
+  updateUI();
+})();
+</script>
+
+</body>
+</html>
