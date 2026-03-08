@@ -12,22 +12,22 @@
 
 :root{
   --bg:#0a0a0a;
-  --card:#111;
-  --text:#e8e8e8;
-  --text-2:#999;
-  --text-3:#555;
-  --blue:#94b8d0;
-  --red:#d46a6a;
-  --green:#7ec4a8;
-  --rule:#1e1e1e;
+  --card:#131313;
+  --text:#f0f0f0;
+  --text-2:#b0b0b0;
+  --text-3:#707070;
+  --blue:#a8ccdf;
+  --red:#e07070;
+  --green:#85cdb0;
+  --rule:#222;
   --font:'Hanken Grotesk',sans-serif;
   --mono:'Geist Mono',monospace;
-  --title:clamp(2.2rem,5vw,4rem);
-  --h2:clamp(1.5rem,3.5vw,2.6rem);
-  --h3:clamp(0.85rem,1.3vw,1.05rem);
-  --body:clamp(0.75rem,1.1vw,0.92rem);
-  --sm:clamp(0.62rem,0.9vw,0.78rem);
-  --xs:clamp(0.52rem,0.75vw,0.65rem);
+  --title:clamp(2.4rem,5.5vw,4.4rem);
+  --h2:clamp(1.7rem,4vw,2.8rem);
+  --h3:clamp(0.95rem,1.5vw,1.15rem);
+  --body:clamp(0.82rem,1.25vw,1.02rem);
+  --sm:clamp(0.7rem,1vw,0.85rem);
+  --xs:clamp(0.58rem,0.85vw,0.72rem);
   --pad:clamp(2rem,4.5vw,4.5rem);
   --ease:cubic-bezier(0.16,1,0.3,1);
 }
@@ -42,10 +42,8 @@ body{font-family:var(--font);font-weight:400;font-size:var(--body);line-height:1
 /* progress */
 #prog{position:fixed;top:0;left:0;height:1px;background:var(--blue);z-index:1000;transition:width .3s ease;width:0}
 
-/* nav dots */
-#dots{position:fixed;right:clamp(.6rem,1.2vw,1rem);top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:5px;z-index:1000}
-.dot{width:4px;height:4px;border-radius:50%;background:var(--text-3);border:none;padding:0;cursor:pointer;transition:all .3s ease;opacity:.5}
-.dot.on{opacity:1;background:var(--text)}
+/* nav dots — hidden */
+#dots{display:none}
 
 /* animations */
 .r{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
@@ -492,8 +490,8 @@ h3{font-family:var(--font);font-size:var(--h3);font-weight:500;line-height:1.35;
 <div class="close-name r">sixtytwo</div>
 <div class="close-tag r">The future of AI runs on-prem.</div>
 <div class="close-contact r">
-<span>antaloaalonso@gmail.com</span>
-<span>jessiesagedong@gmail.com</span>
+<span>ajalonso@stanford.edu</span>
+<span>jessiedong@stanford.edu</span>
 <span>sonnet@stanford.edu</span>
 </div>
 </div>
