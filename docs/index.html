@@ -4,17 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sixtytwo</title>
-<meta name="description" content="Infrastructure software for on-prem AI.">
+<meta name="description" content="Observability infrastructure for on-prem AI.">
 <meta property="og:title" content="Sixtytwo">
-<meta property="og:description" content="Infrastructure software for on-prem AI.">
+<meta property="og:description" content="Observability infrastructure for on-prem AI.">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Sixtytwo">
-<meta name="twitter:description" content="Infrastructure software for on-prem AI.">
+<meta name="twitter:description" content="Observability infrastructure for on-prem AI.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>62</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after {
     margin: 0;
@@ -23,59 +23,55 @@
   }
 
   :root {
-    --bg: #0b0c0b;
-    --text: #d4d3cb;
-    --text-bright: #e8e7e0;
-    --text-dim: #7a7970;
-    --copper: #c4873a;
-    --rule: #1f201f;
+    --bg: #fdfdfc;
+    --text: #2c2c2a;
+    --text-secondary: #5c5c58;
+    --text-dim: #8a8a84;
+    --accent: #4a6670;
+    --rule: #e2e0db;
   }
 
   html {
-    font-size: 16px;
+    font-size: 17px;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Source Serif 4', serif;
     font-weight: 300;
-    font-size: 0.9rem;
-    line-height: 1.75;
+    font-size: 1rem;
+    line-height: 1.78;
     color: var(--text);
     background: var(--bg);
     padding: 0 1.5rem;
   }
 
   main {
-    max-width: 640px;
+    max-width: 620px;
     margin: 0 auto;
-    padding: 6rem 0 4rem;
+    padding: 7rem 0 4rem;
   }
 
   h1 {
-    font-family: 'Cormorant Garamond', serif;
-    font-weight: 400;
-    font-size: 2.1rem;
-    color: var(--text-bright);
-    letter-spacing: 0.01em;
-    margin-bottom: 0.6rem;
-  }
-
-  .opening {
-    font-weight: 500;
-    color: var(--text-bright);
-    margin-bottom: 2rem;
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 2rem;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    line-height: 1.2;
+    margin-bottom: 2.4rem;
   }
 
   p {
-    margin-bottom: 1.4rem;
+    margin-bottom: 1.5rem;
   }
 
   .closer {
-    font-weight: 500;
-    color: var(--text-bright);
-    margin-top: 0.4rem;
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 0.2rem;
     margin-bottom: 0;
   }
 
@@ -87,39 +83,41 @@
   }
 
   h2 {
-    font-family: 'IBM Plex Mono', monospace;
+    font-family: 'Source Serif 4', serif;
     font-weight: 400;
-    font-size: 0.9rem;
-    color: var(--text-bright);
-    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.75rem;
   }
 
   .team-names {
-    color: var(--text-dim);
-  }
-
-  footer {
-    margin-top: 0;
+    color: var(--text-secondary);
   }
 
   a {
-    color: var(--copper);
+    color: var(--accent);
     text-decoration: none;
     transition: opacity 0.2s ease;
   }
 
   a:hover {
-    opacity: 0.7;
+    opacity: 0.6;
+  }
+
+  footer {
+    margin-top: 0;
+    font-size: 0.92rem;
   }
 
   .copyright {
-    margin-top: 2rem;
-    font-size: 0.78rem;
+    margin-top: 1.8rem;
+    font-size: 0.82rem;
     color: var(--text-dim);
   }
 
   @media (max-width: 480px) {
-    main { padding: 4rem 0 3rem; }
+    html { font-size: 16px; }
+    main { padding: 4.5rem 0 3rem; }
     h1 { font-size: 1.7rem; }
   }
 </style>
@@ -129,11 +127,9 @@
 
 <h1>Sixtytwo</h1>
 
-<p class="opening">Infrastructure software for on-prem AI.</p>
-
 <p>Companies are starting to pre-train their own models. Data control and GPU economics are pushing companies on-prem. But going on-prem means taking on everything a cloud provider does invisibly with none of their tooling.</p>
 
-<p>Sixtytwo is the observability infrastructure layer for on-prem. Cloud providers absorb hardware failure and capacity volatility. On-prem, we build the automation for health detection, quarantine, rollouts, spares, and capacity planning to get to cloud-level reliability.</p>
+<p>Sixtytwo is the observability infrastructure layer for on-prem. Cloud providers absorb hardware failure and capacity volatility. On&#8209;prem, we build the automation for health detection, quarantine, rollouts, spares, and capacity planning to get to cloud-level reliability.</p>
 
 <p>Sixtytwo connects data at all layers for on-prem clusters. On-prem clusters get the same system-wide visibility that cloud providers surface automatically.</p>
 
