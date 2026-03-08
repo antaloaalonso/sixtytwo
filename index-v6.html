@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sixtytwo — Pitch Deck</title>
+
+    <!-- Fonts: Instrument Serif (display) + DM Sans (body) + JetBrains Mono (tech) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES (THEME)
+           =========================================== */
+        :root {
+            --bg-primary: #0b0e11;
+            --bg-surface: #12161b;
+            --bg-card: #181d24;
+            --bg-card-hover: #1e2430;
+            --text-primary: #e4e2db;
+            --text-secondary: #8a8d93;
+            --text-dim: #555962;
+            --accent: #e8a45a;
+            --accent-glow: rgba(232, 164, 90, 0.15);
+            --accent-2: #5cb8a4;
+            --accent-2-glow: rgba(92, 184, 164, 0.12);
+            --red: #e06060;
+            --red-glow: rgba(224, 96, 96, 0.1);
+            --rule: rgba(255, 255, 255, 0.06);
+            --rule-accent: rgba(232, 164, 90, 0.2);
+
+            /* Typography — all clamp() for viewport fitting */
+            --font-display: 'Instrument Serif', serif;
+            --font-body: 'DM Sans', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --title-size: clamp(2rem, 5.5vw, 4.2rem);
+            --h2-size: clamp(1.6rem, 4vw, 3rem);
+            --h3-size: clamp(0.9rem, 1.4vw, 1.15rem);
+            --body-size: clamp(0.75rem, 1.15vw, 0.95rem);
+            --small-size: clamp(0.6rem, 0.9vw, 0.75rem);
+            --mono-size: clamp(0.55rem, 0.85vw, 0.7rem);
+
+            /* Spacing */
+            --slide-padding: clamp(1.5rem, 4vw, 4rem);
+            --content-gap: clamp(0.75rem, 2vw, 2rem);
+            --element-gap: clamp(0.25rem, 1vw, 1rem);
+
+            /* Animation */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+            --duration-normal: 0.7s;
+        }
+
+        /* ===========================================
+           VIEWPORT FITTING: MANDATORY BASE STYLES
+           =========================================== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: var(--font-body);
+            font-weight: 400;
+            font-size: var(--body-size);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-primary);
+        }
+
+        /* Each slide = exact viewport height */
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        /* ===========================================
+           PROGRESS BAR
+           =========================================== */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            z-index: 1000;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* ===========================================
+           NAVIGATION DOTS
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.75rem, 1.5vw, 1.25rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(4px, 0.5vh, 6px);
+            z-index: 1000;
+        }
+
+        .nav-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            border: none;
+            padding: 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.4;
+        }
+
+        .nav-dot.active {
+            opacity: 1;
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity var(--duration-normal) var(--ease-out-expo),
+                        transform var(--duration-normal) var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger delays */
+        .slide.visible .reveal:nth-child(1) { transition-delay: 0.05s; }
+        .slide.visible .reveal:nth-child(2) { transition-delay: 0.12s; }
+        .slide.visible .reveal:nth-child(3) { transition-delay: 0.2s; }
+        .slide.visible .reveal:nth-child(4) { transition-delay: 0.28s; }
+        .slide.visible .reveal:nth-child(5) { transition-delay: 0.36s; }
+        .slide.visible .reveal:nth-child(6) { transition-delay: 0.44s; }
+        .slide.visible .reveal:nth-child(7) { transition-delay: 0.52s; }
+
+        .reveal-delay-1 { transition-delay: 0.15s !important; }
+        .reveal-delay-2 { transition-delay: 0.25s !important; }
+        .reveal-delay-3 { transition-delay: 0.35s !important; }
+        .reveal-delay-4 { transition-delay: 0.45s !important; }
+        .reveal-delay-5 { transition-delay: 0.55s !important; }
+
+        /* ===========================================
+           SHARED TYPOGRAPHY
+           =========================================== */
+        .overline {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            font-weight: 500;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: clamp(0.75rem, 1.5vh, 1.25rem);
+        }
+
+        h1 {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 400;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 400;
+            line-height: 1.15;
+            letter-spacing: -0.01em;
+            color: var(--text-primary);
+        }
+
+        h3 {
+            font-family: var(--font-body);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            line-height: 1.35;
+            color: var(--text-primary);
+        }
+
+        .body-text {
+            font-size: var(--body-size);
+            line-height: 1.65;
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 50ch;
+        }
+
+        /* Subtle noise grain */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.018;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-size: 180px;
+        }
+
+        /* ===========================================
+           SLIDE 0: TITLE
+           =========================================== */
+        .title-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .title-logo {
+            font-family: var(--font-body);
+            font-size: clamp(2.8rem, 6vw, 5rem);
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            color: var(--text-primary);
+            margin-bottom: clamp(0.3rem, 0.6vh, 0.5rem);
+        }
+
+        .title-logo span { color: var(--accent); }
+
+        .title-tagline {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 1.8vw, 1.4rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: clamp(2rem, 4vh, 3.5rem);
+        }
+
+        .title-rule {
+            width: clamp(40px, 5vw, 60px);
+            height: 1px;
+            background: var(--accent);
+            opacity: 0.4;
+            margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        }
+
+        .title-founders {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-top: clamp(0.5rem, 1vh, 1rem);
+        }
+
+        .title-meta {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            display: flex;
+            gap: clamp(1rem, 2vw, 2rem);
+            margin-top: clamp(1.5rem, 3vh, 2.5rem);
+        }
+
+        /* Subtle glow behind title */
+        .title-glow {
+            position: absolute;
+            width: clamp(300px, 40vw, 500px);
+            height: clamp(300px, 40vw, 500px);
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .title-slide .slide-content { z-index: 1; }
+
+        /* ===========================================
+           SLIDE 1: THESIS
+           =========================================== */
+        .thesis-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .thesis-quote {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+            font-weight: 400;
+            font-style: italic;
+            line-height: 1.35;
+            color: var(--text-primary);
+            max-width: 22ch;
+            margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        }
+
+        .thesis-sub {
+            font-size: var(--body-size);
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 48ch;
+            line-height: 1.7;
+        }
+
+        /* ===========================================
+           SLIDE 2: PROBLEM
+           =========================================== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(2rem, 4vw, 4rem);
+            align-items: center;
+            height: 100%;
+        }
+
+        .stat-row {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.75rem, 1.5vh, 1.25rem);
+            margin-top: clamp(1rem, 2vh, 1.5rem);
+        }
+
+        .stat-block {
+            display: flex;
+            align-items: baseline;
+            gap: clamp(0.5rem, 1vw, 1rem);
+        }
+
+        .stat-number {
+            font-family: var(--font-display);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
+            font-weight: 400;
+            color: var(--red);
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .stat-label {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.04em;
+            line-height: 1.5;
+        }
+
+        /* Terminal/log visualization */
+        .log-panel {
+            padding: clamp(1rem, 2vw, 1.75rem);
+            background: rgba(224, 96, 96, 0.03);
+            border: 1px solid rgba(224, 96, 96, 0.1);
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.8vw, 0.68rem);
+            line-height: 1.85;
+            color: var(--text-dim);
+        }
+
+        .log-panel .err { color: var(--red); }
+        .log-panel .warn { color: var(--accent); }
+        .log-panel .ts { opacity: 0.35; margin-right: 0.4em; }
+        .log-panel .dim { opacity: 0.3; }
+
+        .log-header {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+            padding-bottom: clamp(0.3rem, 0.5vh, 0.5rem);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .source-tag {
+            font-family: var(--font-mono);
+            font-size: clamp(0.5rem, 0.7vw, 0.6rem);
+            color: var(--text-dim);
+            opacity: 0.5;
+            margin-top: clamp(0.3rem, 0.6vh, 0.5rem);
+        }
+
+        /* ===========================================
+           SLIDE 3: PRETRAINING TIMELINE
+           =========================================== */
+        .timeline-section {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(1.25rem, 2.5vh, 2rem);
+            margin-top: clamp(0.75rem, 1.5vh, 1.25rem);
+        }
+
+        .timeline-row-label {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: clamp(0.25rem, 0.5vh, 0.4rem);
+        }
+
+        .timeline-row-label.bad { color: var(--text-dim); }
+        .timeline-row-label.good { color: var(--accent-2); }
+
+        .timeline-track {
+            position: relative;
+            width: 100%;
+            height: clamp(36px, 5vh, 48px);
+            background: var(--bg-card);
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid var(--rule);
+        }
+
+        .t-seg {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: clamp(0.45rem, 0.7vw, 0.55rem);
+            letter-spacing: 0.04em;
+            color: rgba(228, 226, 219, 0.6);
+        }
+
+        .t-train { background: rgba(92, 184, 164, 0.14); border-right: 1px solid rgba(92, 184, 164, 0.15); }
+        .t-fail { background: rgba(224, 96, 96, 0.2); border-left: 2px solid var(--red); border-right: 2px solid var(--red); }
+        .t-dead { background: repeating-linear-gradient(-45deg, rgba(224,96,96,0.04), rgba(224,96,96,0.04) 3px, rgba(224,96,96,0.09) 3px, rgba(224,96,96,0.09) 6px); }
+        .t-debug { background: rgba(232, 164, 90, 0.08); border-left: 1px dashed rgba(232, 164, 90, 0.2); }
+        .t-restart { background: rgba(140, 160, 180, 0.06); border-left: 1px dashed rgba(140, 160, 180, 0.15); }
+        .t-ckpt { background: rgba(92, 184, 164, 0.2); border-left: 2px solid var(--accent-2); }
+        .t-auto { background: linear-gradient(90deg, rgba(232,164,90,0.1), rgba(92,184,164,0.08)); border-left: 2px solid var(--accent); }
+        .t-resume { background: rgba(92, 184, 164, 0.12); border-left: 1px solid rgba(92, 184, 164, 0.15); }
+        .t-done { background: rgba(92, 184, 164, 0.22); color: var(--accent-2); }
+
+        .t-badge {
+            position: absolute;
+            top: clamp(-16px, -2vh, -18px);
+            font-family: var(--font-mono);
+            font-size: clamp(0.42rem, 0.6vw, 0.52rem);
+            letter-spacing: 0.04em;
+            padding: 1px 5px;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+
+        .t-badge.red { background: rgba(224,96,96,0.12); color: var(--red); border: 1px solid rgba(224,96,96,0.2); }
+        .t-badge.green { background: rgba(92,184,164,0.08); color: var(--accent-2); border: 1px solid rgba(92,184,164,0.18); }
+
+        .timeline-days {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: clamp(0.4rem, 0.6vw, 0.5rem);
+            color: var(--text-dim);
+            opacity: 0.5;
+            padding-top: clamp(0.2rem, 0.4vh, 0.35rem);
+        }
+
+        .timeline-note {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.4rem, 0.8vw, 0.75rem);
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            margin-top: clamp(0.15rem, 0.3vh, 0.25rem);
+        }
+
+        .timeline-note-line {
+            width: 2px;
+            height: clamp(16px, 2.5vh, 24px);
+            flex-shrink: 0;
+        }
+
+        .timeline-note-line.red { background: var(--red); }
+        .timeline-note-line.green { background: var(--accent-2); }
+
+        .timeline-note .highlight-red { color: var(--red); }
+        .timeline-note .highlight-green { color: var(--accent-2); }
+
+        .efficiency-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(0.4rem, 0.8vw, 0.6rem);
+            padding: clamp(0.3rem, 0.6vh, 0.5rem) clamp(0.6rem, 1.2vw, 1rem);
+            background: rgba(92, 184, 164, 0.06);
+            border: 1px solid rgba(92, 184, 164, 0.15);
+            border-radius: 5px;
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--accent-2);
+            align-self: flex-end;
+            margin-top: clamp(0.5rem, 1vh, 0.75rem);
+        }
+
+        .efficiency-badge .big {
+            font-family: var(--font-display);
+            font-size: clamp(1.1rem, 1.8vw, 1.4rem);
+            font-weight: 400;
+        }
+
+        /* ===========================================
+           SLIDE 4: SOLUTION
+           =========================================== */
+        .step-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .step-item {
+            display: grid;
+            grid-template-columns: clamp(32px, 4vw, 40px) 1fr;
+            gap: clamp(0.6rem, 1.2vw, 1rem);
+            padding: clamp(0.6rem, 1vh, 0.85rem) 0;
+            position: relative;
+        }
+
+        .step-connector {
+            position: absolute;
+            left: clamp(15px, 1.9vw, 19px);
+            top: clamp(36px, 4.5vh, 44px);
+            width: 1px;
+            bottom: 0;
+            background: var(--rule);
+        }
+
+        .step-item:last-child .step-connector { display: none; }
+
+        .step-num {
+            width: clamp(32px, 4vw, 40px);
+            height: clamp(32px, 4vw, 40px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            font-weight: 500;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-num.s1 { background: rgba(224,96,96,0.08); border: 1px solid rgba(224,96,96,0.2); color: var(--red); }
+        .step-num.s2 { background: rgba(232,164,90,0.08); border: 1px solid rgba(232,164,90,0.18); color: var(--accent); }
+        .step-num.s3 { background: rgba(140,170,200,0.08); border: 1px solid rgba(140,170,200,0.18); color: #8caac8; }
+        .step-num.s4 { background: rgba(92,184,164,0.08); border: 1px solid rgba(92,184,164,0.18); color: var(--accent-2); }
+
+        .step-body h3 { margin-bottom: clamp(0.1rem, 0.2vh, 0.15rem); }
+        .step-body p { font-size: var(--small-size); color: var(--text-dim); line-height: 1.5; font-weight: 300; }
+
+        /* ===========================================
+           SLIDE 5: PRODUCT
+           =========================================== */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: clamp(0.75rem, 1.5vw, 1.15rem);
+            flex: 1;
+            margin-top: clamp(1rem, 2vh, 1.5rem);
+            max-height: clamp(300px, 55vh, 500px);
+        }
+
+        .p-card {
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border-radius: 8px;
+            background: var(--bg-card);
+            border: 1px solid var(--rule);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .p-card-accent {
+            width: 100%;
+            height: 2px;
+            margin: clamp(-1rem, -2vw, -1.5rem);
+            margin-bottom: clamp(0.75rem, 1.5vh, 1rem);
+            margin-left: clamp(-1rem, -2vw, -1.5rem);
+            margin-right: clamp(-1rem, -2vw, -1.5rem);
+            width: calc(100% + clamp(2rem, 4vw, 3rem));
+        }
+
+        .p-card:nth-child(1) .p-card-accent { background: var(--accent); }
+        .p-card:nth-child(2) .p-card-accent { background: var(--accent-2); }
+        .p-card:nth-child(3) .p-card-accent { background: #8caac8; }
+        .p-card:nth-child(4) .p-card-accent { background: #c0956e; }
+
+        .p-card h3 { margin-bottom: clamp(0.2rem, 0.4vh, 0.35rem); }
+
+        .p-card p {
+            font-size: var(--small-size);
+            color: var(--text-dim);
+            line-height: 1.55;
+            font-weight: 300;
+        }
+
+        .p-tags {
+            margin-top: auto;
+            padding-top: clamp(0.4rem, 0.8vh, 0.6rem);
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(0.2rem, 0.4vw, 0.3rem);
+        }
+
+        .p-tag {
+            font-family: var(--font-mono);
+            font-size: clamp(0.42rem, 0.6vw, 0.52rem);
+            padding: clamp(0.1rem, 0.2vh, 0.15rem) clamp(0.3rem, 0.5vw, 0.4rem);
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-dim);
+            border: 1px solid var(--rule);
+        }
+
+        /* ===========================================
+           SLIDE 6: WHY NOW
+           =========================================== */
+        .why-cards {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.6rem, 1.2vh, 0.9rem);
+        }
+
+        .why-card {
+            padding: clamp(0.75rem, 1.5vh, 1.1rem) clamp(1rem, 2vw, 1.35rem);
+            border-radius: 7px;
+            border: 1px solid var(--rule);
+            background: var(--bg-card);
+            display: flex;
+            gap: clamp(0.75rem, 1.5vw, 1.25rem);
+            align-items: flex-start;
+        }
+
+        .why-num {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2vw, 1.6rem);
+            color: var(--accent);
+            opacity: 0.35;
+            line-height: 1;
+            flex-shrink: 0;
+            width: clamp(20px, 2.5vw, 28px);
+        }
+
+        .why-card h3 { margin-bottom: clamp(0.1rem, 0.2vh, 0.15rem); }
+        .why-card p { font-size: var(--small-size); color: var(--text-dim); line-height: 1.5; font-weight: 300; }
+
+        /* ===========================================
+           SLIDE 7: MARKET
+           =========================================== */
+        .market-stats {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(1.25rem, 2.5vh, 2rem);
+            margin-top: clamp(0.75rem, 1.5vh, 1.25rem);
+        }
+
+        .m-stat-value {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.2rem);
+            font-weight: 400;
+            color: var(--accent);
+            line-height: 1;
+            margin-bottom: clamp(0.15rem, 0.3vh, 0.25rem);
+        }
+
+        .m-stat-desc {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.03em;
+            line-height: 1.45;
+        }
+
+        .market-bars {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.85rem, 1.7vh, 1.25rem);
+        }
+
+        .m-bar-label {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.04em;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: clamp(0.2rem, 0.4vh, 0.3rem);
+        }
+
+        .m-bar-track {
+            width: 100%;
+            height: clamp(20px, 3vh, 26px);
+            background: var(--bg-card);
+            border-radius: 3px;
+            overflow: hidden;
+            border: 1px solid var(--rule);
+        }
+
+        .m-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            width: 0;
+            transition: width 1.2s var(--ease-out-expo);
+        }
+
+        .slide.visible .m-bar-fill { width: var(--fill); }
+
+        .m-bar-fill.a { background: linear-gradient(90deg, rgba(232,164,90,0.25), rgba(232,164,90,0.1)); border-right: 2px solid var(--accent); }
+        .m-bar-fill.b { background: linear-gradient(90deg, rgba(92,184,164,0.2), rgba(92,184,164,0.08)); border-right: 2px solid var(--accent-2); }
+        .m-bar-fill.c { background: linear-gradient(90deg, rgba(140,170,200,0.2), rgba(140,170,200,0.08)); border-right: 2px solid #8caac8; }
+
+        /* ===========================================
+           SLIDE 8: BUSINESS MODEL
+           =========================================== */
+        .biz-tier {
+            padding: clamp(0.85rem, 1.7vh, 1.25rem) clamp(1rem, 2vw, 1.5rem);
+            border-radius: 7px;
+            border: 1px solid var(--rule);
+            background: var(--bg-card);
+            margin-top: clamp(0.75rem, 1.5vh, 1rem);
+        }
+
+        .biz-tier-label {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: clamp(0.15rem, 0.3vh, 0.25rem);
+        }
+
+        .biz-tier-value {
+            font-family: var(--font-display);
+            font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+            color: var(--text-primary);
+        }
+
+        .biz-tier-value .unit {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+
+        .biz-projections {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.5rem, 1vh, 0.75rem);
+        }
+
+        .biz-row {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.75rem, 1.5vw, 1.25rem);
+            padding: clamp(0.5rem, 1vh, 0.75rem) clamp(0.75rem, 1.5vw, 1.1rem);
+            background: var(--bg-card);
+            border-radius: 6px;
+            border: 1px solid var(--rule);
+        }
+
+        .biz-gpus {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.04em;
+            width: clamp(65px, 8vw, 85px);
+            flex-shrink: 0;
+        }
+
+        .biz-arrow {
+            color: var(--text-dim);
+            opacity: 0.25;
+            font-size: var(--small-size);
+        }
+
+        .biz-rev {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 1.6vw, 1.3rem);
+            color: var(--accent-2);
+        }
+
+        .biz-arr {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            margin-left: auto;
+        }
+
+        /* ===========================================
+           SLIDE 9: COMPETITION
+           =========================================== */
+        .comp-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: clamp(0.75rem, 1.5vh, 1.25rem);
+        }
+
+        .comp-table th {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            font-weight: 500;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            text-align: left;
+            padding: clamp(0.3rem, 0.6vh, 0.5rem) clamp(0.5rem, 1vw, 0.75rem);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .comp-table td {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            padding: clamp(0.4rem, 0.8vh, 0.6rem) clamp(0.5rem, 1vw, 0.75rem);
+            border-bottom: 1px solid var(--rule);
+            font-weight: 300;
+            vertical-align: top;
+        }
+
+        .comp-table tr:last-child td { border-bottom: none; }
+
+        .comp-table .us td {
+            color: var(--text-primary);
+            font-weight: 400;
+        }
+
+        .comp-table .us td:first-child { color: var(--accent); }
+
+        .comp-check { color: var(--accent-2); }
+        .comp-x { color: var(--red); opacity: 0.5; }
+
+        /* ===========================================
+           SLIDE 10: TEAM
+           =========================================== */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.75rem, 1.5vw, 1.25rem);
+            margin-top: clamp(1.25rem, 2.5vh, 2rem);
+        }
+
+        .team-card {
+            padding: clamp(1rem, 2vw, 1.5rem);
+            border-radius: 8px;
+            border: 1px solid var(--rule);
+            background: var(--bg-card);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .team-avatar {
+            width: clamp(32px, 4vw, 40px);
+            height: clamp(32px, 4vw, 40px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-display);
+            font-size: clamp(0.9rem, 1.3vw, 1.1rem);
+            font-style: italic;
+            margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
+        }
+
+        .team-card:nth-child(1) .team-avatar { background: rgba(232,164,90,0.08); border: 1px solid rgba(232,164,90,0.18); color: var(--accent); }
+        .team-card:nth-child(2) .team-avatar { background: rgba(92,184,164,0.08); border: 1px solid rgba(92,184,164,0.18); color: var(--accent-2); }
+        .team-card:nth-child(3) .team-avatar { background: rgba(140,170,200,0.08); border: 1px solid rgba(140,170,200,0.18); color: #8caac8; }
+
+        .team-name {
+            font-family: var(--font-body);
+            font-size: var(--h3-size);
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: clamp(0.05rem, 0.1vh, 0.1rem);
+        }
+
+        .team-role {
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-bottom: clamp(0.4rem, 0.8vh, 0.6rem);
+        }
+
+        .team-creds {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.15rem, 0.3vh, 0.2rem);
+        }
+
+        .team-cred {
+            font-size: var(--small-size);
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.4;
+            padding-left: clamp(0.5rem, 0.8vw, 0.65rem);
+            position: relative;
+        }
+
+        .team-cred::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5em;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            opacity: 0.4;
+        }
+
+        .team-footer {
+            margin-top: clamp(1rem, 2vh, 1.5rem);
+            display: flex;
+            justify-content: center;
+            gap: clamp(1.5rem, 3vw, 2.5rem);
+        }
+
+        .team-badge {
+            display: flex;
+            align-items: center;
+            gap: clamp(0.3rem, 0.5vw, 0.4rem);
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+        }
+
+        .team-badge-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent);
+            opacity: 0.4;
+        }
+
+        /* ===========================================
+           SLIDE 11: CLOSING
+           =========================================== */
+        .closing-slide .slide-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .closing-logo {
+            font-family: var(--font-body);
+            font-size: clamp(2.2rem, 5vw, 3.8rem);
+            font-weight: 600;
+            letter-spacing: -0.04em;
+            color: var(--text-primary);
+            margin-bottom: clamp(0.3rem, 0.6vh, 0.5rem);
+        }
+
+        .closing-logo span { color: var(--accent); }
+
+        .closing-tagline {
+            font-family: var(--font-display);
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            font-weight: 400;
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: clamp(1.5rem, 3vh, 2.5rem);
+        }
+
+        .closing-contact {
+            display: flex;
+            gap: clamp(1.5rem, 3vw, 2.5rem);
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+            color: var(--text-dim);
+        }
+
+        /* ===========================================
+           RESPONSIVE BREAKPOINTS
+           =========================================== */
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.5rem, 4.5vw, 2.8rem);
+                --h2-size: clamp(1.3rem, 3.5vw, 2rem);
+            }
+        }
+
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.2rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.9rem);
+            }
+            .nav-dots, .decorative { display: none; }
+        }
+
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.6rem, 1vw, 0.8rem);
+            }
+        }
+
+        @media (max-width: 600px) {
+            :root { --title-size: clamp(1.5rem, 8vw, 2.5rem); }
+            .two-col { grid-template-columns: 1fr; }
+            .product-grid { grid-template-columns: 1fr; }
+            .team-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Navigation Dots -->
+<nav class="nav-dots" id="navDots" aria-label="Slide navigation"></nav>
+
+<!-- ═══════ SLIDE 0: TITLE ═══════ -->
+<section class="slide title-slide" aria-label="Title">
+    <div class="title-glow"></div>
+    <div class="slide-content">
+        <div class="title-rule reveal"></div>
+        <div class="overline reveal">On-prem AI infrastructure</div>
+        <h1 class="title-logo reveal">sixty<span>two</span></h1>
+        <p class="title-tagline reveal">Reliability infrastructure for AI pretraining</p>
+        <div class="title-founders reveal">Antonio Alonso-Stepanov &middot; Jessie Dong &middot; Sonnet Xu</div>
+        <div class="title-meta reveal">
+            <span>Stanford CS '26 / '27</span>
+            <span>Spring 2026</span>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 1: THESIS ═══════ -->
+<section class="slide thesis-slide" aria-label="Thesis">
+    <div class="slide-content">
+        <div class="overline reveal">Our thesis</div>
+        <p class="thesis-quote reveal">A growing number of companies are pretraining their own models.</p>
+        <p class="thesis-sub reveal">Data control and GPU economics are pushing companies on-prem. But going on-prem means taking on everything a cloud provider does invisibly &mdash; with none of their tooling.</p>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 2: PROBLEM ═══════ -->
+<section class="slide" aria-label="Problem">
+    <div class="slide-content">
+        <div class="two-col">
+            <div>
+                <div class="overline reveal">The problem</div>
+                <h2 class="reveal">Pretraining runs<br>are fragile</h2>
+                <p class="body-text reveal" style="margin-top: clamp(0.5rem, 1vh, 0.75rem);">A single node failure days into a multi-week run can mean lost compute, manual debugging, and restarted training from stale checkpoints.</p>
+                <div class="stat-row">
+                    <div class="stat-block reveal reveal-delay-1">
+                        <div class="stat-number">419</div>
+                        <div class="stat-label">failures in 54 days on Meta's 16,384-GPU Llama 3 cluster</div>
+                    </div>
+                    <div class="stat-block reveal reveal-delay-2">
+                        <div class="stat-number">1 / 3hrs</div>
+                        <div class="stat-label">failure frequency at that scale</div>
+                    </div>
+                    <div class="stat-block reveal reveal-delay-3">
+                        <div class="stat-number">~9%</div>
+                        <div class="stat-label">annualized GPU failure rate</div>
+                    </div>
+                </div>
+                <div class="source-tag reveal reveal-delay-4">Source: Meta HPCA 2025, arXiv 2410.21680</div>
+            </div>
+            <div class="reveal reveal-delay-3">
+                <div class="log-panel">
+                    <div class="log-header">Cluster event log</div>
+                    <div><span class="ts">03:14:22</span> <span class="dim">node-047</span> step 48,291 <span class="dim">loss: 2.847</span></div>
+                    <div><span class="ts">03:14:23</span> <span class="dim">node-047</span> step 48,292 <span class="dim">loss: 2.843</span></div>
+                    <div><span class="ts">03:14:24</span> <span class="err">node-012 NCCL TIMEOUT &mdash; allreduce hang</span></div>
+                    <div><span class="ts">03:14:24</span> <span class="err">node-012 GPU 3: Xid 79 &mdash; fallen off bus</span></div>
+                    <div><span class="ts">03:14:25</span> <span class="warn">ALERT training stalled &mdash; rank 12 unresponsive</span></div>
+                    <div><span class="ts">03:14:25</span> <span class="err">all ranks NCCL watchdog timeout &mdash; aborting</span></div>
+                    <div><span class="ts">03:14:26</span> <span class="err">FATAL run terminated &mdash; 72h compute lost</span></div>
+                    <div style="margin-top: clamp(0.3rem, 0.5vh, 0.4rem);"><span class="ts">07:22:00</span> <span class="warn">eng-oncall paged &mdash; investigation begins</span></div>
+                    <div><span class="ts">09:41:00</span> <span class="dim">root cause: GPU HBM3 ECC error</span></div>
+                    <div><span class="ts">11:30:00</span> <span class="dim">node replaced, run restarted from scratch</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 3: PRETRAINING TIMELINE ═══════ -->
+<section class="slide" aria-label="Pretraining deep dive">
+    <div class="slide-content">
+        <div class="overline reveal">Pretraining deep dive</div>
+        <h2 class="reveal">Anatomy of a failed training run</h2>
+
+        <div class="timeline-section">
+            <!-- WITHOUT -->
+            <div class="reveal reveal-delay-1">
+                <div class="timeline-row-label bad">Without Sixtytwo &mdash; 14-day run</div>
+                <div style="position: relative;">
+                    <div class="timeline-track">
+                        <div class="t-seg t-train" style="left:0;width:21%;">training</div>
+                        <div class="t-seg t-fail" style="left:21%;width:3%;">!</div>
+                        <div class="t-seg t-dead" style="left:24%;width:9%;"></div>
+                        <div class="t-seg t-debug" style="left:33%;width:10%;">debug</div>
+                        <div class="t-seg t-restart" style="left:43%;width:4%;">restart</div>
+                        <div class="t-seg t-train" style="left:47%;width:22%;">re-training</div>
+                        <div class="t-seg t-fail" style="left:69%;width:2.5%;">!</div>
+                        <div class="t-seg t-dead" style="left:71.5%;width:6%;"></div>
+                        <div class="t-seg t-debug" style="left:77.5%;width:7%;">debug</div>
+                        <div class="t-seg t-restart" style="left:84.5%;width:3%;">restart</div>
+                        <div class="t-seg t-train" style="left:87.5%;width:12.5%;">training...</div>
+                    </div>
+                    <div class="t-badge red" style="left:24%;">3 days lost</div>
+                    <div class="t-badge red" style="left:71.5%;">1.5 days lost</div>
+                </div>
+                <div class="timeline-days">
+                    <span>Day 0</span><span>Day 3</span><span>Day 7</span><span>Day 10</span><span>Day 14</span>
+                </div>
+                <div class="timeline-note">
+                    <div class="timeline-note-line red"></div>
+                    <span><span class="highlight-red">~30% compute wasted.</span> Run still incomplete at day 14.</span>
+                </div>
+            </div>
+
+            <!-- WITH -->
+            <div class="reveal reveal-delay-3">
+                <div class="timeline-row-label good">With Sixtytwo &mdash; same workload, same hardware</div>
+                <div style="position: relative;">
+                    <div class="timeline-track" style="border-color: rgba(92,184,164,0.12);">
+                        <div class="t-seg t-train" style="left:0;width:21%;">training</div>
+                        <div class="t-seg t-ckpt" style="left:21%;width:2%;">&#x2713;</div>
+                        <div class="t-seg t-auto" style="left:23%;width:3%;">auto</div>
+                        <div class="t-seg t-resume" style="left:26%;width:30%;">resumed from checkpoint</div>
+                        <div class="t-seg t-ckpt" style="left:56%;width:1.5%;">&#x2713;</div>
+                        <div class="t-seg t-auto" style="left:57.5%;width:2.5%;">auto</div>
+                        <div class="t-seg t-resume" style="left:60%;width:30%;">resumed &rarr; complete</div>
+                        <div class="t-seg t-done" style="left:90%;width:10%;">&#x2713; done</div>
+                    </div>
+                    <div class="t-badge green" style="left:21%;">auto-recovered</div>
+                    <div class="t-badge green" style="left:56%;">auto-recovered</div>
+                </div>
+                <div class="timeline-days">
+                    <span>Day 0</span><span>Day 3</span><span>Day 7</span><span>Day 10</span><span style="color:var(--accent-2);">Day 12 &#x2713;</span>
+                </div>
+                <div class="timeline-note">
+                    <div class="timeline-note-line green"></div>
+                    <span><span class="highlight-green">&lt;5% overhead.</span> Failures auto-detected, checkpointed, recovered. Finished 2 days early.</span>
+                </div>
+            </div>
+
+            <div class="efficiency-badge reveal reveal-delay-5">
+                <span>Compute utilization:</span>
+                <span class="big">95%+</span>
+                <span>vs ~65% without</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 4: SOLUTION ═══════ -->
+<section class="slide" aria-label="Solution">
+    <div class="slide-content">
+        <div class="two-col">
+            <div>
+                <div class="overline reveal">Our solution</div>
+                <h2 class="reveal">Self-healing<br>training infrastructure</h2>
+                <p class="body-text reveal" style="margin-top: clamp(0.5rem, 1vh, 0.75rem);">Sixtytwo monitors every layer of the training stack &mdash; hardware, network, framework &mdash; and automatically recovers from failures. No pager. No manual restarts.</p>
+            </div>
+            <div class="step-flow">
+                <div class="step-item reveal reveal-delay-1">
+                    <div class="step-num s1">01</div>
+                    <div class="step-body">
+                        <h3>Detect</h3>
+                        <p>Continuous health monitoring across GPU, NIC, NVLink, NCCL. Sub-second anomaly detection.</p>
+                    </div>
+                    <div class="step-connector"></div>
+                </div>
+                <div class="step-item reveal reveal-delay-2">
+                    <div class="step-num s2">02</div>
+                    <div class="step-body">
+                        <h3>Checkpoint</h3>
+                        <p>Automatically saves training state when issues are detected. No progress lost.</p>
+                    </div>
+                    <div class="step-connector"></div>
+                </div>
+                <div class="step-item reveal reveal-delay-3">
+                    <div class="step-num s3">03</div>
+                    <div class="step-body">
+                        <h3>Replace</h3>
+                        <p>Quarantines failing node, provisions a healthy spare. Handles topology reconfiguration.</p>
+                    </div>
+                    <div class="step-connector"></div>
+                </div>
+                <div class="step-item reveal reveal-delay-4">
+                    <div class="step-num s4">04</div>
+                    <div class="step-body">
+                        <h3>Resume</h3>
+                        <p>Restores from checkpoint on new topology. Recovery in minutes, not days.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 5: PRODUCT ═══════ -->
+<section class="slide" aria-label="Product">
+    <div class="slide-content">
+        <div class="overline reveal">What we build</div>
+        <h2 class="reveal">The on-prem training platform</h2>
+        <div class="product-grid">
+            <div class="p-card reveal reveal-delay-1">
+                <div class="p-card-accent"></div>
+                <h3>Observability</h3>
+                <p>Unified monitoring across GPU health, training metrics, network fabric, and thermals. Purpose-built for pretraining.</p>
+                <div class="p-tags">
+                    <span class="p-tag">Prometheus</span>
+                    <span class="p-tag">DCGM</span>
+                    <span class="p-tag">OpenTelemetry</span>
+                </div>
+            </div>
+            <div class="p-card reveal reveal-delay-2">
+                <div class="p-card-accent"></div>
+                <h3>Fleet Management</h3>
+                <p>Inventory tracking, health scoring, automatic quarantine. Know which nodes are reliable and which are degrading.</p>
+                <div class="p-tags">
+                    <span class="p-tag">Node health</span>
+                    <span class="p-tag">Spare pool</span>
+                    <span class="p-tag">Topology</span>
+                </div>
+            </div>
+            <div class="p-card reveal reveal-delay-3">
+                <div class="p-card-accent"></div>
+                <h3>Orchestration</h3>
+                <p>Intelligent scheduling with automatic checkpointing, failure recovery, and run resumption for distributed training.</p>
+                <div class="p-tags">
+                    <span class="p-tag">PyTorch</span>
+                    <span class="p-tag">Kubernetes</span>
+                    <span class="p-tag">Slurm</span>
+                </div>
+            </div>
+            <div class="p-card reveal reveal-delay-4">
+                <div class="p-card-accent"></div>
+                <h3>Container &amp; Image Mgmt</h3>
+                <p>Reproducible training environments with version-controlled containers. Fast distribution across hundreds of nodes.</p>
+                <div class="p-tags">
+                    <span class="p-tag">Docker</span>
+                    <span class="p-tag">NCCL</span>
+                    <span class="p-tag">CUDA</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 6: WHY NOW ═══════ -->
+<section class="slide" aria-label="Why now">
+    <div class="slide-content">
+        <div class="two-col">
+            <div>
+                <div class="overline reveal">Why now</div>
+                <h2 class="reveal">The shift to on-prem<br>is accelerating</h2>
+                <p class="body-text reveal" style="margin-top: clamp(0.5rem, 1vh, 0.75rem);">79% of enterprises have already repatriated some AI workloads from public cloud. The infrastructure to operate those clusters reliably doesn't exist yet.</p>
+                <div class="source-tag reveal">Source: Feb 2026 enterprise IT survey (n=203)</div>
+            </div>
+            <div class="why-cards">
+                <div class="why-card reveal reveal-delay-1">
+                    <div class="why-num">1</div>
+                    <div>
+                        <h3>Data sovereignty</h3>
+                        <p>73% of enterprises cite data privacy as top AI risk. 120+ countries now have data protection laws, up from 76 in 2011.</p>
+                    </div>
+                </div>
+                <div class="why-card reveal reveal-delay-2">
+                    <div class="why-num">2</div>
+                    <div>
+                        <h3>Cost at scale</h3>
+                        <p>On-prem breaks even vs cloud in under 4 months at high utilization. 8&ndash;18x cheaper per token for sustained workloads.</p>
+                    </div>
+                </div>
+                <div class="why-card reveal reveal-delay-3">
+                    <div class="why-num">3</div>
+                    <div>
+                        <h3>Regulation</h3>
+                        <p>EU AI Act high-risk rules take effect Aug 2026. Emerging US and global policy requires data residency and auditability.</p>
+                    </div>
+                </div>
+                <div class="why-card reveal reveal-delay-4">
+                    <div class="why-num">4</div>
+                    <div>
+                        <h3>Open-source models</h3>
+                        <p>Llama, Mistral, DeepSeek mean companies can pretrain on their own data. The workloads are here &mdash; the tooling isn't.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 7: MARKET ═══════ -->
+<section class="slide" aria-label="Market">
+    <div class="slide-content">
+        <div class="two-col">
+            <div>
+                <div class="overline reveal">Market</div>
+                <h2 class="reveal">A massive, growing<br>opportunity</h2>
+                <div class="market-stats">
+                    <div class="reveal reveal-delay-1">
+                        <div class="m-stat-value">$758B</div>
+                        <div class="m-stat-desc">AI infrastructure spending by 2029 (IDC)</div>
+                    </div>
+                    <div class="reveal reveal-delay-2">
+                        <div class="m-stat-value">75%</div>
+                        <div class="m-stat-desc">of enterprise AI workloads on hybrid infra by 2028 (IDC)</div>
+                    </div>
+                    <div class="reveal reveal-delay-3">
+                        <div class="m-stat-value">$700M</div>
+                        <div class="m-stat-desc">NVIDIA paid for Run:ai &mdash; validating GPU orchestration software</div>
+                    </div>
+                </div>
+            </div>
+            <div class="reveal reveal-delay-2">
+                <div class="market-bars">
+                    <div>
+                        <div class="m-bar-label">
+                            <span>Enterprises repatriating AI from cloud</span>
+                            <span style="color:var(--accent);">79%</span>
+                        </div>
+                        <div class="m-bar-track">
+                            <div class="m-bar-fill a" style="--fill:79%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="m-bar-label">
+                            <span>Enterprise data privacy as top AI risk</span>
+                            <span style="color:var(--accent-2);">73%</span>
+                        </div>
+                        <div class="m-bar-track">
+                            <div class="m-bar-fill b" style="--fill:73%;"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="m-bar-label">
+                            <span>GPU cluster failures causing run restarts</span>
+                            <span style="color:#8caac8;">68%</span>
+                        </div>
+                        <div class="m-bar-track">
+                            <div class="m-bar-fill c" style="--fill:68%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: clamp(1rem, 2vh, 1.5rem); font-family: var(--font-mono); font-size: var(--mono-size); color: var(--text-dim); line-height: 1.6;">
+                    Samsung building 50,000-GPU on-prem AI factory.<br>
+                    Private sector owns 80% of global AI compute (Epoch AI).
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 8: BUSINESS MODEL ═══════ -->
+<section class="slide" aria-label="Business model">
+    <div class="slide-content">
+        <div class="two-col">
+            <div>
+                <div class="overline reveal">Business model</div>
+                <h2 class="reveal">Enterprise SaaS,<br>per GPU</h2>
+                <p class="body-text reveal" style="margin-top: clamp(0.5rem, 1vh, 0.75rem);">Software-only. Deployed on customer hardware. 80&ndash;90% gross margins.</p>
+                <div class="biz-tier reveal reveal-delay-1">
+                    <div class="biz-tier-label">Platform license</div>
+                    <div class="biz-tier-value">~$100 <span class="unit">/GPU/month</span></div>
+                </div>
+                <div style="margin-top: clamp(0.75rem, 1.5vh, 1rem); font-family: var(--font-mono); font-size: var(--mono-size); color: var(--text-dim);" class="reveal reveal-delay-2">
+                    B2B SaaS &middot; AI Infrastructure &middot; 80&ndash;90% margins
+                </div>
+            </div>
+            <div>
+                <div class="biz-projections">
+                    <div style="margin-bottom: clamp(0.25rem, 0.5vh, 0.4rem);">
+                        <span style="font-family: var(--font-mono); font-size: var(--mono-size); color: var(--text-dim); letter-spacing: 0.1em; text-transform: uppercase;">Revenue projections</span>
+                    </div>
+                    <div class="biz-row reveal reveal-delay-1">
+                        <div class="biz-gpus">1,000 GPUs</div>
+                        <div class="biz-arrow">&rarr;</div>
+                        <div class="biz-rev">$100K/mo</div>
+                        <div class="biz-arr">$1.2M ARR</div>
+                    </div>
+                    <div class="biz-row reveal reveal-delay-2">
+                        <div class="biz-gpus">10,000 GPUs</div>
+                        <div class="biz-arrow">&rarr;</div>
+                        <div class="biz-rev">$1M/mo</div>
+                        <div class="biz-arr">$12M ARR</div>
+                    </div>
+                    <div class="biz-row reveal reveal-delay-3">
+                        <div class="biz-gpus">100,000 GPUs</div>
+                        <div class="biz-arrow">&rarr;</div>
+                        <div class="biz-rev">$10M/mo</div>
+                        <div class="biz-arr">$120M ARR</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 9: COMPETITION ═══════ -->
+<section class="slide" aria-label="Competition">
+    <div class="slide-content">
+        <div class="overline reveal">Competitive landscape</div>
+        <h2 class="reveal">No one owns on-prem training reliability</h2>
+        <p class="body-text reveal" style="margin-top: clamp(0.3rem, 0.6vh, 0.5rem); margin-bottom: clamp(0.75rem, 1.5vh, 1rem);">Cloud platforms handle this invisibly. On-prem teams piece together scripts that break.</p>
+
+        <table class="comp-table reveal reveal-delay-1">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>On-prem</th>
+                    <th>Training-aware</th>
+                    <th>Auto-recovery</th>
+                    <th>Observability</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>AWS SageMaker / HyperPod</td>
+                    <td><span class="comp-x">&#x2717;</span></td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                </tr>
+                <tr>
+                    <td>Run:ai (NVIDIA)</td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-x">&#x2717;</span></td>
+                    <td><span class="comp-x">&#x2717;</span></td>
+                    <td>Partial</td>
+                </tr>
+                <tr>
+                    <td>Slurm + DCGM + scripts</td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-x">&#x2717;</span></td>
+                    <td><span class="comp-x">&#x2717;</span></td>
+                    <td><span class="comp-x">&#x2717;</span></td>
+                </tr>
+                <tr class="us">
+                    <td>Sixtytwo</td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                    <td><span class="comp-check">&#x2713;</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 10: TEAM ═══════ -->
+<section class="slide" aria-label="Team">
+    <div class="slide-content" style="align-items: center;">
+        <div class="overline reveal" style="text-align: center;">Team</div>
+        <h2 class="reveal" style="text-align: center;">Built by engineers who<br>know this stack</h2>
+
+        <div class="team-grid">
+            <div class="team-card reveal reveal-delay-1">
+                <div class="team-avatar">A</div>
+                <div class="team-name">Antonio Alonso-Stepanov</div>
+                <div class="team-role">Co-founder</div>
+                <div class="team-creds">
+                    <div class="team-cred">Stanford CS '26</div>
+                    <div class="team-cred">SWE Intern, Meta &mdash; LLM content integrity</div>
+                    <div class="team-cred">Research Asst., NCSU &mdash; DNA data storage</div>
+                    <div class="team-cred">VP Growth, Stanford BASES</div>
+                    <div class="team-cred">TreeHacks 1st Place, OpenAI Prize</div>
+                </div>
+            </div>
+            <div class="team-card reveal reveal-delay-2">
+                <div class="team-avatar">J</div>
+                <div class="team-name">Jessie Dong</div>
+                <div class="team-role">Co-founder</div>
+                <div class="team-creds">
+                    <div class="team-cred">Stanford CS '27</div>
+                    <div class="team-cred">Stanford OVAL AI Lab &mdash; NLP research</div>
+                    <div class="team-cred">Founding Engineer, Sago &mdash; LLM pipelines</div>
+                    <div class="team-cred">Embedded Systems Intern, Tesla</div>
+                    <div class="team-cred">Kleiner Perkins Fellow</div>
+                </div>
+            </div>
+            <div class="team-card reveal reveal-delay-3">
+                <div class="team-avatar">S</div>
+                <div class="team-name">Sonnet Xu</div>
+                <div class="team-role">Co-founder</div>
+                <div class="team-creds">
+                    <div class="team-cred">Stanford CS '27</div>
+                    <div class="team-cred">ML Intern, DatologyAI &mdash; distributed training</div>
+                    <div class="team-cred">Published at NeurIPS, MICCAI</div>
+                    <div class="team-cred">SWE Intern, Amazon &mdash; LLM guardrails</div>
+                    <div class="team-cred">Research Fellow, Hoover Institution</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="team-footer reveal reveal-delay-4">
+            <div class="team-badge"><div class="team-badge-dot"></div><span>All technical founders</span></div>
+            <div class="team-badge"><div class="team-badge-dot"></div><span>3 years building together</span></div>
+            <div class="team-badge"><div class="team-badge-dot"></div><span>Full-time committed</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════ SLIDE 11: CLOSING ═══════ -->
+<section class="slide closing-slide" aria-label="Closing">
+    <div class="title-glow"></div>
+    <div class="slide-content">
+        <div class="title-rule reveal"></div>
+        <h1 class="closing-logo reveal">sixty<span>two</span></h1>
+        <p class="closing-tagline reveal">The future of AI runs on-prem.</p>
+        <div class="closing-contact reveal">
+            <span>antaloaalonso@gmail.com</span>
+            <span>jessiesagedong@gmail.com</span>
+            <span>sonnet@stanford.edu</span>
+        </div>
+    </div>
+</section>
+
+<script>
+    /* ===========================================
+       SLIDE PRESENTATION CONTROLLER
+       =========================================== */
+    class SlidePresentation {
+        constructor() {
+            this.slides = document.querySelectorAll('.slide');
+            this.currentSlide = 0;
+            this.totalSlides = this.slides.length;
+            this.setupIntersectionObserver();
+            this.setupKeyboardNav();
+            this.setupTouchNav();
+            this.setupProgressBar();
+            this.setupNavDots();
+        }
+
+        /* Intersection Observer — triggers .visible class */
+        setupIntersectionObserver() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        const idx = Array.from(this.slides).indexOf(entry.target);
+                        if (idx !== -1) {
+                            this.currentSlide = idx;
+                            this.updateProgressBar();
+                            this.updateNavDots();
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            this.slides.forEach(slide => observer.observe(slide));
+        }
+
+        /* Keyboard: arrows, space, page up/down */
+        setupKeyboardNav() {
+            document.addEventListener('keydown', (e) => {
+                if (['ArrowDown', 'ArrowRight', ' ', 'PageDown'].includes(e.key)) {
+                    e.preventDefault();
+                    this.goTo(this.currentSlide + 1);
+                } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
+                    e.preventDefault();
+                    this.goTo(this.currentSlide - 1);
+                }
+            });
+        }
+
+        /* Touch/swipe */
+        setupTouchNav() {
+            let startY = 0;
+            document.addEventListener('touchstart', (e) => { startY = e.touches[0].clientY; });
+            document.addEventListener('touchend', (e) => {
+                const dy = e.changedTouches[0].clientY - startY;
+                if (Math.abs(dy) > 50) {
+                    if (dy < 0) this.goTo(this.currentSlide + 1);
+                    else this.goTo(this.currentSlide - 1);
+                }
+            });
+        }
+
+        /* Progress bar */
+        setupProgressBar() {
+            this.progressBar = document.getElementById('progressBar');
+            this.updateProgressBar();
+        }
+
+        updateProgressBar() {
+            const pct = (this.currentSlide / (this.totalSlides - 1)) * 100;
+            this.progressBar.style.width = pct + '%';
+        }
+
+        /* Navigation dots */
+        setupNavDots() {
+            const nav = document.getElementById('navDots');
+            this.slides.forEach((_, i) => {
+                const dot = document.createElement('button');
+                dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+                dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+                dot.addEventListener('click', () => this.goTo(i));
+                nav.appendChild(dot);
+            });
+            this.dots = nav.querySelectorAll('.nav-dot');
+        }
+
+        updateNavDots() {
+            this.dots.forEach((d, i) => d.classList.toggle('active', i === this.currentSlide));
+        }
+
+        /* Navigate to slide */
+        goTo(index) {
+            if (index < 0 || index >= this.totalSlides) return;
+            this.slides[index].scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    new SlidePresentation();
+</script>
+
+</body>
+</html>
