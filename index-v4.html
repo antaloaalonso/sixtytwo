@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sixtytwo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --night: #07131a;
+    --night-2: #0d1c26;
+    --night-3: #143142;
+    --cream: #f5f0e6;
+    --mist: #dce5eb;
+    --fog: #96a9b6;
+    --ink: #11171c;
+    --stone: #efe7d7;
+    --paper: #f8f3ea;
+    --line: rgba(211, 198, 176, 0.55);
+    --line-dark: rgba(74, 108, 127, 0.34);
+    --cyan: #7be0ff;
+    --signal: #63f0c9;
+    --orange: #ff8e46;
+    --rose: #ff6a6a;
+    --shadow-dark: 0 30px 80px rgba(3, 7, 10, 0.38);
+    --shadow-light: 0 30px 80px rgba(24, 20, 14, 0.14);
+    --slide-transition: 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: 'Space Grotesk', sans-serif;
+    background: #050a0f;
+    color: var(--cream);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  .presentation {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 1.55rem;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity var(--slide-transition), visibility var(--slide-transition);
+  }
+
+  .slide.active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 2;
+  }
+
+  .slide-frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .slide.dark .slide-frame {
+    background:
+      radial-gradient(circle at 18% 14%, rgba(123, 224, 255, 0.16), transparent 28%),
+      radial-gradient(circle at 90% 85%, rgba(99, 240, 201, 0.12), transparent 22%),
+      linear-gradient(135deg, #08131a 0%, #0c1b25 46%, #07131a 100%);
+    box-shadow: var(--shadow-dark);
+  }
+
+  .slide.light .slide-frame {
+    background:
+      radial-gradient(circle at 14% 18%, rgba(255, 142, 70, 0.10), transparent 28%),
+      radial-gradient(circle at 86% 82%, rgba(123, 224, 255, 0.14), transparent 25%),
+      linear-gradient(135deg, #f9f4ea 0%, #efe6d5 100%);
+    box-shadow: var(--shadow-light);
+    color: var(--ink);
+    border-color: rgba(209, 198, 176, 0.45);
+  }
+
+  .slide-frame::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 5rem 5rem;
+    pointer-events: none;
+  }
+
+  .slide.light .slide-frame::before {
+    background-image:
+      linear-gradient(rgba(183, 170, 147, 0.21) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(183, 170, 147, 0.21) 1px, transparent 1px);
+  }
+
+  .slide-frame::after {
+    content: "";
+    position: absolute;
+    left: -12%;
+    bottom: 12%;
+    width: 120%;
+    height: 42%;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 360' fill='none'%3E%3Cpath d='M0 260C228 150 390 240 642 143C860 59 1061 66 1600 10' stroke='%23224457' stroke-width='2' opacity='.7'/%3E%3Cpath d='M0 305C250 180 448 245 738 172C989 109 1170 95 1600 62' stroke='%23183544' stroke-width='2' opacity='.72'/%3E%3C/svg%3E") center/cover no-repeat;
+    opacity: 0.82;
+    pointer-events: none;
+  }
+
+  .slide.light .slide-frame::after {
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 360' fill='none'%3E%3Cpath d='M40 302C276 173 470 234 728 150C939 82 1167 80 1560 44' stroke='%23d5b28a' stroke-width='2' opacity='.95'/%3E%3Cpath d='M58 340C287 212 499 256 772 196C1032 138 1182 111 1574 82' stroke='%238fd7ef' stroke-width='2' opacity='.95'/%3E%3C/svg%3E") center/cover no-repeat;
+    opacity: 0.9;
+  }
+
+  .slide-inner {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    padding: 2.35rem 2.65rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+  }
+
+  .slide-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 2rem;
+    min-height: 2rem;
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--signal);
+  }
+
+  .slide.light .eyebrow { color: #0e6c6a; }
+
+  .note {
+    margin-left: auto;
+    max-width: 33rem;
+    text-align: right;
+    font-size: 0.92rem;
+    line-height: 1.3;
+    color: var(--fog);
+  }
+
+  .slide.light .note { color: #6d8290; }
+
+  .display {
+    font-family: 'Newsreader', serif;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+  }
+
+  .headline-xl { font-size: clamp(3.25rem, 6.2vw, 5.4rem); }
+  .headline-lg { font-size: clamp(2.8rem, 5vw, 4.2rem); }
+  .headline-md { font-size: clamp(2.25rem, 4vw, 3.2rem); }
+
+  .lead {
+    max-width: 30rem;
+    font-size: 1.25rem;
+    line-height: 1.38;
+    color: var(--mist);
+  }
+
+  .slide.light .lead { color: #485864; }
+
+  .mono {
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .subtle {
+    color: var(--fog);
+  }
+
+  .slide.light .subtle {
+    color: #6f8290;
+  }
+
+  .pill,
+  .chip,
+  .glass-card,
+  .paper-card,
+  .panel,
+  .bubble {
+    border-radius: 24px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.78rem 1.1rem;
+    background: rgba(10, 29, 39, 0.7);
+    border: 1px solid rgba(79, 116, 137, 0.42);
+    backdrop-filter: blur(10px);
+  }
+
+  .slide.light .pill {
+    background: rgba(255, 248, 237, 0.78);
+    border-color: rgba(208, 194, 169, 0.88);
+  }
+
+  .pill .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+
+  .pill .text {
+    font-size: 1rem;
+    line-height: 1.3;
+    color: var(--mist);
+  }
+
+  .slide.light .pill .text { color: var(--ink); }
+
+  .glass-card {
+    background: rgba(9, 27, 36, 0.72);
+    border: 1px solid rgba(69, 102, 121, 0.42);
+    box-shadow: 0 18px 40px rgba(1, 8, 11, 0.18);
+    backdrop-filter: blur(12px);
+  }
+
+  .paper-card {
+    background: rgba(255, 249, 239, 0.82);
+    border: 1px solid rgba(208, 194, 169, 0.9);
+    box-shadow: 0 14px 28px rgba(17, 14, 10, 0.08);
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.7rem;
+  }
+
+  .chip {
+    padding: 0.55rem 0.95rem;
+    border: 1px solid rgba(208, 194, 169, 0.9);
+    background: rgba(255, 247, 235, 0.6);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.84rem;
+    color: #3d4950;
+    letter-spacing: 0.06em;
+  }
+
+  .nav-fixed {
+    position: fixed;
+    top: 1.55rem;
+    left: 2rem;
+    right: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .nav-fixed > * { pointer-events: auto; }
+
+  .brand,
+  .slide-counter {
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.82rem;
+    color: rgba(245, 240, 230, 0.68);
+  }
+
+  .slide-counter { text-align: right; }
+
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 10%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--signal), var(--orange));
+    z-index: 25;
+    transition: width 0.4s ease;
+  }
+
+  .nav-arrows {
+    position: fixed;
+    right: 1.8rem;
+    bottom: 1.5rem;
+    display: flex;
+    gap: 0.6rem;
+    z-index: 20;
+  }
+
+  .nav-arrow {
+    width: 2.8rem;
+    height: 2.8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.12);
+    background: rgba(6, 14, 18, 0.6);
+    color: rgba(255,255,255,0.86);
+    cursor: pointer;
+    font-size: 1rem;
+  }
+
+  .slide.light ~ .nav-arrows .nav-arrow { color: var(--ink); }
+
+  .cover-grid,
+  .problem-grid,
+  .product-grid,
+  .why-grid,
+  .market-grid,
+  .competition-grid,
+  .roadmap-grid,
+  .team-grid,
+  .close-grid {
+    display: grid;
+    gap: 1.6rem;
+    min-height: 0;
+    flex: 1;
+  }
+
+  .cover-grid { grid-template-columns: 1.05fr 0.95fr; align-items: center; }
+  .problem-grid { grid-template-columns: 1fr 1.1fr; align-items: start; }
+  .product-grid { grid-template-columns: 1.05fr 0.95fr; align-items: start; }
+  .why-grid { grid-template-columns: 1.08fr 0.92fr; align-items: start; }
+  .market-grid { grid-template-columns: 0.92fr 1.08fr; align-items: start; }
+  .competition-grid { grid-template-columns: 1.12fr 0.88fr; align-items: start; }
+  .roadmap-grid { grid-template-columns: 1.12fr 0.88fr; align-items: start; }
+  .team-grid { grid-template-columns: repeat(3, 1fr); align-items: stretch; }
+  .close-grid { grid-template-columns: 1.05fr 0.95fr; align-items: end; }
+
+  .cover-copy,
+  .product-copy,
+  .competition-copy,
+  .close-copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1.35rem;
+    min-height: 100%;
+  }
+
+  .founder-row {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    gap: 1.6rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    color: var(--fog);
+  }
+
+  .diagram-panel,
+  .visual-panel,
+  .status-panel,
+  .quad-panel,
+  .market-panel,
+  .contact-panel {
+    position: relative;
+    padding: 1.2rem;
+  }
+
+  .diagram-panel,
+  .quad-panel,
+  .market-panel,
+  .contact-panel {
+    min-height: 100%;
+  }
+
+  .diagram-panel svg,
+  .visual-panel svg,
+  .quad-panel svg {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .stack-card,
+  .mini-card,
+  .team-card,
+  .status-card {
+    padding: 1.1rem 1.2rem;
+  }
+
+  .mini-card h3,
+  .stack-card h3,
+  .team-card h3,
+  .status-card h3 {
+    font-family: 'Newsreader', serif;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+  }
+
+  .mini-card h3 { font-size: 2rem; margin-bottom: 0.35rem; }
+  .stack-card h3 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+  .team-card h3 { font-size: 1.7rem; margin-bottom: 0.55rem; }
+  .status-card h3 { font-size: 1.55rem; margin-bottom: 0.7rem; }
+
+  .mini-card p,
+  .stack-card p,
+  .team-card li,
+  .status-card li,
+  .market-panel li,
+  .competition-copy li {
+    font-size: 1.02rem;
+    line-height: 1.42;
+    color: var(--fog);
+  }
+
+  .slide.light .mini-card p,
+  .slide.light .stack-card p,
+  .slide.light .status-card li,
+  .slide.light .market-panel li {
+    color: #627480;
+  }
+
+  .bullet-list {
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .bullet-list li {
+    position: relative;
+    padding-left: 1.2rem;
+  }
+
+  .bullet-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.6rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: var(--signal);
+  }
+
+  .bullet-list.orange li::before { background: var(--orange); }
+
+  .problem-stack {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .problem-copy {
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .problem-card {
+    display: grid;
+    grid-template-columns: 1.35fr 2.2fr;
+    align-items: start;
+    gap: 1rem;
+    padding: 0.95rem 1.1rem;
+  }
+
+  .problem-card h3 {
+    font-family: 'Newsreader', serif;
+    font-size: 2rem;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+  }
+
+  .product-copy .glass-card {
+    padding: 1.4rem 1.45rem;
+  }
+
+  .split-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 1.4rem;
+  }
+
+  .small-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--orange);
+  }
+
+  .slide.light .small-label { color: #0f6e6b; }
+
+  .why-cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .why-cards .paper-card {
+    padding: 1rem 1.15rem;
+    min-height: 8.2rem;
+  }
+
+  .market-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    padding: 1.35rem 1.35rem 1.2rem;
+  }
+
+  .market-bars {
+    display: grid;
+    gap: 0.62rem;
+  }
+
+  .bar {
+    border-radius: 22px;
+    padding: 0.72rem 1rem 0.76rem;
+    box-shadow: 0 14px 30px rgba(7, 12, 16, 0.2);
+  }
+
+  .bar h3 {
+    font-family: 'Newsreader', serif;
+    font-size: 2.3rem;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+  }
+
+  .bar .mono {
+    font-size: 0.88rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.22rem;
+    text-transform: none;
+  }
+
+  .bar .sub { font-size: 0.96rem; color: rgba(9, 19, 26, 0.72); }
+
+  .market-headline {
+    max-width: 14ch;
+    font-size: clamp(2.15rem, 3.7vw, 3.2rem);
+    line-height: 0.88;
+  }
+
+  .quad-wrap {
+    position: relative;
+    height: 100%;
+    min-height: 24rem;
+    border-radius: 24px;
+    background: rgba(8, 24, 33, 0.7);
+    border: 1px solid rgba(69, 102, 121, 0.42);
+    overflow: hidden;
+  }
+
+  .quad-wrap::before,
+  .quad-wrap::after {
+    content: "";
+    position: absolute;
+    background: rgba(67, 101, 120, 0.44);
+  }
+
+  .quad-wrap::before {
+    top: 1.8rem;
+    bottom: 1.8rem;
+    left: 50%;
+    width: 1px;
+    transform: translateX(-50%);
+  }
+
+  .quad-wrap::after {
+    left: 1.8rem;
+    right: 1.8rem;
+    top: 50%;
+    height: 1px;
+    transform: translateY(-50%);
+  }
+
+  .axis-label {
+    position: absolute;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    color: var(--fog);
+  }
+
+  .bubble {
+    position: absolute;
+    padding: 0.7rem 1rem;
+    font-size: 1.05rem;
+    line-height: 1.15;
+    text-align: center;
+    font-weight: 500;
+    color: var(--ink);
+    box-shadow: 0 14px 30px rgba(7, 12, 16, 0.18);
+  }
+
+  .bubble.orange { background: var(--orange); }
+  .bubble.sand { background: var(--cream); }
+  .bubble.gray { background: #afbcc7; }
+  .bubble.green { background: var(--signal); }
+
+  .roadmap-surface {
+    position: relative;
+    min-height: 24rem;
+    padding-top: 2.2rem;
+  }
+
+  .roadmap-wave {
+    position: absolute;
+    inset: auto 0 1.1rem 0;
+    width: 100%;
+    opacity: 0.9;
+  }
+
+  .roadmap-steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.9rem;
+    padding-top: 6.2rem;
+    z-index: 1;
+  }
+
+  .step {
+    position: relative;
+    align-self: end;
+    border-radius: 22px;
+    padding: 1rem 1rem 1.1rem;
+    color: var(--cream);
+    box-shadow: 0 16px 32px rgba(16, 18, 22, 0.12);
+  }
+
+  .step:nth-child(1) { background: #0b2230; margin-top: 3.2rem; }
+  .step:nth-child(2) { background: #10293a; margin-top: 2.4rem; }
+  .step:nth-child(3) { background: #0f6b67; margin-top: 1.5rem; }
+  .step:nth-child(4) { background: var(--orange); color: var(--ink); margin-top: 0; }
+
+  .step h3 {
+    font-family: 'Newsreader', serif;
+    font-size: 2rem;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.45rem;
+  }
+
+  .step p {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .today {
+    position: absolute;
+    left: 0.25rem;
+    bottom: -1.5rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.84rem;
+    letter-spacing: 0.1em;
+    color: var(--orange);
+  }
+
+  .status-card {
+    padding: 1.35rem 1.35rem 1.1rem;
+    min-height: 24rem;
+  }
+
+  .team-card {
+    padding: 1.25rem 1.2rem;
+    position: relative;
+    min-height: 23rem;
+  }
+
+  .team-card::before {
+    content: "";
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    width: 0.3rem;
+    height: 6rem;
+    border-radius: 999px;
+    background: var(--signal);
+  }
+
+  .team-card:nth-child(2)::before { background: var(--cyan); }
+  .team-card:nth-child(3)::before { background: var(--orange); }
+
+  .team-name {
+    margin-left: 0.75rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.88rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--signal);
+  }
+
+  .team-card:nth-child(2) .team-name { color: var(--cyan); }
+  .team-card:nth-child(3) .team-name { color: var(--orange); }
+
+  .team-role {
+    margin: 0.55rem 0 0.75rem 0.75rem;
+    font-family: 'Newsreader', serif;
+    font-size: 2.15rem;
+    line-height: 0.92;
+    letter-spacing: -0.04em;
+  }
+
+  .team-list {
+    list-style: none;
+    display: grid;
+    gap: 1rem;
+    margin-left: 0.75rem;
+  }
+
+  .team-list li {
+    position: relative;
+    padding-left: 1.15rem;
+    color: var(--fog);
+    line-height: 1.42;
+    font-size: 1rem;
+  }
+
+  .team-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.56rem;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-radius: 999px;
+    background: var(--signal);
+  }
+
+  .team-card:nth-child(2) .team-list li::before { background: var(--cyan); }
+  .team-card:nth-child(3) .team-list li::before { background: var(--orange); }
+
+  .contact-panel {
+    display: grid;
+    gap: 1rem;
+    padding: 1.35rem;
+  }
+
+  .contact-box {
+    padding: 1rem 1.15rem;
+  }
+
+  .contact-box .small-label { margin-bottom: 0.4rem; }
+
+  .contact-list {
+    display: grid;
+    gap: 0.25rem;
+    font-size: 1.15rem;
+    color: var(--mist);
+  }
+
+  .contact-list a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .nav-dot { display: none; }
+
+  @media (max-width: 1100px) {
+    body { overflow: auto; }
+    .slide { position: static; min-height: 100vh; }
+    .slide:not(.active) { display: none; }
+    .cover-grid,
+    .problem-grid,
+    .product-grid,
+    .why-grid,
+    .market-grid,
+    .competition-grid,
+    .roadmap-grid,
+    .team-grid,
+    .close-grid,
+    .why-cards,
+    .roadmap-steps,
+    .problem-card {
+      grid-template-columns: 1fr;
+    }
+    .founder-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="progress-bar" id="progressBar"></div>
+<div class="nav-fixed">
+  <div class="brand">Sixtytwo</div>
+  <div class="slide-counter" id="slideCounter">01 / 09</div>
+</div>
+<div class="nav-dots"></div>
+<div class="nav-arrows">
+  <button class="nav-arrow" id="prevBtn" aria-label="Previous slide">&#8592;</button>
+  <button class="nav-arrow" id="nextBtn" aria-label="Next slide">&#8594;</button>
+</div>
+
+<div class="presentation" id="presentation">
+  <section class="slide dark active" data-slide="0">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Sixtytwo</div>
+          <div class="note">Operational intelligence for on-prem AI clusters</div>
+        </div>
+        <div class="cover-grid">
+          <div class="cover-copy">
+            <div>
+              <h1 class="display headline-xl">The cloud has an operations layer for AI clusters. On-prem doesn't.</h1>
+            </div>
+            <p class="lead">Sixtytwo is the operational intelligence layer for on-prem AI clusters. Start with reliability. Expand into the control plane.</p>
+            <div class="pill">
+              <div>
+                <div class="label">Initial wedge</div>
+                <div class="text">Make owned GPU clusters reliable enough for serious AI workloads without a cloud-sized platform team.</div>
+              </div>
+            </div>
+            <div class="founder-row">
+              <span>SONNET XU</span>
+              <span>ANTONIO ALONSO-STEPANOV</span>
+              <span>JESSIE DONG</span>
+            </div>
+          </div>
+          <div class="diagram-panel glass-card">
+            <svg viewBox="0 0 620 620" role="img" aria-label="Cluster diagram">
+              <defs>
+                <radialGradient id="cover-glow" cx="50%" cy="48%" r="42%">
+                  <stop offset="0%" stop-color="#7be0ff" stop-opacity="0.26"></stop>
+                  <stop offset="100%" stop-color="#7be0ff" stop-opacity="0"></stop>
+                </radialGradient>
+              </defs>
+              <rect x="0" y="0" width="620" height="620" rx="36" fill="rgba(7,19,26,0.14)"></rect>
+              <circle cx="320" cy="290" r="180" fill="url(#cover-glow)"></circle>
+              <g stroke="#28495e" stroke-width="2.3" opacity="0.95">
+                <path d="M170 145 L285 205"></path>
+                <path d="M285 205 L408 145"></path>
+                <path d="M285 205 L230 315"></path>
+                <path d="M285 205 L408 290"></path>
+                <path d="M408 145 L505 210"></path>
+                <path d="M230 315 L322 382"></path>
+                <path d="M408 290 L322 382"></path>
+                <path d="M408 290 L500 350"></path>
+                <path d="M322 382 L260 478"></path>
+                <path d="M322 382 L454 490"></path>
+              </g>
+              <g font-family="IBM Plex Mono, monospace" font-size="22" fill="#dce5eb" opacity="0.9">
+                <text x="112" y="110">GPU fleet</text>
+                <text x="425" y="122">scheduler</text>
+                <text x="438" y="398">metrics</text>
+                <text x="210" y="508">jobs</text>
+              </g>
+              <g>
+                <circle cx="170" cy="145" r="16" fill="#ff8e46"></circle>
+                <circle cx="285" cy="205" r="21" fill="#7be0ff"></circle>
+                <circle cx="408" cy="145" r="16" fill="#63f0c9"></circle>
+                <circle cx="230" cy="315" r="16" fill="#7be0ff"></circle>
+                <circle cx="408" cy="290" r="16" fill="#63f0c9"></circle>
+                <circle cx="505" cy="210" r="16" fill="#ff8e46"></circle>
+                <circle cx="322" cy="382" r="24" fill="#f5f0e6"></circle>
+                <circle cx="500" cy="350" r="15" fill="#7be0ff"></circle>
+                <circle cx="260" cy="478" r="15" fill="#63f0c9"></circle>
+                <circle cx="454" cy="490" r="15" fill="#ff8e46"></circle>
+              </g>
+              <rect x="235" y="530" width="210" height="48" rx="24" fill="#0d2634" stroke="#28495e"></rect>
+              <text x="262" y="560" fill="#f5f0e6" font-family="Space Grotesk, sans-serif" font-size="20">operational intelligence layer</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide light" data-slide="1">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Problem</div>
+          <div class="note">Going on-prem means owning the failure path.</div>
+        </div>
+        <h2 class="display headline-lg">The current stack sees the cluster in fragments. No one handles the failure path end to end.</h2>
+        <div class="problem-grid">
+          <div class="problem-stack">
+            <div class="visual-panel paper-card">
+              <svg viewBox="0 0 760 360" role="img" aria-label="Failure chart">
+                <rect width="760" height="360" rx="28" fill="#081b26"></rect>
+                <g stroke="#18384a" stroke-width="1.2">
+                  <path d="M80 60 V292"></path>
+                  <path d="M200 60 V292"></path>
+                  <path d="M320 60 V292"></path>
+                  <path d="M440 60 V292"></path>
+                  <path d="M560 60 V292"></path>
+                  <path d="M680 60 V292"></path>
+                  <path d="M80 78 H680"></path>
+                  <path d="M80 148 H680"></path>
+                  <path d="M80 218 H680"></path>
+                  <path d="M80 292 H680"></path>
+                </g>
+                <path d="M80 235 C165 220, 205 110, 280 112 S 392 265, 475 258 570 132, 680 145" fill="none" stroke="#7be0ff" stroke-width="5"></path>
+                <path d="M80 250 C168 236, 214 150, 284 152 S 398 282, 480 274 576 170, 680 184" fill="none" stroke="#63f0c9" stroke-width="4"></path>
+                <circle cx="475" cy="258" r="11" fill="#ff6a6a"></circle>
+                <circle cx="570" cy="132" r="10" fill="#ff8e46"></circle>
+                <rect x="418" y="36" width="162" height="46" rx="23" fill="#112938" stroke="#294d61"></rect>
+                <text x="446" y="66" fill="#f5f0e6" font-family="Space Grotesk, sans-serif" font-size="20">node failure</text>
+                <rect x="514" y="274" width="164" height="46" rx="23" fill="#112938" stroke="#294d61"></rect>
+                <text x="537" y="304" fill="#f5f0e6" font-family="Space Grotesk, sans-serif" font-size="20">manual restart</text>
+              </svg>
+            </div>
+            <p class="lead" style="max-width: none; font-size: 1.15rem;">On-prem teams stitch together DCGM, Slurm, Kubernetes, Prometheus, and internal scripts. When a node goes unhealthy, the operator still has to coordinate the response.</p>
+          </div>
+          <div class="problem-copy">
+            <div class="problem-card paper-card">
+              <h3>Health</h3>
+              <p>Signals live in different tools. Hardware issues are often detected late or without enough context.</p>
+            </div>
+            <div class="problem-card paper-card">
+              <h3>Coordination</h3>
+              <p>Recovery spans scheduler state, checkpoints, fleet health, and workload state, but teams orchestrate it manually.</p>
+            </div>
+            <div class="problem-card paper-card">
+              <h3>Utilization</h3>
+              <p>Every slow diagnosis or restart wastes cluster time and makes owned infrastructure look worse than it should.</p>
+            </div>
+            <div class="chip-row">
+              <span class="chip">DCGM</span>
+              <span class="chip">Slurm</span>
+              <span class="chip">Kubernetes</span>
+              <span class="chip">Prometheus</span>
+              <span class="chip">Scripts</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dark" data-slide="2">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Product</div>
+          <div class="note">Connect the stack. Automate the first recovery loop.</div>
+        </div>
+        <div class="product-grid">
+          <div>
+            <h2 class="display headline-lg">Sixtytwo sits above the raw tools and turns telemetry into actions.</h2>
+            <div class="visual-panel glass-card" style="margin-top: 1.2rem;">
+              <svg viewBox="0 0 820 520" role="img" aria-label="System stack diagram">
+                <rect x="0" y="0" width="820" height="520" rx="32" fill="rgba(7, 19, 26, 0.18)"></rect>
+                <g font-family="Space Grotesk, sans-serif" fill="#f5f0e6" font-size="27">
+                  <rect x="70" y="86" width="610" height="74" rx="18" fill="#133040" stroke="#274a5b"></rect>
+                  <text x="110" y="132">workloads: training, fine-tuning, serving</text>
+                  <rect x="108" y="188" width="570" height="74" rx="18" fill="#112c3b" stroke="#274a5b"></rect>
+                  <text x="146" y="235">schedulers + runtime: Slurm, Kubernetes, Ray</text>
+                  <rect x="146" y="292" width="520" height="74" rx="18" fill="#0f2836" stroke="#274a5b"></rect>
+                  <text x="214" y="338">GPU fleet, storage, networking</text>
+                  <rect x="246" y="398" width="332" height="58" rx="18" fill="#f5f0e6"></rect>
+                  <text x="290" y="435" fill="#10171d">raw telemetry + health signals</text>
+                  <rect x="516" y="162" width="190" height="232" rx="24" fill="#122735" stroke="#63f0c9" stroke-width="3"></rect>
+                  <text x="556" y="203" font-size="24" fill="#63f0c9">Sixtytwo</text>
+                  <text x="548" y="248" font-size="21">detect</text>
+                  <text x="548" y="289" font-size="21">quarantine</text>
+                  <text x="548" y="330" font-size="21">checkpoint</text>
+                  <text x="548" y="371" font-size="21">reschedule</text>
+                </g>
+                <g stroke="#63f0c9" stroke-width="3" fill="none">
+                  <path d="M485 124 H516"></path>
+                  <path d="M458 226 H516"></path>
+                  <path d="M470 326 H516"></path>
+                  <path d="M414 427 H514"></path>
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div class="product-copy">
+            <div class="glass-card">
+              <div class="small-label">What the product does</div>
+              <ul class="bullet-list">
+                <li>Observability across GPU health, scheduler state, workload signals, and cluster behavior.</li>
+                <li>Failure detection tied to quarantine, checkpoint, and rescheduling workflows.</li>
+                <li>An operator surface for understanding where capacity is leaking and what to do next.</li>
+              </ul>
+            </div>
+            <div class="pill" style="padding: 1rem 1.15rem;">
+              <div>
+                <div class="label" style="color: var(--signal);">Initial wedge</div>
+                <div class="text">Long-running training jobs, where failures are expensive and operational pain is immediate.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide light" data-slide="3">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Why now</div>
+          <div class="note">Owned clusters are arriving before the operations layer does.</div>
+        </div>
+        <div class="why-grid">
+          <div>
+            <h2 class="display headline-lg">The market is moving on-prem faster than tooling is catching up.</h2>
+            <div class="why-cards" style="margin-top: 1.3rem;">
+              <div class="paper-card mini-card">
+                <h3>Data control</h3>
+                <p>Sensitive data and model behavior are harder to push into third-party APIs or shared cloud workflows.</p>
+              </div>
+              <div class="paper-card mini-card">
+                <h3>Open weights</h3>
+                <p>More companies can build differentiated models on their own infrastructure instead of staying fully dependent on vendors.</p>
+              </div>
+              <div class="paper-card mini-card">
+                <h3>Cloud spend</h3>
+                <p>At sustained utilization, owned GPUs become compelling, but only if the cluster runs cleanly.</p>
+              </div>
+              <div class="paper-card mini-card">
+                <h3>Cluster sprawl</h3>
+                <p>The stack keeps getting deeper, and generic monitoring still stops at visibility.</p>
+              </div>
+            </div>
+          </div>
+          <div class="visual-panel paper-card" style="padding: 1rem 1rem 0.8rem; align-self: start; margin-top: 0.35rem;">
+            <svg viewBox="0 0 620 360" role="img" aria-label="Signal bars">
+              <rect width="620" height="360" rx="28" fill="rgba(255,255,255,0.15)"></rect>
+              <g opacity="0.92">
+                <rect x="72" y="188" width="84" height="108" rx="22" fill="#2c4b5d"></rect>
+                <rect x="194" y="140" width="84" height="156" rx="22" fill="#1f756f"></rect>
+                <rect x="316" y="94" width="84" height="202" rx="22" fill="#7bc4df"></rect>
+                <rect x="438" y="54" width="84" height="242" rx="22" fill="#f7984f"></rect>
+              </g>
+              <path d="M70 248 C190 215, 250 180, 356 148 S 490 76, 548 66" fill="none" stroke="#11171c" stroke-width="4"></path>
+              <circle cx="548" cy="66" r="8" fill="#11171c"></circle>
+              <g font-family="IBM Plex Mono, monospace" font-size="18" fill="#5b6a75">
+                <text x="63" y="324">cloud spend</text>
+                <text x="174" y="324">open weights</text>
+                <text x="328" y="324">data control</text>
+                <text x="431" y="324">owned clusters</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dark" data-slide="4">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Market + business model</div>
+          <div class="note">Enterprise software sold to infra and platform teams.</div>
+        </div>
+        <div class="market-grid">
+          <div class="market-panel glass-card">
+            <div class="small-label" style="color: var(--signal);">Buyer profile</div>
+            <ul class="bullet-list orange">
+              <li>AI companies training or serving models on owned GPU clusters.</li>
+              <li>Enterprises moving sensitive AI workloads off the public cloud.</li>
+              <li>Infrastructure and platform teams measured on uptime, throughput, and utilization.</li>
+            </ul>
+            <div class="small-label" style="margin-top: 0.5rem;">Pricing</div>
+            <p class="lead" style="max-width:none; font-size: 1.18rem;">From the application: roughly $100 per GPU per month.</p>
+          </div>
+          <div>
+            <h2 class="display headline-lg market-headline">Pricing scales with GPU count. The buyer already exists.</h2>
+            <div class="market-bars" style="margin-top: 0.95rem;">
+              <div class="bar" style="background: var(--cream); color: var(--ink); margin-right: 0.45rem;">
+                <div class="mono" style="color:#24333e;">1,000 GPUs</div>
+                <h3>$1.2M ARR</h3>
+                <div class="sub">early large cluster</div>
+              </div>
+              <div class="bar" style="background: var(--signal); color: var(--ink); margin-left: 0.5rem; margin-right: 0.2rem;">
+                <div class="mono" style="color:#14312f;">10,000 GPUs</div>
+                <h3>$12M ARR</h3>
+                <div class="sub">scaled deployment</div>
+              </div>
+              <div class="bar" style="background: var(--orange); color: var(--ink); margin-left: 0.95rem;">
+                <div class="mono" style="color:#432612;">100,000 GPUs</div>
+                <h3>$120M ARR</h3>
+                <div class="sub">category-scale footprint</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dark" data-slide="5">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Competition</div>
+          <div class="note">The alternatives are cloud-only, incomplete, or manual.</div>
+        </div>
+        <div class="competition-grid">
+          <div>
+            <h2 class="display headline-lg">This is not just another observability product.</h2>
+            <div class="quad-wrap" style="margin-top: 1.1rem;">
+              <span class="axis-label" style="left: 1rem; top: 0.8rem;">cloud-native</span>
+              <span class="axis-label" style="left: 1rem; bottom: 0.8rem;">on-prem native</span>
+              <span class="axis-label" style="left: 1rem; bottom: 0.2rem;">manual</span>
+              <span class="axis-label" style="right: 1rem; bottom: 0.2rem;">automated</span>
+              <div class="bubble orange" style="left: 20%; top: 22%; width: 11rem;">Cloud training<br>platforms</div>
+              <div class="bubble sand" style="left: 18%; top: 68%; width: 7.7rem;">DIY stack</div>
+              <div class="bubble gray" style="left: 41%; top: 49%; width: 10rem;">Generic<br>observability</div>
+              <div class="bubble green" style="right: 14%; bottom: 18%; width: 8.4rem; font-weight: 700;">Sixtytwo</div>
+            </div>
+          </div>
+          <div class="competition-copy">
+            <div class="glass-card" style="padding: 1.35rem 1.35rem 1.1rem;">
+              <div class="small-label">Why we are different</div>
+              <ul class="bullet-list">
+                <li>We are built for owned clusters, not cloud assumptions.</li>
+                <li>We connect visibility to actual operator actions instead of stopping at dashboards.</li>
+                <li>Training reliability is the initial entry point, but the surface expands toward full cluster operations.</li>
+              </ul>
+            </div>
+            <div class="pill" style="padding: 1rem 1.1rem; justify-content: center; text-align: center;">
+              <div class="text">Cloud platforms solve this in the cloud. DIY stacks do not solve it at all.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide light" data-slide="6">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Wedge + roadmap</div>
+          <div class="note">Land where the pain is sharpest. Expand into full cluster ops.</div>
+        </div>
+        <div class="roadmap-grid">
+          <div>
+            <h2 class="display headline-lg">Start with cluster reliability. Expand into the operating layer for owned AI infrastructure.</h2>
+            <div class="roadmap-surface">
+              <svg class="roadmap-wave" viewBox="0 0 1000 280" fill="none" aria-hidden="true">
+                <path d="M30 250C220 145 395 195 604 132C772 81 840 72 982 34" stroke="#d5b28a" stroke-width="3"></path>
+                <path d="M30 278C228 181 422 216 632 164C790 125 860 110 986 86" stroke="#8fd7ef" stroke-width="3"></path>
+              </svg>
+              <div class="roadmap-steps">
+                <div class="step">
+                  <h3>cluster reliability</h3>
+                  <p>failed runs<br>checkpoint + resume</p>
+                  <div class="today">today</div>
+                </div>
+                <div class="step">
+                  <h3>fleet health</h3>
+                  <p>quarantine<br>spares + drift</p>
+                </div>
+                <div class="step">
+                  <h3>scheduling</h3>
+                  <p>placement<br>capacity planning</p>
+                </div>
+                <div class="step">
+                  <h3>ops layer</h3>
+                  <p>system-wide<br>cluster intelligence</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="status-card paper-card">
+            <div class="small-label">Current status</div>
+            <ul class="bullet-list orange">
+              <li>Customer discovery with teams running or considering on-prem AI infrastructure.</li>
+              <li>Prototype planned in the next few weeks.</li>
+              <li>Goal: test with a small number of GPU-cluster teams first.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dark" data-slide="7">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Team</div>
+          <div class="note">Relevant backgrounds across distributed training, GPU orchestration, and production systems.</div>
+        </div>
+        <h2 class="display headline-lg">The team has worked on the parts of the stack this product has to touch.</h2>
+        <div class="team-grid">
+          <div class="team-card glass-card">
+            <div class="team-name">SONNET XU</div>
+            <div class="team-role">distributed training</div>
+            <ul class="team-list">
+              <li>DatologyAI: high-performance dataloader work for large-scale distributed LLM training.</li>
+              <li>Stanford research across ML systems and evaluation.</li>
+            </ul>
+          </div>
+          <div class="team-card glass-card" style="background: rgba(13,39,52,0.75);">
+            <div class="team-name">JESSIE DONG</div>
+            <div class="team-role">gpu orchestration</div>
+            <ul class="team-list">
+              <li>Mithril: GPU provisioning, job scheduling, telemetry, worker discovery, heartbeat recovery.</li>
+              <li>Sago: founding engineer building production AI systems.</li>
+            </ul>
+          </div>
+          <div class="team-card glass-card">
+            <div class="team-name">ANTONIO ALONSO-STEPANOV</div>
+            <div class="team-role">operator product</div>
+            <ul class="team-list">
+              <li>Meta: shipped production software, including LLM-related internal tooling.</li>
+              <li>Brings product and systems engineering discipline to the operator surface.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide dark" data-slide="8">
+    <div class="slide-frame">
+      <div class="slide-inner">
+        <div class="slide-top">
+          <div class="eyebrow">Close</div>
+          <div class="note">On-prem AI needs its own operations layer.</div>
+        </div>
+        <div class="close-grid">
+          <div class="close-copy">
+            <h2 class="display headline-xl">Owned GPU clusters need more than raw metrics. They need an operating layer.</h2>
+            <p class="lead">Sixtytwo is building the operational intelligence layer for on-prem AI clusters.</p>
+          </div>
+          <div class="contact-panel">
+            <div class="glass-card" style="padding: 1rem;">
+              <svg viewBox="0 0 620 620" role="img" aria-label="Cluster diagram small">
+                <defs>
+                  <radialGradient id="close-glow" cx="50%" cy="48%" r="42%">
+                    <stop offset="0%" stop-color="#7be0ff" stop-opacity="0.26"></stop>
+                    <stop offset="100%" stop-color="#7be0ff" stop-opacity="0"></stop>
+                  </radialGradient>
+                </defs>
+                <rect x="0" y="0" width="620" height="620" rx="36" fill="rgba(7,19,26,0.14)"></rect>
+                <circle cx="320" cy="290" r="180" fill="url(#close-glow)"></circle>
+                <g stroke="#28495e" stroke-width="2.3" opacity="0.95">
+                  <path d="M170 145 L285 205"></path>
+                  <path d="M285 205 L408 145"></path>
+                  <path d="M285 205 L230 315"></path>
+                  <path d="M285 205 L408 290"></path>
+                  <path d="M408 145 L505 210"></path>
+                  <path d="M230 315 L322 382"></path>
+                  <path d="M408 290 L322 382"></path>
+                  <path d="M408 290 L500 350"></path>
+                  <path d="M322 382 L260 478"></path>
+                  <path d="M322 382 L454 490"></path>
+                </g>
+                <g font-family="IBM Plex Mono, monospace" font-size="22" fill="#dce5eb" opacity="0.9">
+                  <text x="112" y="110">GPU fleet</text>
+                  <text x="425" y="122">scheduler</text>
+                  <text x="438" y="398">metrics</text>
+                  <text x="210" y="508">jobs</text>
+                </g>
+                <g>
+                  <circle cx="170" cy="145" r="16" fill="#ff8e46"></circle>
+                  <circle cx="285" cy="205" r="21" fill="#7be0ff"></circle>
+                  <circle cx="408" cy="145" r="16" fill="#63f0c9"></circle>
+                  <circle cx="230" cy="315" r="16" fill="#7be0ff"></circle>
+                  <circle cx="408" cy="290" r="16" fill="#63f0c9"></circle>
+                  <circle cx="505" cy="210" r="16" fill="#ff8e46"></circle>
+                  <circle cx="322" cy="382" r="24" fill="#f5f0e6"></circle>
+                  <circle cx="500" cy="350" r="15" fill="#7be0ff"></circle>
+                  <circle cx="260" cy="478" r="15" fill="#63f0c9"></circle>
+                  <circle cx="454" cy="490" r="15" fill="#ff8e46"></circle>
+                </g>
+              </svg>
+            </div>
+            <div class="contact-box glass-card">
+              <div class="small-label">Contact</div>
+              <div class="contact-list">
+                <a href="mailto:ajalonso@stanford.edu">ajalonso@stanford.edu</a>
+                <a href="mailto:sonnet@stanford.edu">sonnet@stanford.edu</a>
+                <a href="mailto:jessiedong@stanford.edu">jessiedong@stanford.edu</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  class Deck {
+    constructor() {
+      this.slides = Array.from(document.querySelectorAll('.slide'));
+      this.total = this.slides.length;
+      this.current = 0;
+      this.progress = document.getElementById('progressBar');
+      this.counter = document.getElementById('slideCounter');
+      this.prevBtn = document.getElementById('prevBtn');
+      this.nextBtn = document.getElementById('nextBtn');
+      this.bind();
+      this.render();
+    }
+
+    bind() {
+      this.prevBtn.addEventListener('click', () => this.go(this.current - 1));
+      this.nextBtn.addEventListener('click', () => this.go(this.current + 1));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight' || event.key === 'PageDown' || event.key === ' ') {
+          event.preventDefault();
+          this.go(this.current + 1);
+        }
+        if (event.key === 'ArrowLeft' || event.key === 'PageUp') {
+          event.preventDefault();
+          this.go(this.current - 1);
+        }
+      });
+    }
+
+    go(index) {
+      if (index < 0 || index >= this.total) return;
+      this.current = index;
+      this.render();
+    }
+
+    render() {
+      this.slides.forEach((slide, index) => {
+        slide.classList.toggle('active', index === this.current);
+      });
+      this.counter.textContent = `${String(this.current + 1).padStart(2, '0')} / ${String(this.total).padStart(2, '0')}`;
+      this.progress.style.width = `${((this.current + 1) / this.total) * 100}%`;
+      this.prevBtn.disabled = this.current === 0;
+      this.nextBtn.disabled = this.current === this.total - 1;
+    }
+  }
+
+  new Deck();
+</script>
+</body>
+</html>

@@ -17,8 +17,10 @@ const path = require('path');
   await page.evaluate(() => document.fonts.ready);
   await new Promise(r => setTimeout(r, 2000));
 
-  // Override padding/spacing to be tighter for PDF
+  // Legacy decks can opt into tighter PDF spacing via `data-pdf-tighten="true"`.
   await page.evaluate(() => {
+    if (document.body?.dataset?.pdfTighten !== 'true') return;
+
     const style = document.createElement('style');
     style.textContent = `
       .slide-inner { padding: 2rem 2.5rem !important; }
