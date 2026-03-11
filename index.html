@@ -3,36 +3,46 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sixtytwo</title>
+<title>Sixtytwo — GPU Cluster Health</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500;1,600&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --cream: #edece4;
-  --ink: #1e1e1c;
-  --charcoal: #2d2d2d;
+  /* Light slide palette */
+  --sage: #eef7f1;
+  --sage-dark: #e0f0e6;
+  --sage-surface: #d8eade;
+  --ink: #0d1f12;
+  --ink-muted: rgba(13,31,18,0.55);
+  /* Dark slide palette */
+  --forest: #0d1f12;
+  --forest-mid: #142918;
+  --forest-light: #1e3a23;
+  --leaf: #e4f2e8;
+  --leaf-muted: rgba(228,242,232,0.5);
+  /* Accents */
+  --green-bright: #4ade80;
+  --green-bright-dim: rgba(74,222,128,0.15);
   --emerald: #1a6b42;
-  --emerald-light: #2a8f5a;
   --copper: #c4873a;
   --copper-light: #d4a055;
-  --warm-gray: #b8b5aa;
-  --dark-bg: #0f110f;
-  --dark-surface: #181a18;
+  --mono-gray: #7a8c7d;
+  /* Competitors */
+  --white: #ffffff;
   --slide-transition: 0.8s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
 html { font-size: 16px; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
-  background: var(--dark-bg);
+  font-family: 'Inter', sans-serif;
+  background: var(--sage);
   color: var(--ink);
   overflow: hidden;
-  height: 100vh;
-  width: 100vw;
+  height: 100vh; width: 100vw;
   cursor: default;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -40,1155 +50,615 @@ body {
 
 /* ── CUSTOM CURSOR ── */
 .cursor-dot {
-  position: fixed;
-  width: 8px;
-  height: 8px;
-  background: var(--copper);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transition: transform 0.15s ease, opacity 0.15s ease;
-  mix-blend-mode: difference;
+  position: fixed; width: 8px; height: 8px;
+  background: var(--green-bright);
+  border-radius: 50%; pointer-events: none;
+  z-index: 10000; transition: transform 0.15s ease;
 }
-
 .cursor-ring {
-  position: fixed;
-  width: 36px;
-  height: 36px;
-  border: 1.5px solid var(--copper);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
+  position: fixed; width: 36px; height: 36px;
+  border: 1.5px solid var(--green-bright);
+  border-radius: 50%; pointer-events: none;
+  z-index: 10000; opacity: 0.35;
   transition: transform 0.3s ease, width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
-  opacity: 0.5;
-  mix-blend-mode: difference;
 }
 
-/* ── PRESENTATION CONTAINER ── */
-.presentation {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
+/* ── PRESENTATION ── */
+.presentation { position: relative; width: 100vw; height: 100vh; overflow: hidden; }
 
-/* ── SLIDES ── */
 .slide {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  visibility: hidden;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; visibility: hidden;
   transition: opacity var(--slide-transition), visibility var(--slide-transition);
   will-change: opacity;
 }
-
-.slide.active {
-  opacity: 1;
-  visibility: visible;
-  z-index: 2;
-}
-
-.slide.leaving {
-  opacity: 0;
-  z-index: 1;
-}
+.slide.active { opacity: 1; visibility: visible; z-index: 2; }
+.slide.leaving { opacity: 0; z-index: 1; }
 
 .slide-inner {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%; height: 100%; position: relative;
+  display: flex; align-items: center; justify-content: center;
   padding: 4rem;
 }
 
 /* ── PROGRESS BAR ── */
 .progress-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--emerald), var(--copper));
-  z-index: 100;
-  transition: width 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+  position: fixed; top: 0; left: 0; height: 2px;
+  background: linear-gradient(90deg, var(--green-bright), var(--copper));
+  z-index: 100; transition: width 0.6s cubic-bezier(0.33, 1, 0.68, 1);
 }
 
 /* ── NAV ── */
 .nav-fixed {
-  position: fixed;
-  top: 2rem;
-  left: 2.5rem;
-  right: 2.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  z-index: 100;
-  pointer-events: none;
+  position: fixed; top: 2rem; left: 2.5rem; right: 2.5rem;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 100; pointer-events: none;
 }
-
 .nav-fixed > * { pointer-events: auto; }
 
 .nav-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  opacity: 0;
-  transform: translateY(-10px);
+  display: flex; align-items: center; gap: 0.6rem;
+  opacity: 0; transform: translateY(-10px);
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
-
-.nav-logo.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.nav-logo svg {
-  width: 28px;
-  height: 28px;
-}
+.nav-logo.visible { opacity: 1; transform: translateY(0); }
+.nav-logo svg { width: 26px; height: 26px; }
 
 .nav-logo-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  font-weight: 500;
-  letter-spacing: 0.02em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.95rem; font-weight: 600; letter-spacing: 0.01em;
 }
 
 .slide-counter {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.75rem;
-  font-weight: 400;
-  letter-spacing: 0.1em;
-  opacity: 0.5;
-  color: var(--warm-gray);
-  transition: color 0.5s ease;
+  font-size: 0.72rem; font-weight: 400;
+  letter-spacing: 0.1em; opacity: 0.45;
 }
 
-/* ── NAVIGATION DOTS ── */
+/* ── NAV DOTS ── */
 .nav-dots {
-  position: fixed;
-  right: 2.5rem;
-  top: 50%;
+  position: fixed; right: 2.5rem; top: 50%;
   transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 100;
+  display: flex; flex-direction: column; gap: 10px; z-index: 100;
 }
-
 .nav-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--warm-gray);
-  opacity: 0.3;
-  cursor: pointer;
-  transition: all 0.4s ease;
-  border: none;
-  padding: 0;
+  width: 6px; height: 6px; border-radius: 50%;
+  opacity: 0.25; cursor: pointer;
+  transition: all 0.4s ease; border: none; padding: 0;
 }
-
-.nav-dot.active {
-  opacity: 1;
-  background: var(--copper);
-  transform: scale(1.4);
-}
-
-.nav-dot:hover {
-  opacity: 0.7;
-  transform: scale(1.2);
-}
+.nav-dot.active { opacity: 1; background: var(--green-bright) !important; transform: scale(1.5); }
+.nav-dot:hover { opacity: 0.6; transform: scale(1.2); }
 
 /* ── ARROW NAV ── */
 .nav-arrows {
-  position: fixed;
-  bottom: 2rem;
-  right: 2.5rem;
-  display: flex;
-  gap: 0.5rem;
-  z-index: 100;
+  position: fixed; bottom: 2rem; right: 2.5rem;
+  display: flex; gap: 0.5rem; z-index: 100;
 }
-
 .nav-arrow {
-  width: 44px;
-  height: 44px;
-  border: 1px solid rgba(180,175,165,0.3);
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
   transition: all 0.3s ease;
-  color: var(--warm-gray);
 }
-
-.nav-arrow:hover {
-  border-color: var(--copper);
-  color: var(--copper);
-  transform: scale(1.05);
-}
-
-.nav-arrow svg {
-  width: 16px;
-  height: 16px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-}
-
-/* ── GEOMETRIC BACKGROUND PATTERNS ── */
-.geo-grid {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.geo-line {
-  position: absolute;
-  background: currentColor;
-  opacity: 0.04;
-}
-
-.geo-line.h {
-  height: 1px;
-  width: 100%;
-  left: 0;
-}
-
-.geo-line.v {
-  width: 1px;
-  height: 100%;
-  top: 0;
-}
-
-/* ── FLOATING PARTICLES ── */
-.particles-canvas {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ═══════════════════════════════════════
-   SLIDE 1: TITLE
-   ═══════════════════════════════════════ */
-.slide-title {
-  background: var(--cream);
-}
-
-.title-content {
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
-
-.title-overline {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.35em;
-  text-transform: uppercase;
-  color: var(--copper);
-  margin-bottom: 2.5rem;
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.title-main {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(4rem, 10vw, 9rem);
-  font-weight: 400;
-  line-height: 0.95;
-  letter-spacing: -0.02em;
-  color: var(--ink);
-  margin-bottom: 1.5rem;
-  overflow: hidden;
-}
-
-.title-main .word {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(100%);
-}
-
-.title-divider {
-  width: 0;
-  height: 1px;
-  background: var(--ink);
-  margin: 1.5rem auto 2rem;
-  transition: width 1.2s cubic-bezier(0.33, 1, 0.68, 1);
-}
-
-.title-divider.animate {
-  width: min(600px, 80vw);
-}
-
-.title-subtitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--charcoal);
-  opacity: 0;
-  transform: translateY(15px);
-}
-
-.title-founders {
-  margin-top: 4rem;
-  display: flex;
-  gap: 2.5rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.founder-name {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 400;
-  color: var(--charcoal);
-  opacity: 0;
-  transform: translateY(15px);
-  letter-spacing: 0.02em;
-}
-
-.title-logo {
-  position: absolute;
-  bottom: 3.5rem;
-  right: 4rem;
-  opacity: 0;
-  transform: scale(0.8);
-}
-
-.title-logo svg {
-  width: 56px;
-  height: 56px;
-}
+.nav-arrow svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
 
 /* corner accents */
-.corner-accent {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  opacity: 0;
-}
-
+.corner-accent { position: absolute; width: 60px; height: 60px; opacity: 0; }
 .corner-accent.tl { top: 3rem; left: 3rem; }
 .corner-accent.br { bottom: 3rem; right: 3rem; }
-
-.corner-accent .line-h,
-.corner-accent .line-v {
-  position: absolute;
-  background: var(--copper);
-  opacity: 0.3;
-}
-
-.corner-accent .line-h {
-  height: 1px;
-  width: 80px;
-  top: 0;
-  left: 0;
-}
-
-.corner-accent .line-v {
-  width: 1px;
-  height: 80px;
-  top: 0;
-  left: 0;
-}
-
+.corner-accent .line-h { position: absolute; height: 1px; width: 60px; top: 0; left: 0; }
+.corner-accent .line-v { position: absolute; width: 1px; height: 60px; top: 0; left: 0; }
 .corner-accent.br .line-h { top: auto; bottom: 0; left: auto; right: 0; }
 .corner-accent.br .line-v { top: auto; bottom: 0; left: auto; right: 0; }
 
 /* ═══════════════════════════════════════
-   SLIDE 2: THE FRONTIER
+   LIGHT SLIDES — shared label style
    ═══════════════════════════════════════ */
-.slide-frontier {
-  background: var(--dark-bg);
-  color: var(--cream);
-}
-
-.frontier-content {
-  max-width: 900px;
-  position: relative;
-  z-index: 2;
-}
-
-.frontier-label {
+.label-light {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--emerald-light);
-  margin-bottom: 2.5rem;
-  opacity: 0;
-  transform: translateX(-20px);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--emerald); opacity: 0; transform: translateY(15px);
+  display: flex; align-items: center; gap: 0.9rem; margin-bottom: 2rem;
+}
+.label-light::before { content: ''; width: 36px; height: 1px; background: var(--emerald); display: block; }
+
+/* ═══════════════════════════════════════
+   SLIDE 1: TITLE  (light sage)
+   ═══════════════════════════════════════ */
+.slide-title { background: var(--sage); }
+
+.title-content { text-align: center; position: relative; z-index: 2; }
+
+.title-overline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--emerald); margin-bottom: 2.5rem;
+  opacity: 0; transform: translateY(20px);
 }
 
-.frontier-label::before {
-  content: '';
-  width: 40px;
-  height: 1px;
-  background: var(--emerald-light);
-  display: block;
+.title-main {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(5rem, 12vw, 10rem);
+  font-weight: 700; line-height: 0.9;
+  letter-spacing: -0.04em; color: var(--ink);
+  margin-bottom: 1.5rem; overflow: hidden;
+}
+.title-main .word { display: inline-block; opacity: 0; transform: translateY(100%); }
+
+.title-divider {
+  width: 0; height: 1px; background: var(--ink);
+  margin: 1.5rem auto 2rem;
+  transition: width 1.2s cubic-bezier(0.33, 1, 0.68, 1);
+}
+.title-divider.animate { width: min(500px, 80vw); }
+
+.title-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--ink); opacity: 0; transform: translateY(15px);
 }
 
-.frontier-headline {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2.2rem, 5vw, 4rem);
-  font-weight: 400;
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+.title-founders {
+  margin-top: 4rem; display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap;
+}
+.founder-name {
+  font-family: 'Inter', sans-serif; font-size: 0.82rem; font-weight: 400;
+  color: rgba(13,31,18,0.6); opacity: 0; transform: translateY(15px);
 }
 
-.frontier-headline .line {
-  display: block;
-  overflow: hidden;
+.title-logo { position: absolute; bottom: 3rem; right: 4rem; opacity: 0; transform: scale(0.85); }
+.title-logo svg { width: 48px; height: 48px; }
+
+.corner-line { background: var(--emerald); opacity: 0.3; }
+
+/* ═══════════════════════════════════════
+   SLIDE 2: THE PROBLEM  (dark forest)
+   ═══════════════════════════════════════ */
+.slide-problem { background: var(--forest); color: var(--leaf); }
+
+.problem-content { max-width: 900px; position: relative; z-index: 2; }
+
+.problem-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--green-bright); margin-bottom: 2.5rem;
+  opacity: 0; transform: translateX(-20px);
+  display: flex; align-items: center; gap: 0.9rem;
+}
+.problem-label::before { content: ''; width: 36px; height: 1px; background: var(--green-bright); display: block; }
+
+.problem-headline {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.2rem, 5vw, 4.2rem);
+  font-weight: 600; line-height: 1.1; letter-spacing: -0.02em;
+  color: var(--leaf);
+}
+.problem-headline .line { display: block; overflow: hidden; }
+.problem-headline .line-inner { display: block; opacity: 0; transform: translateY(100%); }
+.problem-headline em { color: var(--green-bright); font-style: normal; }
+
+.problem-sub {
+  margin-top: 2.5rem; font-size: 0.95rem; line-height: 1.75;
+  color: var(--leaf-muted); max-width: 540px;
+  opacity: 0; transform: translateY(15px);
 }
 
-.frontier-headline .line-inner {
-  display: block;
-  opacity: 0;
-  transform: translateY(100%);
+.problem-stat-row {
+  display: flex; gap: 3rem; margin-top: 3.5rem;
+  opacity: 0; transform: translateY(20px);
 }
-
-.frontier-emphasis {
-  color: var(--copper-light);
-  font-style: italic;
+.problem-stat-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2.4rem; font-weight: 700;
+  color: var(--green-bright); line-height: 1;
 }
-
-.frontier-glow {
-  position: absolute;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(26,107,66,0.12) 0%, transparent 70%);
-  top: 50%;
-  right: -10%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.frontier-grid-accent {
-  position: absolute;
-  right: 4rem;
-  top: 50%;
-  transform: translateY(-50%);
-  opacity: 0;
-  width: 200px;
-  height: 200px;
-}
-
-.frontier-grid-accent .grid-cell {
-  position: absolute;
-  border: 1px solid rgba(196,135,58,0.1);
-  transition: border-color 0.6s ease, opacity 0.6s ease;
+.problem-stat-label {
+  font-size: 0.75rem; color: var(--leaf-muted);
+  margin-top: 0.4rem; letter-spacing: 0.01em; max-width: 140px;
 }
 
 /* ═══════════════════════════════════════
-   SLIDE 3: THE CHALLENGE
+   SLIDE 3: THE CHALLENGE  (light sage)
    ═══════════════════════════════════════ */
-.slide-challenge {
-  background: var(--dark-bg);
-  color: var(--cream);
-}
+.slide-challenge { background: var(--sage); color: var(--ink); }
 
-.challenge-content {
-  width: 100%;
-  max-width: 1200px;
-  position: relative;
-  z-index: 2;
-}
-
-.challenge-header {
-  margin-bottom: 4rem;
-}
+.challenge-content { width: 100%; max-width: 1200px; position: relative; z-index: 2; }
+.challenge-header { margin-bottom: 3.5rem; }
 
 .challenge-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: rgba(237,236,228,0.4);
-  margin-bottom: 1.2rem;
-  opacity: 0;
-  transform: translateY(15px);
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: rgba(13,31,18,0.38); margin-bottom: 1rem;
+  opacity: 0; transform: translateY(15px);
 }
 
 .challenge-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2.5rem, 5vw, 4.5rem);
-  font-weight: 400;
-  opacity: 0;
-  transform: translateY(30px);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 700; letter-spacing: -0.02em;
+  opacity: 0; transform: translateY(30px);
 }
+.challenge-title em { color: #b83a2a; font-style: normal; }
 
-.challenge-title em {
-  color: #c0392b;
-  font-style: italic;
-}
-
-.challenge-pillars {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-}
+.challenge-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
 
 .pillar {
-  background: var(--dark-surface);
-  padding: 2.5rem 2rem;
-  position: relative;
-  overflow: hidden;
-  opacity: 0;
-  transform: translateY(40px);
+  background: var(--sage-dark);
+  padding: 2.5rem 2rem; position: relative; overflow: hidden;
+  opacity: 0; transform: translateY(40px);
 }
-
 .pillar::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--copper), transparent);
-  transform: scaleX(0);
-  transform-origin: left;
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--emerald); transform: scaleX(0); transform-origin: left;
   transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
 }
+.pillar.animate::before { transform: scaleX(1); }
 
-.pillar.animate::before {
-  transform: scaleX(1);
-}
-
-.pillar-icon {
-  width: 40px;
-  height: 40px;
-  margin-bottom: 1.5rem;
-  color: var(--copper);
-}
-
-.pillar-icon svg {
-  width: 100%;
-  height: 100%;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.5;
-}
+.pillar-icon { width: 38px; height: 38px; margin-bottom: 1.5rem; color: var(--emerald); }
+.pillar-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.5; }
 
 .pillar-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  letter-spacing: 0.01em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;
 }
 
-.pillar-items {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
+.pillar-items { list-style: none; display: flex; flex-direction: column; gap: 0.6rem; }
 .pillar-items li {
-  font-size: 0.85rem;
-  color: rgba(237,236,228,0.6);
-  line-height: 1.5;
-  padding-left: 1rem;
-  position: relative;
+  font-size: 0.84rem; color: var(--ink-muted);
+  line-height: 1.55; padding-left: 1rem; position: relative;
 }
-
 .pillar-items li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--emerald-light);
-  opacity: 0.6;
+  content: ''; position: absolute; left: 0; top: 0.6em;
+  width: 4px; height: 4px; border-radius: 50%; background: var(--emerald);
 }
 
 /* ═══════════════════════════════════════
-   SLIDE 4: OUR MISSION
+   SLIDE 4: MISSION  (light sage)
    ═══════════════════════════════════════ */
-.slide-mission {
-  background: var(--cream);
-  color: var(--ink);
-}
+.slide-mission { background: var(--sage); color: var(--ink); }
 
-.mission-content {
-  max-width: 1000px;
-  position: relative;
-  z-index: 2;
-}
+.mission-content { max-width: 1000px; position: relative; z-index: 2; }
 
 .mission-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--emerald);
-  margin-bottom: 2.5rem;
-  opacity: 0;
-  transform: translateX(-20px);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--emerald); margin-bottom: 2.5rem;
+  opacity: 0; transform: translateX(-20px);
+  display: flex; align-items: center; gap: 0.9rem;
 }
-
-.mission-label::before {
-  content: '';
-  width: 40px;
-  height: 1px;
-  background: var(--emerald);
-  display: block;
-}
+.mission-label::before { content: ''; width: 36px; height: 1px; background: var(--emerald); display: block; }
 
 .mission-text {
-  font-family: 'Playfair Display', serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-size: clamp(2rem, 4.5vw, 3.5rem);
-  font-weight: 400;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  font-weight: 600; line-height: 1.2; letter-spacing: -0.02em;
 }
-
-.mission-text .word {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.mission-text .highlight {
-  color: var(--emerald);
-  font-style: italic;
-}
+.mission-text .word { display: inline-block; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.mission-text .highlight { color: var(--emerald); }
 
 .mission-accent-line {
-  width: 0;
-  height: 2px;
+  width: 0; height: 3px;
   background: linear-gradient(90deg, var(--emerald), var(--copper));
   margin-top: 3rem;
   transition: width 1.5s cubic-bezier(0.33, 1, 0.68, 1);
 }
+.mission-accent-line.animate { width: 180px; }
 
-.mission-accent-line.animate {
-  width: 200px;
-}
-
-/* large watermark number */
 .mission-watermark {
-  position: absolute;
-  right: -2rem;
-  bottom: -3rem;
-  font-family: 'Playfair Display', serif;
-  font-size: 20rem;
-  font-weight: 700;
-  color: var(--ink);
-  opacity: 0.03;
-  line-height: 1;
-  pointer-events: none;
-  user-select: none;
+  position: absolute; right: -2rem; bottom: -3rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 18rem; font-weight: 700; color: var(--ink);
+  opacity: 0.04; line-height: 1; pointer-events: none; user-select: none;
 }
 
 /* ═══════════════════════════════════════
-   SLIDE 5: WHAT WE PROVIDE
+   SLIDE 5: PLATFORM  (light sage)
    ═══════════════════════════════════════ */
-.slide-provide {
-  background: var(--cream);
-  color: var(--ink);
-}
+.slide-provide { background: var(--sage); color: var(--ink); }
 
-.provide-content {
-  width: 100%;
-  max-width: 1200px;
-  position: relative;
-  z-index: 2;
-}
-
-.provide-header {
-  margin-bottom: 3.5rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-}
+.provide-content { width: 100%; max-width: 1200px; position: relative; z-index: 2; }
+.provide-header { margin-bottom: 3rem; }
 
 .provide-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--copper);
-  margin-bottom: 0.8rem;
-  opacity: 0;
-  transform: translateY(15px);
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 0.8rem;
+  opacity: 0; transform: translateY(15px);
 }
 
 .provide-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 400;
-  opacity: 0;
-  transform: translateY(20px);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; letter-spacing: -0.02em;
+  opacity: 0; transform: translateY(20px);
 }
 
 .provide-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: rgba(45,45,45,0.08);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 1px; background: rgba(13,31,18,0.08);
 }
 
 .provide-card {
-  background: var(--cream);
-  padding: 2.2rem 1.8rem;
-  position: relative;
-  opacity: 0;
-  transform: translateY(30px);
-  cursor: default;
-  transition: background 0.4s ease;
+  background: var(--sage); padding: 2rem 1.6rem;
+  position: relative; opacity: 0; transform: translateY(30px);
+  cursor: default; transition: background 0.3s ease;
 }
-
-.provide-card:hover {
-  background: #e5e4dc;
-}
-
+.provide-card:hover { background: var(--sage-dark); }
 .provide-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 1.8rem;
-  right: 1.8rem;
-  height: 2px;
-  background: var(--emerald);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+  content: ''; position: absolute; bottom: 0; left: 1.6rem; right: 1.6rem;
+  height: 2px; background: var(--emerald); transform: scaleX(0);
+  transform-origin: left; transition: transform 0.4s ease;
 }
-
-.provide-card:hover::after {
-  transform: scaleX(1);
-}
+.provide-card:hover::after { transform: scaleX(1); }
 
 .provide-card-number {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--copper);
-  letter-spacing: 0.1em;
-  margin-bottom: 1.5rem;
-  opacity: 0.6;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+  color: var(--copper); letter-spacing: 0.1em; margin-bottom: 1.2rem; opacity: 0.7;
 }
 
-.provide-card-icon {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 1.2rem;
-  color: var(--emerald);
-}
-
-.provide-card-icon svg {
-  width: 100%;
-  height: 100%;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 1.5;
-}
+.provide-card-icon { width: 34px; height: 34px; margin-bottom: 1rem; color: var(--emerald); }
+.provide-card-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 1.5; }
 
 .provide-card-cat {
-  font-family: 'Playfair Display', serif;
-  font-size: 0.85rem;
-  font-style: italic;
-  color: var(--copper);
-  margin-bottom: 0.3rem;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.6rem;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 0.4rem; opacity: 0.8;
 }
-
 .provide-card-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem; font-weight: 600; margin-bottom: 0.9rem; letter-spacing: -0.01em;
+}
+.provide-card-desc { font-size: 0.8rem; line-height: 1.65; color: var(--ink-muted); }
+
+/* ═══════════════════════════════════════
+   SLIDE 6: TAM  (light sage, tinted)
+   ═══════════════════════════════════════ */
+.slide-tam { background: var(--sage-dark); color: var(--ink); }
+
+.tam-content { width: 100%; max-width: 1100px; position: relative; z-index: 2; }
+.tam-header { margin-bottom: 3.5rem; }
+
+.tam-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--emerald); margin-bottom: 1rem;
+  opacity: 0; transform: translateY(15px);
+  display: flex; align-items: center; gap: 0.9rem;
+}
+.tam-label::before { content: ''; width: 36px; height: 1px; background: var(--emerald); }
+
+.tam-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; letter-spacing: -0.02em;
+  opacity: 0; transform: translateY(20px);
 }
 
-.provide-card-desc {
-  font-size: 0.8rem;
-  line-height: 1.6;
-  color: rgba(30,30,28,0.6);
+.tam-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 3rem; }
+
+.tam-tier {
+  background: var(--sage); border-radius: 2px; padding: 2.2rem 2rem;
+  position: relative; opacity: 0; transform: translateY(30px);
+  border-top: 3px solid transparent;
+}
+.tam-tier:nth-child(1) { border-top-color: rgba(26,107,66,0.2); }
+.tam-tier:nth-child(2) { border-top-color: rgba(26,107,66,0.55); }
+.tam-tier:nth-child(3) { border-top-color: var(--emerald); }
+
+.tam-tier-tag {
+  font-family: 'JetBrains Mono', monospace; font-size: 0.58rem;
+  letter-spacing: 0.28em; text-transform: uppercase;
+  color: var(--emerald); opacity: 0.7; margin-bottom: 1rem;
+}
+.tam-tier-num {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 700;
+  color: var(--ink); line-height: 1; margin-bottom: 0.5rem;
+}
+.tam-tier-label { font-family: 'Inter', sans-serif; font-size: 0.88rem; font-weight: 600; margin-bottom: 0.5rem; }
+.tam-tier-desc { font-size: 0.78rem; line-height: 1.6; color: var(--ink-muted); }
+
+.tam-footnote {
+  font-size: 0.82rem; line-height: 1.7; color: var(--ink-muted);
+  max-width: 760px; opacity: 0; transform: translateY(15px);
+  padding-left: 1rem; border-left: 3px solid var(--emerald);
 }
 
 /* ═══════════════════════════════════════
-   SLIDE 6: WHY NOW
+   SLIDE 7: COMPETITORS  (white)
    ═══════════════════════════════════════ */
-.slide-whynow {
-  background: var(--dark-bg);
-  color: var(--cream);
+.slide-competitors { background: var(--white); color: var(--ink); }
+
+.comp-content { width: 100%; max-width: 1100px; position: relative; z-index: 2; }
+.comp-header { margin-bottom: 3rem; }
+
+.comp-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 0.9rem;
+  opacity: 0; transform: translateY(15px);
+  display: flex; align-items: center; gap: 0.9rem;
+}
+.comp-label::before { content: ''; width: 36px; height: 1px; background: var(--copper); }
+
+.comp-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 700; letter-spacing: -0.02em;
+  opacity: 0; transform: translateY(20px);
+}
+.comp-title em { color: var(--emerald); font-style: normal; }
+
+.comp-table-wrap {
+  overflow: hidden; border: 1px solid rgba(13,31,18,0.1);
+  border-radius: 2px; opacity: 0; transform: translateY(25px);
 }
 
-.whynow-content {
-  width: 100%;
-  max-width: 1100px;
-  position: relative;
-  z-index: 2;
-}
+.comp-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
 
-.whynow-header {
-  margin-bottom: 3.5rem;
+.comp-table th {
+  padding: 1rem 1.4rem; text-align: center;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.82rem;
+  border-bottom: 1px solid rgba(13,31,18,0.08);
+  background: var(--sage);
 }
+.comp-table th:first-child { text-align: left; }
+.comp-table th.us { background: var(--forest); color: var(--leaf); }
+
+.comp-table td {
+  padding: 0.85rem 1.4rem; text-align: center;
+  border-bottom: 1px solid rgba(13,31,18,0.05);
+  color: var(--ink-muted); vertical-align: middle;
+}
+.comp-table td:first-child { text-align: left; font-weight: 500; color: var(--ink); font-size: 0.82rem; }
+.comp-table tr:last-child td { border-bottom: none; }
+.comp-table tr:hover td { background: var(--sage); }
+.comp-table td.us { background: rgba(13,31,18,0.03); color: var(--emerald); font-weight: 600; }
+
+.check { color: var(--emerald); }
+.partial { color: var(--copper); font-size: 0.75rem; }
+.cross { color: rgba(13,31,18,0.25); }
+
+/* ═══════════════════════════════════════
+   SLIDE 8: WHY NOW  (dark forest)
+   ═══════════════════════════════════════ */
+.slide-whynow { background: var(--forest); color: var(--leaf); }
+
+.whynow-content { width: 100%; max-width: 1100px; position: relative; z-index: 2; }
+.whynow-header { margin-bottom: 3.5rem; }
 
 .whynow-label {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--emerald-light);
-  margin-bottom: 1rem;
-  opacity: 0;
-  transform: translateY(15px);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  font-size: 0.63rem; letter-spacing: 0.38em; text-transform: uppercase;
+  color: var(--green-bright); margin-bottom: 1rem;
+  opacity: 0; transform: translateY(15px);
+  display: flex; align-items: center; gap: 0.9rem;
 }
-
-.whynow-label::before {
-  content: '';
-  width: 40px;
-  height: 1px;
-  background: var(--emerald-light);
-}
+.whynow-label::before { content: ''; width: 36px; height: 1px; background: var(--green-bright); }
 
 .whynow-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 400;
-  opacity: 0;
-  transform: translateY(20px);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; letter-spacing: -0.02em;
+  color: var(--leaf); opacity: 0; transform: translateY(20px);
 }
 
-.whynow-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 2rem;
-}
+.whynow-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
 
 .whynow-card {
-  padding: 2rem;
-  border: 1px solid rgba(237,236,228,0.08);
-  position: relative;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: border-color 0.4s ease;
+  padding: 2rem; border: 1px solid rgba(228,242,232,0.1);
+  background: var(--forest-mid); position: relative;
+  opacity: 0; transform: translateY(30px); transition: border-color 0.4s ease;
 }
-
-.whynow-card:hover {
-  border-color: rgba(196,135,58,0.3);
-}
+.whynow-card:hover { border-color: rgba(74,222,128,0.3); }
 
 .whynow-stat {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 3.5vw, 3rem);
-  font-weight: 700;
-  color: var(--copper-light);
-  margin-bottom: 0.5rem;
-  line-height: 1;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 700;
+  color: var(--green-bright); margin-bottom: 0.5rem; line-height: 1;
 }
-
 .whynow-card-title {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  margin-bottom: 0.6rem;
-  letter-spacing: 0.02em;
+  font-family: 'Inter', sans-serif; font-size: 0.92rem;
+  font-weight: 600; margin-bottom: 0.6rem;
+  color: var(--leaf);
 }
-
-.whynow-card-desc {
-  font-size: 0.82rem;
-  line-height: 1.6;
-  color: rgba(237,236,228,0.5);
-}
+.whynow-card-desc { font-size: 0.8rem; line-height: 1.65; color: var(--leaf-muted); }
 
 /* ═══════════════════════════════════════
-   SLIDE 7: BUSINESS MODEL
+   SLIDE 9: BUSINESS MODEL  (light sage)
    ═══════════════════════════════════════ */
-.slide-business {
-  background: var(--cream);
-  color: var(--ink);
-}
+.slide-business { background: var(--sage); color: var(--ink); }
 
 .business-content {
-  width: 100%;
-  max-width: 1100px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
-  position: relative;
-  z-index: 2;
+  width: 100%; max-width: 1100px;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4rem;
+  align-items: center; position: relative; z-index: 2;
 }
-
-.business-left {}
 
 .business-label {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--copper);
-  margin-bottom: 1.2rem;
-  opacity: 0;
-  transform: translateY(15px);
+  font-family: 'JetBrains Mono', monospace; font-size: 0.63rem;
+  letter-spacing: 0.38em; text-transform: uppercase; color: var(--copper);
+  margin-bottom: 1.2rem; opacity: 0; transform: translateY(15px);
 }
-
 .business-title {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 3.5vw, 2.8rem);
-  font-weight: 400;
-  margin-bottom: 2rem;
-  line-height: 1.15;
-  opacity: 0;
-  transform: translateY(20px);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(1.8rem, 3.2vw, 2.6rem); font-weight: 700;
+  letter-spacing: -0.02em; margin-bottom: 1.8rem; line-height: 1.15;
+  opacity: 0; transform: translateY(20px);
 }
-
 .business-desc {
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: rgba(30,30,28,0.65);
-  max-width: 440px;
-  opacity: 0;
-  transform: translateY(15px);
+  font-size: 0.9rem; line-height: 1.75; color: var(--ink-muted);
+  max-width: 420px; opacity: 0; transform: translateY(15px);
 }
 
-.business-right {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
+.business-right { display: flex; flex-direction: column; }
 
 .biz-tier {
-  padding: 1.8rem 2rem;
-  border-bottom: 1px solid rgba(45,45,45,0.08);
-  opacity: 0;
-  transform: translateX(30px);
-  position: relative;
+  padding: 1.6rem 2rem; border-bottom: 1px solid rgba(13,31,18,0.08);
+  opacity: 0; transform: translateX(30px);
   transition: background 0.3s ease;
 }
+.biz-tier:last-child { border-bottom: none; }
+.biz-tier:hover { background: var(--sage-dark); }
 
-.biz-tier:last-child {
-  border-bottom: none;
-}
-
-.biz-tier:hover {
-  background: rgba(26,107,66,0.03);
-}
-
-.biz-tier-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.6rem;
-}
-
+.biz-tier-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
 .biz-tier-number {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  color: var(--emerald);
-  width: 24px;
-  height: 24px;
-  border: 1px solid var(--emerald);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+  font-family: 'JetBrains Mono', monospace; font-size: 0.62rem;
+  color: var(--emerald); width: 24px; height: 24px;
+  border: 1px solid var(--emerald); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
-
-.biz-tier-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.1rem;
-  font-weight: 600;
-}
-
-.biz-tier-desc {
-  font-size: 0.82rem;
-  color: rgba(30,30,28,0.55);
-  line-height: 1.55;
-  padding-left: 2.4rem;
-}
+.biz-tier-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 600; }
+.biz-tier-desc { font-size: 0.8rem; color: var(--ink-muted); line-height: 1.6; padding-left: 2.2rem; }
 
 /* ═══════════════════════════════════════
-   SLIDE 8: CLOSING
+   SLIDE 10: CLOSING  (deep forest)
    ═══════════════════════════════════════ */
-.slide-closing {
-  background: var(--dark-bg);
-  color: var(--cream);
-  overflow: hidden;
-}
+.slide-closing { background: #071209; color: var(--leaf); overflow: hidden; }
 
-.closing-content {
-  text-align: center;
-  position: relative;
-  z-index: 2;
-}
+.closing-content { text-align: center; position: relative; z-index: 2; }
 
 .closing-headline {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 400;
-  line-height: 1.1;
-  margin-bottom: 2rem;
-  letter-spacing: -0.02em;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: clamp(2.5rem, 6vw, 5.5rem); font-weight: 700;
+  line-height: 1.05; margin-bottom: 2rem; letter-spacing: -0.03em;
+  color: var(--leaf);
 }
-
-.closing-headline .line {
-  display: block;
-  overflow: hidden;
-}
-
-.closing-headline .line-inner {
-  display: block;
-  opacity: 0;
-  transform: translateY(100%);
-}
-
-.closing-headline em {
-  font-style: italic;
-  color: var(--copper-light);
-}
+.closing-headline .line { display: block; overflow: hidden; }
+.closing-headline .line-inner { display: block; opacity: 0; transform: translateY(100%); }
+.closing-headline em { color: var(--green-bright); font-style: normal; }
 
 .closing-divider {
-  width: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--copper), transparent);
+  width: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green-bright), transparent);
   margin: 2rem auto;
   transition: width 1.2s cubic-bezier(0.33, 1, 0.68, 1);
 }
-
-.closing-divider.animate {
-  width: min(400px, 60vw);
-}
+.closing-divider.animate { width: min(400px, 60vw); }
 
 .closing-founders {
-  display: flex;
-  gap: 2.5rem;
-  justify-content: center;
-  margin-bottom: 3rem;
-  flex-wrap: wrap;
+  display: flex; gap: 2.5rem; justify-content: center;
+  margin-bottom: 3rem; flex-wrap: wrap;
 }
+.closing-founder { opacity: 0; transform: translateY(15px); }
+.closing-founder-name { font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.02em; color: var(--leaf); }
+.closing-founder-role { font-family: 'JetBrains Mono', monospace; font-size: 0.58rem; color: var(--leaf-muted); letter-spacing: 0.08em; margin-top: 0.2rem; }
 
-.closing-founder {
-  opacity: 0;
-  transform: translateY(15px);
-}
-
-.closing-founder-name {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 500;
-  letter-spacing: 0.03em;
-}
-
-.closing-founder-role {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.6rem;
-  color: var(--warm-gray);
-  letter-spacing: 0.08em;
-  margin-top: 0.2rem;
-}
-
-.closing-logo {
-  opacity: 0;
-  transform: scale(0.8) translateY(10px);
-}
-
-.closing-logo svg {
-  width: 48px;
-  height: 48px;
-}
-
+.closing-logo { opacity: 0; transform: scale(0.85) translateY(10px); }
+.closing-logo svg { width: 44px; height: 44px; }
 .closing-logo-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  letter-spacing: 0.05em;
-  opacity: 0.7;
+  font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600;
+  margin-top: 0.5rem; letter-spacing: 0.03em; color: rgba(228,242,232,0.6);
 }
 
-/* radial glow */
 .closing-glow {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(196,135,58,0.07) 0%, transparent 60%);
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.closing-glow-2 {
-  position: absolute;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(26,107,66,0.06) 0%, transparent 60%);
-  top: 30%;
-  left: 30%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-/* ── ANIMATION UTILITIES ── */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInLeft {
-  from { opacity: 0; transform: translateX(-20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.8); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-@keyframes drawLine {
-  from { stroke-dashoffset: var(--length); }
-  to { stroke-dashoffset: 0; }
-}
-
-.animate-in {
-  animation-fill-mode: both;
-  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1);
+  position: absolute; width: 700px; height: 700px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(74,222,128,0.07) 0%, transparent 60%);
+  top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none;
 }
 
 /* ── NOISE OVERLAY ── */
 .noise-overlay {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.025;
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.02;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
+  background-repeat: repeat; background-size: 256px 256px;
 }
 
 /* ── RESPONSIVE ── */
@@ -1198,47 +668,38 @@ body {
   .provide-grid { grid-template-columns: 1fr 1fr; }
   .whynow-grid { grid-template-columns: 1fr; }
   .business-content { grid-template-columns: 1fr; gap: 2rem; }
+  .tam-grid { grid-template-columns: 1fr; gap: 1rem; }
   .nav-dots { display: none; }
   .nav-fixed { top: 1.2rem; left: 1.5rem; right: 1.5rem; }
-  .title-founders { gap: 1.5rem; }
-  .provide-header { flex-direction: column; align-items: flex-start; }
-  .frontier-grid-accent { display: none; }
 }
-
 @media (max-width: 600px) {
   .provide-grid { grid-template-columns: 1fr; }
   .nav-arrows { bottom: 1rem; right: 1.5rem; }
   .corner-accent { display: none; }
   .closing-founders { flex-direction: column; align-items: center; gap: 1.5rem; }
+  .problem-stat-row { flex-direction: column; gap: 1.5rem; }
 }
 </style>
 </head>
 <body>
 
-<!-- Custom cursor -->
 <div class="cursor-dot" id="cursorDot"></div>
 <div class="cursor-ring" id="cursorRing"></div>
-
-<!-- Noise overlay for texture -->
 <div class="noise-overlay"></div>
-
-<!-- Progress bar -->
 <div class="progress-bar" id="progressBar"></div>
 
-<!-- Fixed nav -->
 <nav class="nav-fixed">
   <div class="nav-logo" id="navLogo">
     <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M20 4 L32 12 L32 28 L20 36 L8 28 L8 12 Z" stroke="currentColor" stroke-width="1.5" fill="none"/>
-      <path d="M20 12 L26 16 L26 24 L20 28 L14 24 L14 16 Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.6"/>
-      <path d="M20 18 L23 20 L23 24 L20 26 L17 24 L17 20 Z" fill="currentColor" opacity="0.3"/>
+      <path d="M20 12 L26 16 L26 24 L20 28 L14 24 L14 16 Z" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/>
+      <path d="M20 18 L23 20 L23 24 L20 26 L17 24 L17 20 Z" fill="currentColor" opacity="0.25"/>
     </svg>
     <span class="nav-logo-text" id="navLogoText">Sixtytwo</span>
   </div>
-  <span class="slide-counter" id="slideCounter">01 / 08</span>
+  <span class="slide-counter" id="slideCounter">01 / 10</span>
 </nav>
 
-<!-- Nav dots -->
 <div class="nav-dots" id="navDots">
   <button class="nav-dot active" data-slide="0"></button>
   <button class="nav-dot" data-slide="1"></button>
@@ -1248,9 +709,10 @@ body {
   <button class="nav-dot" data-slide="5"></button>
   <button class="nav-dot" data-slide="6"></button>
   <button class="nav-dot" data-slide="7"></button>
+  <button class="nav-dot" data-slide="8"></button>
+  <button class="nav-dot" data-slide="9"></button>
 </div>
 
-<!-- Arrow navigation -->
 <div class="nav-arrows">
   <button class="nav-arrow" id="prevBtn" aria-label="Previous slide">
     <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
@@ -1260,28 +722,24 @@ body {
   </button>
 </div>
 
-<!-- PRESENTATION -->
 <div class="presentation" id="presentation">
 
   <!-- ═══ SLIDE 1: TITLE ═══ -->
   <section class="slide slide-title active" data-slide="0" data-theme="light">
-    <canvas class="particles-canvas" id="particlesTitle"></canvas>
     <div class="corner-accent tl">
-      <div class="line-h"></div>
-      <div class="line-v"></div>
+      <div class="line-h corner-line"></div>
+      <div class="line-v corner-line"></div>
     </div>
     <div class="corner-accent br">
-      <div class="line-h"></div>
-      <div class="line-v"></div>
+      <div class="line-h corner-line"></div>
+      <div class="line-v corner-line"></div>
     </div>
     <div class="slide-inner">
       <div class="title-content">
-        <div class="title-overline">OPERATIONAL INTELLIGENCE FOR ON-PREM AI</div>
-        <h1 class="title-main">
-          <span class="word">Sixtytwo</span>
-        </h1>
+        <div class="title-overline">GPU CLUSTER HEALTH MONITORING</div>
+        <h1 class="title-main"><span class="word">Sixtytwo</span></h1>
         <div class="title-divider"></div>
-        <div class="title-subtitle">Observability & Hardware Management for the AI Era</div>
+        <div class="title-subtitle">Real-time observability for on-prem GPU clusters</div>
         <div class="title-founders">
           <span class="founder-name">Sonnet Xu</span>
           <span class="founder-name">Antonio Alonso-Stepanov</span>
@@ -1289,72 +747,85 @@ body {
         </div>
       </div>
       <div class="title-logo">
-        <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg viewBox="0 0 60 60" fill="none">
           <path d="M30 6 L50 18 L50 42 L30 54 L10 42 L10 18 Z" stroke="var(--ink)" stroke-width="1.5" fill="none"/>
-          <path d="M30 16 L40 22 L40 34 L30 40 L20 34 L20 22 Z" stroke="var(--ink)" stroke-width="1.2" fill="none" opacity="0.5"/>
-          <path d="M30 24 L35 27 L35 33 L30 36 L25 33 L25 27 Z" fill="var(--ink)" opacity="0.15"/>
+          <path d="M30 16 L40 22 L40 34 L30 40 L20 34 L20 22 Z" stroke="var(--ink)" stroke-width="1.2" fill="none" opacity="0.4"/>
+          <path d="M30 24 L35 27 L35 33 L30 36 L25 33 L25 27 Z" fill="var(--ink)" opacity="0.12"/>
         </svg>
       </div>
     </div>
   </section>
 
-  <!-- ═══ SLIDE 2: THE FRONTIER ═══ -->
-  <section class="slide slide-frontier" data-slide="1" data-theme="dark">
-    <div class="frontier-glow"></div>
-    <div class="frontier-grid-accent" id="frontierGrid"></div>
+  <!-- ═══ SLIDE 2: THE PROBLEM ═══ -->
+  <section class="slide slide-problem" data-slide="1" data-theme="dark">
     <div class="slide-inner">
-      <div class="frontier-content">
-        <div class="frontier-label">THE NEW FRONTIER</div>
-        <h2 class="frontier-headline">
-          <span class="line"><span class="line-inner">On-prem deployment is</span></span>
-          <span class="line"><span class="line-inner">the <span class="frontier-emphasis">new frontier</span> for</span></span>
-          <span class="line"><span class="line-inner">private, customized</span></span>
-          <span class="line"><span class="line-inner">AI models.</span></span>
+      <div class="problem-content">
+        <div class="problem-label">THE PROBLEM</div>
+        <h2 class="problem-headline">
+          <span class="line"><span class="line-inner">GPU clusters fail silently.</span></span>
+          <span class="line"><span class="line-inner">Your AI workloads <em>shouldn't.</em></span></span>
         </h2>
+        <p class="problem-sub">
+          Enterprises spend millions on GPU hardware, then manage it with shell scripts and fragmented dashboards. Hardware faults degrade model performance invisibly. There is no purpose-built health layer for GPU clusters.
+        </p>
+        <div class="problem-stat-row">
+          <div class="problem-stat-item">
+            <div class="problem-stat-num">$100B+</div>
+            <div class="problem-stat-label">GPU hardware deployed in enterprises</div>
+          </div>
+          <div class="problem-stat-item">
+            <div class="problem-stat-num">~35%</div>
+            <div class="problem-stat-label">GPU capacity wasted to blind spots</div>
+          </div>
+          <div class="problem-stat-item">
+            <div class="problem-stat-num">72 hrs</div>
+            <div class="problem-stat-label">Avg time to detect silent degradation</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- ═══ SLIDE 3: THE CHALLENGE ═══ -->
-  <section class="slide slide-challenge" data-slide="2" data-theme="dark">
+  <section class="slide slide-challenge" data-slide="2" data-theme="light">
     <div class="slide-inner">
       <div class="challenge-content">
         <div class="challenge-header">
-          <div class="challenge-label">THE PROBLEM</div>
-          <h2 class="challenge-title">But it's <em>hard.</em></h2>
+          <div class="challenge-label">ROOT CAUSES</div>
+          <h2 class="challenge-title">Cluster health is a <em>blind spot.</em></h2>
         </div>
         <div class="challenge-pillars">
           <div class="pillar" data-delay="0">
             <div class="pillar-icon">
-              <svg viewBox="0 0 40 40"><rect x="4" y="8" width="32" height="24" rx="2"/><line x1="4" y1="20" x2="36" y2="20"/><circle cx="12" cy="14" r="2"/><circle cx="20" cy="14" r="2"/><circle cx="28" cy="14" r="2"/><line x1="12" y1="26" x2="28" y2="26"/></svg>
+              <svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="14"/><path d="M20 10v10l6 4"/><circle cx="20" cy="20" r="3"/></svg>
             </div>
-            <h3 class="pillar-title">Hardware</h3>
+            <h3 class="pillar-title">Visibility</h3>
             <ul class="pillar-items">
-              <li>Buy and maintain large GPU clusters</li>
-              <li>Power, cooling, and physical infrastructure</li>
-              <li>Ongoing maintenance burden at scale</li>
+              <li>No unified view across GPU nodes</li>
+              <li>Temperature, memory, and error metrics live in silos</li>
+              <li>Multi-vendor clusters have no common health language</li>
             </ul>
           </div>
           <div class="pillar" data-delay="1">
             <div class="pillar-icon">
               <svg viewBox="0 0 40 40"><path d="M8 8h10v10H8z"/><path d="M22 8h10v10H22z"/><path d="M15 22h10v10H15z"/><line x1="13" y1="18" x2="18" y2="22"/><line x1="27" y1="18" x2="22" y2="22"/></svg>
             </div>
-            <h3 class="pillar-title">Software Stack</h3>
+            <h3 class="pillar-title">Reliability</h3>
             <ul class="pillar-items">
-              <li>GPU infrastructure & distributed systems expertise</li>
-              <li>ML operations & performance optimization</li>
-              <li>Most companies lack this knowledge in-house</li>
+              <li>Hardware faults degrade models without alerting anyone</li>
+              <li>NVLink / interconnect failures missed for days</li>
+              <li>No predictive detection before full failure</li>
             </ul>
           </div>
           <div class="pillar" data-delay="2">
             <div class="pillar-icon">
-              <svg viewBox="0 0 40 40"><path d="M20 4 L36 14 L36 30 L20 36 L4 30 L4 14 Z"/><line x1="20" y1="4" x2="20" y2="36"/><line x1="4" y1="14" x2="36" y2="14"/><line x1="4" y1="30" x2="36" y2="30"/></svg>
+              <svg viewBox="0 0 40 40"><rect x="6" y="6" width="28" height="28" rx="2"/><path d="M12 28l6-8 6 4 8-10"/></svg>
             </div>
-            <h3 class="pillar-title">Cost Structure</h3>
+            <h3 class="pillar-title">Efficiency</h3>
             <ul class="pillar-items">
-              <li>Large upfront capital expenditure</li>
-              <li>Ongoing operational costs vs. pay-per-use</li>
-              <li>Economics only work at very high usage levels</li>
+              <li>Suboptimal scheduling leaves GPUs idle or fragmented</li>
+              <li>No baseline to compare node performance over time</li>
+              <li>Cluster ROI invisible to infrastructure teams</li>
             </ul>
           </div>
         </div>
@@ -1369,78 +840,180 @@ body {
       <div class="mission-content">
         <div class="mission-label">OUR MISSION</div>
         <p class="mission-text">
-          <span class="word highlight">Accelerate</span>
-          <span class="word">on-prem</span>
-          <span class="word">deployment</span>
-          <span class="word">with</span>
-          <span class="word highlight">observability</span>
-          <span class="word">and</span>
-          <span class="word highlight">hardware</span>
-          <span class="word highlight">management</span>
+          <span class="word highlight">Complete,</span>
+          <span class="word highlight">real-time</span>
+          <span class="word">health</span>
+          <span class="word">intelligence</span>
           <span class="word">for</span>
-          <span class="word">the</span>
-          <span class="word">AI</span>
-          <span class="word">era.</span>
+          <span class="word">every</span>
+          <span class="word">GPU</span>
+          <span class="word">in</span>
+          <span class="word">your</span>
+          <span class="word highlight">cluster.</span>
         </p>
         <div class="mission-accent-line"></div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ SLIDE 5: WHAT WE PROVIDE ═══ -->
+  <!-- ═══ SLIDE 5: PLATFORM ═══ -->
   <section class="slide slide-provide" data-slide="4" data-theme="light">
     <div class="slide-inner">
       <div class="provide-content">
         <div class="provide-header">
           <div>
             <div class="provide-label">OUR PLATFORM</div>
-            <h2 class="provide-title">What We Provide</h2>
+            <h2 class="provide-title">GPU Cluster Health Suite</h2>
           </div>
         </div>
         <div class="provide-grid">
           <div class="provide-card" data-delay="0">
             <div class="provide-card-number">01</div>
             <div class="provide-card-icon">
-              <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="14"/><path d="M18 8v20"/><path d="M8 18h20"/><circle cx="18" cy="18" r="6" opacity="0.4"/><circle cx="18" cy="12" r="2"/><circle cx="24" cy="18" r="2"/><circle cx="12" cy="18" r="2"/><circle cx="18" cy="24" r="2"/></svg>
+              <svg viewBox="0 0 36 36"><rect x="4" y="8" width="28" height="20" rx="2"/><line x1="4" y1="18" x2="32" y2="18"/><circle cx="10" cy="13" r="2"/><circle cx="17" cy="13" r="2"/><circle cx="24" cy="13" r="2"/><path d="M8 23h5"/><path d="M16 23h5"/><path d="M24 23h4"/></svg>
             </div>
-            <div class="provide-card-cat">Deep</div>
-            <h3 class="provide-card-title">Observability</h3>
-            <p class="provide-card-desc">Real-time GPU telemetry, model performance metrics, inference latency tracking, and resource utilization dashboards across your entire AI infrastructure.</p>
+            <div class="provide-card-cat">Real-Time</div>
+            <h3 class="provide-card-title">GPU Health Monitoring</h3>
+            <p class="provide-card-desc">Per-GPU telemetry: temperature, utilization, memory pressure, error rates, power draw, and interconnect health — unified dashboard.</p>
           </div>
           <div class="provide-card" data-delay="1">
             <div class="provide-card-number">02</div>
             <div class="provide-card-icon">
-              <svg viewBox="0 0 36 36"><path d="M6 10h24v16H6z" rx="2"/><path d="M10 18h4"/><circle cx="12" cy="14" r="1.5"/><path d="M20 14h6"/><path d="M20 18h6"/><path d="M10 22h16"/><path d="M14 6v4"/><path d="M22 6v4"/></svg>
+              <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="13"/><path d="M18 9v9l5 5"/></svg>
             </div>
-            <div class="provide-card-cat">Health &</div>
-            <h3 class="provide-card-title">Fleet Management</h3>
-            <p class="provide-card-desc">Automated hardware health monitoring, predictive failure detection, firmware updates, and centralized management for GPU clusters across data centers.</p>
+            <div class="provide-card-cat">Proactive</div>
+            <h3 class="provide-card-title">Fault Detection & Alerts</h3>
+            <p class="provide-card-desc">ML-based anomaly detection catches degrading GPUs before failure. Automated alerts with root-cause context, not just raw metric spikes.</p>
           </div>
           <div class="provide-card" data-delay="2">
             <div class="provide-card-number">03</div>
             <div class="provide-card-icon">
-              <svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="14"/><path d="M18 4a14 14 0 0 1 0 28" stroke-dasharray="4 3"/><circle cx="18" cy="18" r="7"/><path d="M18 11v7l5 3"/></svg>
+              <svg viewBox="0 0 36 36"><rect x="4" y="4" width="12" height="12" rx="1"/><rect x="20" y="4" width="12" height="12" rx="1"/><rect x="4" y="20" width="12" height="12" rx="1"/><rect x="20" y="20" width="12" height="12" rx="1"/><line x1="16" y1="10" x2="20" y2="10"/><line x1="16" y1="26" x2="20" y2="26"/><line x1="10" y1="16" x2="10" y2="20"/><line x1="26" y1="16" x2="26" y2="20"/></svg>
             </div>
-            <div class="provide-card-cat">Orchestration &</div>
-            <h3 class="provide-card-title">Scheduling</h3>
-            <p class="provide-card-desc">Intelligent workload scheduling, multi-model serving, dynamic resource allocation, and automatic scaling based on inference demand patterns.</p>
+            <div class="provide-card-cat">Comparative</div>
+            <h3 class="provide-card-title">Performance Analytics</h3>
+            <p class="provide-card-desc">Benchmark nodes against each other and historical baselines. Identify underperforming hardware before it impacts training or inference SLAs.</p>
           </div>
           <div class="provide-card" data-delay="3">
             <div class="provide-card-number">04</div>
             <div class="provide-card-icon">
-              <svg viewBox="0 0 36 36"><path d="M8 8h20v20H8z" rx="2"/><path d="M8 14h20"/><path d="M14 14v14"/><path d="M11 11h2"/><path d="M16 18h8"/><path d="M16 22h6"/><path d="M16 26h8"/></svg>
+              <svg viewBox="0 0 36 36"><circle cx="10" cy="18" r="5"/><circle cx="26" cy="10" r="5"/><circle cx="26" cy="26" r="5"/><line x1="15" y1="16" x2="21" y2="12"/><line x1="15" y1="20" x2="21" y2="24"/></svg>
             </div>
-            <div class="provide-card-cat">Container &</div>
-            <h3 class="provide-card-title">Image Management</h3>
-            <p class="provide-card-desc">Streamlined ML model packaging, version control for model artifacts, optimized container runtimes for GPU workloads, and one-click deployment pipelines.</p>
+            <div class="provide-card-cat">Unified</div>
+            <h3 class="provide-card-title">Fleet Management</h3>
+            <p class="provide-card-desc">Single control plane across multi-cluster, multi-vendor environments. Firmware tracking, driver versions, cluster-wide health scoring.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ SLIDE 6: WHY NOW ═══ -->
-  <section class="slide slide-whynow" data-slide="5" data-theme="dark">
+  <!-- ═══ SLIDE 6: TAM ═══ -->
+  <section class="slide slide-tam" data-slide="5" data-theme="light">
+    <div class="slide-inner">
+      <div class="tam-content">
+        <div class="tam-header">
+          <div class="tam-label">MARKET OPPORTUNITY</div>
+          <h2 class="tam-title">A category that does not yet exist</h2>
+        </div>
+        <div class="tam-grid">
+          <div class="tam-tier" data-delay="0">
+            <div class="tam-tier-tag">TAM</div>
+            <div class="tam-tier-num">$21B</div>
+            <div class="tam-tier-label">GPU Infrastructure Software</div>
+            <div class="tam-tier-desc">Total market for software managing enterprise GPU infrastructure. Growing 38% YoY as GPU deployments accelerate globally.</div>
+          </div>
+          <div class="tam-tier" data-delay="1">
+            <div class="tam-tier-tag">SAM</div>
+            <div class="tam-tier-num">$6B</div>
+            <div class="tam-tier-label">On-Prem AI Cluster Management</div>
+            <div class="tam-tier-desc">Enterprises running private GPU clusters who need dedicated health and observability tooling. Today served by fragmented tools.</div>
+          </div>
+          <div class="tam-tier" data-delay="2">
+            <div class="tam-tier-tag">SOM · Year 3</div>
+            <div class="tam-tier-num">$400M</div>
+            <div class="tam-tier-label">Reachable GPU Health Market</div>
+            <div class="tam-tier-desc">Mid-to-large enterprises with 50+ GPU nodes who are actively spending on infrastructure tooling and lack a GPU-native health solution.</div>
+          </div>
+        </div>
+        <div class="tam-footnote">
+          Cloud observability (Datadog, Dynatrace) reached $60B+ with no on-prem equivalent. GPU cluster health is the same whitespace for the AI infrastructure era.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 7: COMPETITORS ═══ -->
+  <section class="slide slide-competitors" data-slide="6" data-theme="light">
+    <div class="slide-inner">
+      <div class="comp-content">
+        <div class="comp-header">
+          <div class="comp-label">COMPETITIVE LANDSCAPE</div>
+          <h2 class="comp-title">No one is doing this. <em>Yet.</em></h2>
+        </div>
+        <div class="comp-table-wrap">
+          <table class="comp-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th class="us">Sixtytwo</th>
+                <th>Datadog</th>
+                <th>Grafana + DCGM</th>
+                <th>Custom Scripts</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>GPU-native health monitoring</td>
+                <td class="us"><span class="check">✓</span></td>
+                <td><span class="partial">Partial</span></td>
+                <td><span class="partial">Partial</span></td>
+                <td><span class="cross">✗</span></td>
+              </tr>
+              <tr>
+                <td>Cross-vendor (NVIDIA, AMD, Intel)</td>
+                <td class="us"><span class="check">✓</span></td>
+                <td><span class="check">✓</span></td>
+                <td><span class="partial">NVIDIA only</span></td>
+                <td><span class="cross">✗</span></td>
+              </tr>
+              <tr>
+                <td>Predictive fault detection</td>
+                <td class="us"><span class="check">✓</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="cross">✗</span></td>
+              </tr>
+              <tr>
+                <td>On-prem native deployment</td>
+                <td class="us"><span class="check">✓</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="check">✓</span></td>
+                <td><span class="check">✓</span></td>
+              </tr>
+              <tr>
+                <td>Zero manual configuration</td>
+                <td class="us"><span class="check">✓</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="cross">✗</span></td>
+              </tr>
+              <tr>
+                <td>Cluster-wide performance scoring</td>
+                <td class="us"><span class="check">✓</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="cross">✗</span></td>
+                <td><span class="cross">✗</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SLIDE 8: WHY NOW ═══ -->
+  <section class="slide slide-whynow" data-slide="7" data-theme="dark">
     <div class="slide-inner">
       <div class="whynow-content">
         <div class="whynow-header">
@@ -1449,38 +1022,38 @@ body {
         </div>
         <div class="whynow-grid">
           <div class="whynow-card" data-delay="0">
-            <div class="whynow-stat">$200B+</div>
-            <h3 class="whynow-card-title">AI Infrastructure Market</h3>
-            <p class="whynow-card-desc">The global AI infrastructure market is projected to exceed $200B, with on-prem deployment as the fastest-growing segment.</p>
+            <div class="whynow-stat">$100B+</div>
+            <h3 class="whynow-card-title">GPU Hardware Deployed</h3>
+            <p class="whynow-card-desc">Enterprise GPU clusters have scaled past where manual management is viable. The tooling gap widens as hardware complexity explodes.</p>
           </div>
           <div class="whynow-card" data-delay="1">
-            <div class="whynow-stat">57%</div>
-            <h3 class="whynow-card-title">Enterprise Demand</h3>
-            <p class="whynow-card-desc">Of enterprises now train AI models on-premises rather than in the public cloud, driven by data sovereignty and compliance.</p>
+            <div class="whynow-stat">3×</div>
+            <h3 class="whynow-card-title">YoY Cluster Growth</h3>
+            <p class="whynow-card-desc">Enterprise GPU cluster deployments tripling annually. H100s, MI300Xs, and multi-node NVLink topologies make health monitoring exponentially harder.</p>
           </div>
           <div class="whynow-card" data-delay="2">
-            <div class="whynow-stat">EU AI Act</div>
-            <h3 class="whynow-card-title">Regulatory Pressure</h3>
-            <p class="whynow-card-desc">New data sovereignty regulations and the EU AI Act are pushing enterprises toward private, auditable AI infrastructure.</p>
+            <div class="whynow-stat">57%</div>
+            <h3 class="whynow-card-title">Training On-Prem</h3>
+            <p class="whynow-card-desc">Of enterprises train AI models on-premises due to data sovereignty and cost. Every one needs a health layer — none has one built for GPUs.</p>
           </div>
           <div class="whynow-card" data-delay="3">
-            <div class="whynow-stat">Open Source</div>
-            <h3 class="whynow-card-title">Model Ecosystem</h3>
-            <p class="whynow-card-desc">Llama, Mistral, and other open-weight models make on-prem deployment viable — but the infrastructure tooling gap remains wide open.</p>
+            <div class="whynow-stat">EU AI Act</div>
+            <h3 class="whynow-card-title">Regulatory Tailwinds</h3>
+            <p class="whynow-card-desc">Compliance requirements push enterprises toward auditable on-prem AI. GPU health monitoring is a prerequisite for demonstrating infrastructure reliability.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ SLIDE 7: BUSINESS MODEL ═══ -->
-  <section class="slide slide-business" data-slide="6" data-theme="light">
+  <!-- ═══ SLIDE 9: BUSINESS MODEL ═══ -->
+  <section class="slide slide-business" data-slide="8" data-theme="light">
     <div class="slide-inner">
       <div class="business-content">
         <div class="business-left">
-          <div class="business-label">REVENUE</div>
-          <h2 class="business-title">Land with observability.<br>Expand into the full stack.</h2>
-          <p class="business-desc">A SaaS platform model that grows with your infrastructure. Start with visibility, scale into complete control.</p>
+          <div class="business-label">REVENUE MODEL</div>
+          <h2 class="business-title">Land with health.<br>Expand into the full stack.</h2>
+          <p class="business-desc">Start with GPU cluster health monitoring — the fastest entry point. Grow into orchestration, scheduling, and fleet management as trust is earned. 80–90% software margins.</p>
         </div>
         <div class="business-right">
           <div class="biz-tier" data-delay="0">
@@ -1488,36 +1061,35 @@ body {
               <div class="biz-tier-number">1</div>
               <h3 class="biz-tier-title">Platform License</h3>
             </div>
-            <p class="biz-tier-desc">Annual SaaS platform fee for core observability and management dashboard access.</p>
+            <p class="biz-tier-desc">Annual SaaS subscription for the GPU health monitoring platform — deployed on-prem, zero cloud data egress.</p>
           </div>
           <div class="biz-tier" data-delay="1">
             <div class="biz-tier-header">
               <div class="biz-tier-number">2</div>
-              <h3 class="biz-tier-title">Per-Node Pricing</h3>
+              <h3 class="biz-tier-title">Per-GPU Node Pricing</h3>
             </div>
-            <p class="biz-tier-desc">Usage-based pricing per managed GPU node — scales linearly as customers expand their infrastructure.</p>
+            <p class="biz-tier-desc">Usage-based component that scales with cluster size. Revenue grows automatically as customers expand infrastructure.</p>
           </div>
           <div class="biz-tier" data-delay="2">
             <div class="biz-tier-header">
               <div class="biz-tier-number">3</div>
               <h3 class="biz-tier-title">Full Stack Expansion</h3>
             </div>
-            <p class="biz-tier-desc">Upsell into orchestration, scheduling, and container management as trust and infrastructure grow.</p>
+            <p class="biz-tier-desc">Upsell into orchestration, scheduling, and multi-cluster management as the relationship deepens.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ═══ SLIDE 8: CLOSING ═══ -->
-  <section class="slide slide-closing" data-slide="7" data-theme="dark">
+  <!-- ═══ SLIDE 10: CLOSING ═══ -->
+  <section class="slide slide-closing" data-slide="9" data-theme="dark">
     <div class="closing-glow"></div>
-    <div class="closing-glow-2"></div>
     <div class="slide-inner">
       <div class="closing-content">
         <h2 class="closing-headline">
-          <span class="line"><span class="line-inner">Join us in the</span></span>
-          <span class="line"><span class="line-inner"><em>on-prem revolution.</em></span></span>
+          <span class="line"><span class="line-inner">Every GPU deserves</span></span>
+          <span class="line"><span class="line-inner">to be <em>seen.</em></span></span>
         </h2>
         <div class="closing-divider"></div>
         <div class="closing-founders">
@@ -1535,10 +1107,10 @@ body {
           </div>
         </div>
         <div class="closing-logo">
-          <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M30 6 L50 18 L50 42 L30 54 L10 42 L10 18 Z" stroke="var(--cream)" stroke-width="1.5" fill="none"/>
-            <path d="M30 16 L40 22 L40 34 L30 40 L20 34 L20 22 Z" stroke="var(--cream)" stroke-width="1.2" fill="none" opacity="0.5"/>
-            <path d="M30 24 L35 27 L35 33 L30 36 L25 33 L25 27 Z" fill="var(--cream)" opacity="0.15"/>
+          <svg viewBox="0 0 60 60" fill="none">
+            <path d="M30 6 L50 18 L50 42 L30 54 L10 42 L10 18 Z" stroke="var(--leaf)" stroke-width="1.5" fill="none"/>
+            <path d="M30 16 L40 22 L40 34 L30 40 L20 34 L20 22 Z" stroke="var(--leaf)" stroke-width="1.2" fill="none" opacity="0.4"/>
+            <path d="M30 24 L35 27 L35 33 L30 36 L25 33 L25 27 Z" fill="var(--leaf)" opacity="0.15"/>
           </svg>
           <div class="closing-logo-text">Sixtytwo</div>
         </div>
@@ -1549,48 +1121,33 @@ body {
 </div>
 
 <script>
-// ═══════════════════════════════════════
-// PRESENTATION ENGINE
-// ═══════════════════════════════════════
-
 class PitchDeck {
   constructor() {
     this.currentSlide = 0;
-    this.totalSlides = 8;
+    this.totalSlides = 10;
     this.isAnimating = false;
     this.slides = document.querySelectorAll('.slide');
     this.dots = document.querySelectorAll('.nav-dot');
     this.progressBar = document.getElementById('progressBar');
     this.slideCounter = document.getElementById('slideCounter');
     this.navLogo = document.getElementById('navLogo');
-
     this.init();
   }
 
   init() {
     this.setupNavigation();
     this.setupCursor();
-    this.setupParticles();
-    this.setupFrontierGrid();
     this.animateSlide(0);
     this.updateProgress();
     this.updateThemeColors();
   }
 
-  // ── NAVIGATION ──
   setupNavigation() {
-    // Keyboard
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
-        e.preventDefault();
-        this.next();
-      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        e.preventDefault();
-        this.prev();
-      }
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') { e.preventDefault(); this.next(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); this.prev(); }
     });
 
-    // Wheel
     let wheelTimeout;
     document.addEventListener('wheel', (e) => {
       if (wheelTimeout) return;
@@ -1599,58 +1156,33 @@ class PitchDeck {
       else if (e.deltaY < -30) this.prev();
     }, { passive: true });
 
-    // Touch
     let touchStartY = 0;
-    document.addEventListener('touchstart', (e) => {
-      touchStartY = e.touches[0].clientY;
-    }, { passive: true });
+    document.addEventListener('touchstart', (e) => { touchStartY = e.touches[0].clientY; }, { passive: true });
     document.addEventListener('touchend', (e) => {
       const diff = touchStartY - e.changedTouches[0].clientY;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) this.next();
-        else this.prev();
-      }
+      if (Math.abs(diff) > 50) { diff > 0 ? this.next() : this.prev(); }
     }, { passive: true });
 
-    // Buttons
     document.getElementById('prevBtn').addEventListener('click', () => this.prev());
     document.getElementById('nextBtn').addEventListener('click', () => this.next());
-
-    // Dots
-    this.dots.forEach(dot => {
-      dot.addEventListener('click', () => {
-        this.goTo(parseInt(dot.dataset.slide));
-      });
-    });
+    this.dots.forEach(dot => dot.addEventListener('click', () => this.goTo(parseInt(dot.dataset.slide))));
   }
 
-  next() {
-    if (this.currentSlide < this.totalSlides - 1) {
-      this.goTo(this.currentSlide + 1);
-    }
-  }
-
-  prev() {
-    if (this.currentSlide > 0) {
-      this.goTo(this.currentSlide - 1);
-    }
-  }
+  next() { if (this.currentSlide < this.totalSlides - 1) this.goTo(this.currentSlide + 1); }
+  prev() { if (this.currentSlide > 0) this.goTo(this.currentSlide - 1); }
 
   goTo(index) {
     if (index === this.currentSlide || this.isAnimating) return;
     this.isAnimating = true;
 
-    const oldSlide = this.slides[this.currentSlide];
-    const newSlide = this.slides[index];
+    const old = this.slides[this.currentSlide];
+    const next = this.slides[index];
 
-    oldSlide.classList.remove('active');
-    oldSlide.classList.add('leaving');
+    old.classList.remove('active');
+    old.classList.add('leaving');
+    setTimeout(() => old.classList.remove('leaving'), 800);
 
-    setTimeout(() => {
-      oldSlide.classList.remove('leaving');
-    }, 800);
-
-    newSlide.classList.add('active');
+    next.classList.add('active');
     this.currentSlide = index;
 
     this.updateDots();
@@ -1658,634 +1190,254 @@ class PitchDeck {
     this.updateThemeColors();
     this.animateSlide(index);
 
-    // Show nav logo after first slide
-    if (index > 0) {
-      this.navLogo.classList.add('visible');
-    } else {
-      this.navLogo.classList.remove('visible');
-    }
-
-    setTimeout(() => {
-      this.isAnimating = false;
-    }, 900);
+    this.navLogo.classList.toggle('visible', index > 0);
+    setTimeout(() => { this.isAnimating = false; }, 900);
   }
 
   updateDots() {
-    this.dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === this.currentSlide);
-    });
+    this.dots.forEach((d, i) => d.classList.toggle('active', i === this.currentSlide));
   }
 
   updateProgress() {
-    const pct = ((this.currentSlide + 1) / this.totalSlides) * 100;
-    this.progressBar.style.width = pct + '%';
-    this.slideCounter.textContent = String(this.currentSlide + 1).padStart(2, '0') + ' / ' + String(this.totalSlides).padStart(2, '0');
+    this.progressBar.style.width = ((this.currentSlide + 1) / this.totalSlides * 100) + '%';
+    this.slideCounter.textContent =
+      String(this.currentSlide + 1).padStart(2, '0') + ' / ' + String(this.totalSlides).padStart(2, '0');
   }
 
   updateThemeColors() {
-    const theme = this.slides[this.currentSlide].dataset.theme;
-    const isDark = theme === 'dark';
-    const color = isDark ? 'var(--cream)' : 'var(--ink)';
+    const isDark = this.slides[this.currentSlide].dataset.theme === 'dark';
+    const logoText = document.getElementById('navLogoText');
+    const logoSvg = document.querySelector('.nav-logo svg');
+    const counter = this.slideCounter;
 
-    document.getElementById('navLogoText').style.color = color;
-    document.querySelector('.nav-logo svg').style.color = color;
-    this.slideCounter.style.color = isDark ? 'var(--warm-gray)' : 'var(--charcoal)';
-
-    this.dots.forEach(dot => {
-      if (!dot.classList.contains('active')) {
-        dot.style.background = isDark ? 'var(--warm-gray)' : 'var(--charcoal)';
-      }
-    });
-
-    document.querySelectorAll('.nav-arrow').forEach(btn => {
-      btn.style.color = isDark ? 'var(--warm-gray)' : 'var(--charcoal)';
-      btn.style.borderColor = isDark ? 'rgba(180,175,165,0.2)' : 'rgba(45,45,45,0.2)';
-    });
-  }
-
-  // ── SLIDE ANIMATIONS ──
-  animateSlide(index) {
-    const slide = this.slides[index];
-
-    switch(index) {
-      case 0: this.animateTitle(slide); break;
-      case 1: this.animateFrontier(slide); break;
-      case 2: this.animateChallenge(slide); break;
-      case 3: this.animateMission(slide); break;
-      case 4: this.animateProvide(slide); break;
-      case 5: this.animateWhyNow(slide); break;
-      case 6: this.animateBusiness(slide); break;
-      case 7: this.animateClosing(slide); break;
+    if (isDark) {
+      logoText.style.color = '#e4f2e8';
+      logoSvg.style.color = '#e4f2e8';
+      counter.style.color = 'rgba(228,242,232,0.4)';
+      this.dots.forEach(d => { if (!d.classList.contains('active')) d.style.background = '#7a8c7d'; });
+      document.querySelectorAll('.nav-arrow').forEach(b => {
+        b.style.color = '#7a8c7d';
+        b.style.borderColor = 'rgba(228,242,232,0.15)';
+      });
+    } else {
+      logoText.style.color = '#0d1f12';
+      logoSvg.style.color = '#0d1f12';
+      counter.style.color = 'rgba(13,31,18,0.4)';
+      this.dots.forEach(d => { if (!d.classList.contains('active')) d.style.background = '#2d4a35'; });
+      document.querySelectorAll('.nav-arrow').forEach(b => {
+        b.style.color = '#2d4a35';
+        b.style.borderColor = 'rgba(13,31,18,0.2)';
+      });
     }
   }
 
-  animateTitle(slide) {
-    const overline = slide.querySelector('.title-overline');
-    const words = slide.querySelectorAll('.title-main .word');
-    const divider = slide.querySelector('.title-divider');
-    const subtitle = slide.querySelector('.title-subtitle');
-    const founders = slide.querySelectorAll('.founder-name');
-    const logo = slide.querySelector('.title-logo');
-    const corners = slide.querySelectorAll('.corner-accent');
+  _show(el, delay, fromX = 0, fromY = 20, dur = 0.65) {
+    el.style.cssText += `;transition:none;opacity:0;transform:translate(${fromX}px,${fromY}px)`;
+    setTimeout(() => {
+      el.style.transition = `opacity ${dur}s ease, transform ${dur}s cubic-bezier(0.33,1,0.68,1)`;
+      el.style.opacity = '1';
+      el.style.transform = 'translate(0,0)';
+    }, delay);
+  }
 
-    // Reset
-    overline.style.transition = 'none';
-    overline.style.opacity = '0';
-    overline.style.transform = 'translateY(20px)';
+  animateSlide(i) {
+    const s = this.slides[i];
+    switch(i) {
+      case 0: this._animTitle(s); break;
+      case 1: this._animProblem(s); break;
+      case 2: this._animChallenge(s); break;
+      case 3: this._animMission(s); break;
+      case 4: this._animProvide(s); break;
+      case 5: this._animTAM(s); break;
+      case 6: this._animComp(s); break;
+      case 7: this._animWhyNow(s); break;
+      case 8: this._animBusiness(s); break;
+      case 9: this._animClosing(s); break;
+    }
+  }
 
-    words.forEach(w => {
-      w.style.transition = 'none';
-      w.style.opacity = '0';
-      w.style.transform = 'translateY(100%)';
-    });
-
-    subtitle.style.transition = 'none';
-    subtitle.style.opacity = '0';
-    subtitle.style.transform = 'translateY(15px)';
-
-    founders.forEach(f => {
-      f.style.transition = 'none';
-      f.style.opacity = '0';
-      f.style.transform = 'translateY(15px)';
-    });
-
-    logo.style.transition = 'none';
-    logo.style.opacity = '0';
-    logo.style.transform = 'scale(0.8)';
-
-    corners.forEach(c => {
-      c.style.transition = 'none';
-      c.style.opacity = '0';
-    });
+  _animTitle(s) {
+    const overline = s.querySelector('.title-overline');
+    const words = s.querySelectorAll('.title-main .word');
+    const divider = s.querySelector('.title-divider');
+    const subtitle = s.querySelector('.title-subtitle');
+    const founders = s.querySelectorAll('.founder-name');
+    const logo = s.querySelector('.title-logo');
+    const corners = s.querySelectorAll('.corner-accent');
 
     divider.classList.remove('animate');
-
-    requestAnimationFrame(() => {
-      // Overline
+    this._show(overline, 200, 0, 20);
+    words.forEach((w, i) => {
+      w.style.cssText += ';transition:none;opacity:0;transform:translateY(100%)';
       setTimeout(() => {
-        overline.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        overline.style.opacity = '1';
-        overline.style.transform = 'translateY(0)';
-      }, 200);
-
-      // Words
-      words.forEach((w, i) => {
-        setTimeout(() => {
-          w.style.transition = 'opacity 0.8s cubic-bezier(0.33, 1, 0.68, 1), transform 0.8s cubic-bezier(0.33, 1, 0.68, 1)';
-          w.style.opacity = '1';
-          w.style.transform = 'translateY(0)';
-        }, 400 + i * 150);
-      });
-
-      // Divider
-      setTimeout(() => divider.classList.add('animate'), 800);
-
-      // Subtitle
-      setTimeout(() => {
-        subtitle.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        subtitle.style.opacity = '1';
-        subtitle.style.transform = 'translateY(0)';
-      }, 1100);
-
-      // Founders
-      founders.forEach((f, i) => {
-        setTimeout(() => {
-          f.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-          f.style.opacity = '1';
-          f.style.transform = 'translateY(0)';
-        }, 1400 + i * 120);
-      });
-
-      // Logo
-      setTimeout(() => {
-        logo.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        logo.style.opacity = '1';
-        logo.style.transform = 'scale(1)';
-      }, 1600);
-
-      // Corners
-      corners.forEach((c, i) => {
-        setTimeout(() => {
-          c.style.transition = 'opacity 1s ease';
-          c.style.opacity = '1';
-        }, 1800 + i * 200);
-      });
+        w.style.transition = 'opacity 0.8s cubic-bezier(0.33,1,0.68,1), transform 0.8s cubic-bezier(0.33,1,0.68,1)';
+        w.style.opacity = '1'; w.style.transform = 'translateY(0)';
+      }, 400 + i * 150);
     });
+    setTimeout(() => divider.classList.add('animate'), 800);
+    this._show(subtitle, 1100);
+    founders.forEach((f, i) => this._show(f, 1400 + i * 120));
+    this._show(logo, 1600, 0, 0);
+    corners.forEach((c, i) => { c.style.transition = 'none'; c.style.opacity = '0'; setTimeout(() => { c.style.transition = 'opacity 1s ease'; c.style.opacity = '1'; }, 1800 + i * 200); });
   }
 
-  animateFrontier(slide) {
-    const label = slide.querySelector('.frontier-label');
-    const lines = slide.querySelectorAll('.frontier-headline .line-inner');
+  _animProblem(s) {
+    const label = s.querySelector('.problem-label');
+    const lines = s.querySelectorAll('.problem-headline .line-inner');
+    const sub = s.querySelector('.problem-sub');
+    const stats = s.querySelector('.problem-stat-row');
 
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-    label.style.transform = 'translateX(-20px)';
-
-    lines.forEach(l => {
-      l.style.transition = 'none';
-      l.style.opacity = '0';
-      l.style.transform = 'translateY(100%)';
-    });
-
-    requestAnimationFrame(() => {
+    this._show(label, 150, -20, 0);
+    lines.forEach((l, i) => {
+      l.style.cssText += ';transition:none;opacity:0;transform:translateY(100%)';
       setTimeout(() => {
-        label.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        label.style.opacity = '1';
-        label.style.transform = 'translateX(0)';
-      }, 200);
-
-      lines.forEach((l, i) => {
-        setTimeout(() => {
-          l.style.transition = 'opacity 0.7s cubic-bezier(0.33, 1, 0.68, 1), transform 0.7s cubic-bezier(0.33, 1, 0.68, 1)';
-          l.style.opacity = '1';
-          l.style.transform = 'translateY(0)';
-        }, 400 + i * 150);
-      });
+        l.style.transition = 'opacity 0.75s cubic-bezier(0.33,1,0.68,1), transform 0.75s cubic-bezier(0.33,1,0.68,1)';
+        l.style.opacity = '1'; l.style.transform = 'translateY(0)';
+      }, 300 + i * 180);
     });
+    this._show(sub, 750);
+    this._show(stats, 1000);
   }
 
-  animateChallenge(slide) {
-    const label = slide.querySelector('.challenge-label');
-    const title = slide.querySelector('.challenge-title');
-    const pillars = slide.querySelectorAll('.pillar');
+  _animChallenge(s) {
+    const label = s.querySelector('.challenge-label');
+    const title = s.querySelector('.challenge-title');
+    const pillars = s.querySelectorAll('.pillar');
 
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-    label.style.transform = 'translateY(15px)';
-
-    title.style.transition = 'none';
-    title.style.opacity = '0';
-    title.style.transform = 'translateY(30px)';
-
-    pillars.forEach(p => {
-      p.style.transition = 'none';
-      p.style.opacity = '0';
-      p.style.transform = 'translateY(40px)';
+    this._show(label, 200);
+    this._show(title, 380, 0, 30);
+    pillars.forEach((p, i) => {
       p.classList.remove('animate');
-    });
-
-    requestAnimationFrame(() => {
+      p.style.cssText += ';transition:none;opacity:0;transform:translateY(40px)';
       setTimeout(() => {
-        label.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        label.style.opacity = '1';
-        label.style.transform = 'translateY(0)';
-      }, 200);
-
-      setTimeout(() => {
-        title.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        title.style.opacity = '1';
-        title.style.transform = 'translateY(0)';
-      }, 400);
-
-      pillars.forEach((p, i) => {
-        setTimeout(() => {
-          p.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-          p.style.opacity = '1';
-          p.style.transform = 'translateY(0)';
-          setTimeout(() => p.classList.add('animate'), 200);
-        }, 700 + i * 180);
-      });
+        p.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+        p.style.opacity = '1'; p.style.transform = 'translateY(0)';
+        setTimeout(() => p.classList.add('animate'), 200);
+      }, 680 + i * 180);
     });
   }
 
-  animateMission(slide) {
-    const label = slide.querySelector('.mission-label');
-    const words = slide.querySelectorAll('.mission-text .word');
-    const line = slide.querySelector('.mission-accent-line');
-
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-    label.style.transform = 'translateX(-20px)';
-
-    words.forEach(w => {
-      w.style.transition = 'none';
-      w.style.opacity = '0';
-      w.style.transform = 'translateY(20px)';
-    });
+  _animMission(s) {
+    const label = s.querySelector('.mission-label');
+    const words = s.querySelectorAll('.mission-text .word');
+    const line = s.querySelector('.mission-accent-line');
 
     line.classList.remove('animate');
-
-    requestAnimationFrame(() => {
+    this._show(label, 200, -20, 0);
+    words.forEach((w, i) => {
+      w.style.cssText += ';transition:none;opacity:0;transform:translateY(20px)';
       setTimeout(() => {
-        label.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        label.style.opacity = '1';
-        label.style.transform = 'translateX(0)';
-      }, 200);
+        w.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        w.style.opacity = '1'; w.style.transform = 'translateY(0)';
+      }, 400 + i * 80);
+    });
+    setTimeout(() => line.classList.add('animate'), 1200);
+  }
 
-      words.forEach((w, i) => {
-        setTimeout(() => {
-          w.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-          w.style.opacity = '1';
-          w.style.transform = 'translateY(0)';
-        }, 400 + i * 80);
-      });
-
-      setTimeout(() => line.classList.add('animate'), 1200);
+  _animProvide(s) {
+    this._show(s.querySelector('.provide-label'), 200);
+    this._show(s.querySelector('.provide-title'), 350, 0, 20);
+    s.querySelectorAll('.provide-card').forEach((c, i) => {
+      c.style.cssText += ';transition:none;opacity:0;transform:translateY(30px)';
+      setTimeout(() => {
+        c.style.transition = 'opacity 0.6s ease, transform 0.6s ease, background 0.3s ease';
+        c.style.opacity = '1'; c.style.transform = 'translateY(0)';
+      }, 550 + i * 130);
     });
   }
 
-  animateProvide(slide) {
-    const label = slide.querySelector('.provide-label');
-    const title = slide.querySelector('.provide-title');
-    const cards = slide.querySelectorAll('.provide-card');
-
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-    label.style.transform = 'translateY(15px)';
-
-    title.style.transition = 'none';
-    title.style.opacity = '0';
-    title.style.transform = 'translateY(20px)';
-
-    cards.forEach(c => {
-      c.style.transition = 'none';
-      c.style.opacity = '0';
-      c.style.transform = 'translateY(30px)';
+  _animTAM(s) {
+    this._show(s.querySelector('.tam-label'), 150);
+    this._show(s.querySelector('.tam-title'), 300);
+    s.querySelectorAll('.tam-tier').forEach((t, i) => {
+      t.style.cssText += ';transition:none;opacity:0;transform:translateY(30px)';
+      setTimeout(() => {
+        t.style.transition = 'opacity 0.65s ease, transform 0.65s ease';
+        t.style.opacity = '1'; t.style.transform = 'translateY(0)';
+      }, 500 + i * 160);
     });
+    this._show(s.querySelector('.tam-footnote'), 1050);
+  }
 
-    requestAnimationFrame(() => {
+  _animComp(s) {
+    this._show(s.querySelector('.comp-label'), 150);
+    this._show(s.querySelector('.comp-title'), 300);
+    this._show(s.querySelector('.comp-table-wrap'), 550, 0, 25);
+  }
+
+  _animWhyNow(s) {
+    this._show(s.querySelector('.whynow-label'), 200);
+    this._show(s.querySelector('.whynow-title'), 350);
+    s.querySelectorAll('.whynow-card').forEach((c, i) => {
+      c.style.cssText += ';transition:none;opacity:0;transform:translateY(30px)';
       setTimeout(() => {
-        label.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        label.style.opacity = '1';
-        label.style.transform = 'translateY(0)';
-      }, 200);
-
-      setTimeout(() => {
-        title.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        title.style.opacity = '1';
-        title.style.transform = 'translateY(0)';
-      }, 350);
-
-      cards.forEach((c, i) => {
-        setTimeout(() => {
-          c.style.transition = 'opacity 0.6s ease, transform 0.6s ease, background 0.4s ease';
-          c.style.opacity = '1';
-          c.style.transform = 'translateY(0)';
-        }, 550 + i * 130);
-      });
+        c.style.transition = 'opacity 0.6s ease, transform 0.6s ease, border-color 0.4s ease';
+        c.style.opacity = '1'; c.style.transform = 'translateY(0)';
+      }, 550 + i * 150);
     });
   }
 
-  animateWhyNow(slide) {
-    const label = slide.querySelector('.whynow-label');
-    const title = slide.querySelector('.whynow-title');
-    const cards = slide.querySelectorAll('.whynow-card');
-
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-    label.style.transform = 'translateY(15px)';
-
-    title.style.transition = 'none';
-    title.style.opacity = '0';
-    title.style.transform = 'translateY(20px)';
-
-    cards.forEach(c => {
-      c.style.transition = 'none';
-      c.style.opacity = '0';
-      c.style.transform = 'translateY(30px)';
-    });
-
-    requestAnimationFrame(() => {
+  _animBusiness(s) {
+    this._show(s.querySelector('.business-label'), 200);
+    this._show(s.querySelector('.business-title'), 350);
+    this._show(s.querySelector('.business-desc'), 520);
+    s.querySelectorAll('.biz-tier').forEach((t, i) => {
+      t.style.cssText += ';transition:none;opacity:0;transform:translateX(30px)';
       setTimeout(() => {
-        label.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        label.style.opacity = '1';
-        label.style.transform = 'translateY(0)';
-      }, 200);
-
-      setTimeout(() => {
-        title.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        title.style.opacity = '1';
-        title.style.transform = 'translateY(0)';
-      }, 350);
-
-      cards.forEach((c, i) => {
-        setTimeout(() => {
-          c.style.transition = 'opacity 0.6s ease, transform 0.6s ease, border-color 0.4s ease';
-          c.style.opacity = '1';
-          c.style.transform = 'translateY(0)';
-        }, 550 + i * 150);
-      });
+        t.style.transition = 'opacity 0.6s ease, transform 0.6s ease, background 0.3s ease';
+        t.style.opacity = '1'; t.style.transform = 'translateX(0)';
+      }, 600 + i * 160);
     });
   }
 
-  animateBusiness(slide) {
-    const label = slide.querySelector('.business-label');
-    const title = slide.querySelector('.business-title');
-    const desc = slide.querySelector('.business-desc');
-    const tiers = slide.querySelectorAll('.biz-tier');
-
-    label.style.transition = 'none';
-    label.style.opacity = '0';
-    label.style.transform = 'translateY(15px)';
-
-    title.style.transition = 'none';
-    title.style.opacity = '0';
-    title.style.transform = 'translateY(20px)';
-
-    desc.style.transition = 'none';
-    desc.style.opacity = '0';
-    desc.style.transform = 'translateY(15px)';
-
-    tiers.forEach(t => {
-      t.style.transition = 'none';
-      t.style.opacity = '0';
-      t.style.transform = 'translateX(30px)';
-    });
-
-    requestAnimationFrame(() => {
-      setTimeout(() => {
-        label.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        label.style.opacity = '1';
-        label.style.transform = 'translateY(0)';
-      }, 200);
-
-      setTimeout(() => {
-        title.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
-        title.style.opacity = '1';
-        title.style.transform = 'translateY(0)';
-      }, 350);
-
-      setTimeout(() => {
-        desc.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        desc.style.opacity = '1';
-        desc.style.transform = 'translateY(0)';
-      }, 550);
-
-      tiers.forEach((t, i) => {
-        setTimeout(() => {
-          t.style.transition = 'opacity 0.6s ease, transform 0.6s ease, background 0.3s ease';
-          t.style.opacity = '1';
-          t.style.transform = 'translateX(0)';
-        }, 600 + i * 160);
-      });
-    });
-  }
-
-  animateClosing(slide) {
-    const lines = slide.querySelectorAll('.closing-headline .line-inner');
-    const divider = slide.querySelector('.closing-divider');
-    const founders = slide.querySelectorAll('.closing-founder');
-    const logo = slide.querySelector('.closing-logo');
-
-    lines.forEach(l => {
-      l.style.transition = 'none';
-      l.style.opacity = '0';
-      l.style.transform = 'translateY(100%)';
-    });
+  _animClosing(s) {
+    const lines = s.querySelectorAll('.closing-headline .line-inner');
+    const divider = s.querySelector('.closing-divider');
+    const founders = s.querySelectorAll('.closing-founder');
+    const logo = s.querySelector('.closing-logo');
 
     divider.classList.remove('animate');
-
-    founders.forEach(f => {
-      f.style.transition = 'none';
-      f.style.opacity = '0';
-      f.style.transform = 'translateY(15px)';
-    });
-
-    logo.style.transition = 'none';
-    logo.style.opacity = '0';
-    logo.style.transform = 'scale(0.8) translateY(10px)';
-
-    requestAnimationFrame(() => {
-      lines.forEach((l, i) => {
-        setTimeout(() => {
-          l.style.transition = 'opacity 0.8s cubic-bezier(0.33, 1, 0.68, 1), transform 0.8s cubic-bezier(0.33, 1, 0.68, 1)';
-          l.style.opacity = '1';
-          l.style.transform = 'translateY(0)';
-        }, 300 + i * 200);
-      });
-
-      setTimeout(() => divider.classList.add('animate'), 900);
-
-      founders.forEach((f, i) => {
-        setTimeout(() => {
-          f.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-          f.style.opacity = '1';
-          f.style.transform = 'translateY(0)';
-        }, 1200 + i * 120);
-      });
-
+    lines.forEach((l, i) => {
+      l.style.cssText += ';transition:none;opacity:0;transform:translateY(100%)';
       setTimeout(() => {
-        logo.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        logo.style.opacity = '1';
-        logo.style.transform = 'scale(1) translateY(0)';
-      }, 1600);
+        l.style.transition = 'opacity 0.8s cubic-bezier(0.33,1,0.68,1), transform 0.8s cubic-bezier(0.33,1,0.68,1)';
+        l.style.opacity = '1'; l.style.transform = 'translateY(0)';
+      }, 300 + i * 200);
     });
+    setTimeout(() => divider.classList.add('animate'), 900);
+    founders.forEach((f, i) => this._show(f, 1200 + i * 120));
+    logo.style.cssText += ';transition:none;opacity:0;transform:scale(0.85) translateY(10px)';
+    setTimeout(() => {
+      logo.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      logo.style.opacity = '1'; logo.style.transform = 'scale(1) translateY(0)';
+    }, 1600);
   }
 
-  // ── CUSTOM CURSOR ──
   setupCursor() {
     const dot = document.getElementById('cursorDot');
     const ring = document.getElementById('cursorRing');
-    let mx = 0, my = 0;
-    let dx = 0, dy = 0;
+    if ('ontouchstart' in window) { dot.style.display = 'none'; ring.style.display = 'none'; return; }
 
-    // Hide on touch devices
-    if ('ontouchstart' in window) {
-      dot.style.display = 'none';
-      ring.style.display = 'none';
-      return;
-    }
-
+    let mx = 0, my = 0, dx = 0, dy = 0;
     document.addEventListener('mousemove', (e) => {
-      mx = e.clientX;
-      my = e.clientY;
-      dot.style.left = mx - 4 + 'px';
-      dot.style.top = my - 4 + 'px';
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx - 4 + 'px'; dot.style.top = my - 4 + 'px';
     });
-
     const follow = () => {
-      dx += (mx - dx) * 0.15;
-      dy += (my - dy) * 0.15;
-      ring.style.left = dx - 18 + 'px';
-      ring.style.top = dy - 18 + 'px';
+      dx += (mx - dx) * 0.15; dy += (my - dy) * 0.15;
+      ring.style.left = dx - 18 + 'px'; ring.style.top = dy - 18 + 'px';
       requestAnimationFrame(follow);
     };
     follow();
 
-    // Hover effects
-    document.querySelectorAll('button, .provide-card, .whynow-card, .biz-tier, .nav-dot').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        ring.style.width = '50px';
-        ring.style.height = '50px';
-        ring.style.left = (dx - 25) + 'px';
-        ring.style.top = (dy - 25) + 'px';
-        ring.style.opacity = '0.3';
-        dot.style.transform = 'scale(1.5)';
-      });
-      el.addEventListener('mouseleave', () => {
-        ring.style.width = '36px';
-        ring.style.height = '36px';
-        ring.style.opacity = '0.5';
-        dot.style.transform = 'scale(1)';
-      });
+    document.querySelectorAll('button, .provide-card, .whynow-card, .biz-tier, .nav-dot, .tam-tier').forEach(el => {
+      el.addEventListener('mouseenter', () => { ring.style.width = '50px'; ring.style.height = '50px'; ring.style.opacity = '0.25'; dot.style.transform = 'scale(1.5)'; });
+      el.addEventListener('mouseleave', () => { ring.style.width = '36px'; ring.style.height = '36px'; ring.style.opacity = '0.35'; dot.style.transform = 'scale(1)'; });
     });
-  }
-
-  // ── PARTICLES ──
-  setupParticles() {
-    const canvas = document.getElementById('particlesTitle');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    resize();
-    window.addEventListener('resize', resize);
-
-    const particles = [];
-    for (let i = 0; i < 40; i++) {
-      particles.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: Math.random() * 2 + 0.5,
-        speedX: (Math.random() - 0.5) * 0.3,
-        speedY: (Math.random() - 0.5) * 0.3,
-        opacity: Math.random() * 0.15 + 0.03,
-        type: Math.random() > 0.5 ? 'circle' : 'diamond'
-      });
-    }
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      particles.forEach(p => {
-        p.x += p.speedX;
-        p.y += p.speedY;
-
-        if (p.x < 0) p.x = canvas.width;
-        if (p.x > canvas.width) p.x = 0;
-        if (p.y < 0) p.y = canvas.height;
-        if (p.y > canvas.height) p.y = 0;
-
-        ctx.save();
-        ctx.globalAlpha = p.opacity;
-        ctx.fillStyle = '#1a6b42';
-
-        if (p.type === 'circle') {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
-        } else {
-          ctx.translate(p.x, p.y);
-          ctx.rotate(Math.PI / 4);
-          ctx.fillRect(-p.size, -p.size, p.size * 2, p.size * 2);
-        }
-
-        ctx.restore();
-      });
-
-      // Draw faint connections
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < 150) {
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(26,107,66,${0.03 * (1 - dist / 150)})`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.stroke();
-          }
-        }
-      }
-
-      requestAnimationFrame(animate);
-    };
-    animate();
-  }
-
-  // ── FRONTIER GRID ──
-  setupFrontierGrid() {
-    const container = document.getElementById('frontierGrid');
-    if (!container) return;
-
-    const size = 200;
-    const cells = 5;
-    const cellSize = size / cells;
-
-    for (let r = 0; r < cells; r++) {
-      for (let c = 0; c < cells; c++) {
-        const cell = document.createElement('div');
-        cell.className = 'grid-cell';
-        cell.style.cssText = `
-          left: ${c * cellSize}px;
-          top: ${r * cellSize}px;
-          width: ${cellSize}px;
-          height: ${cellSize}px;
-        `;
-        container.appendChild(cell);
-      }
-    }
-
-    // Animate random cells
-    setInterval(() => {
-      const cells = container.querySelectorAll('.grid-cell');
-      const randomCell = cells[Math.floor(Math.random() * cells.length)];
-      randomCell.style.borderColor = 'rgba(196,135,58,0.35)';
-      randomCell.style.background = 'rgba(196,135,58,0.03)';
-      setTimeout(() => {
-        randomCell.style.borderColor = 'rgba(196,135,58,0.1)';
-        randomCell.style.background = 'transparent';
-      }, 1200);
-    }, 600);
-
-    // Fade in
-    setTimeout(() => {
-      container.style.transition = 'opacity 1s ease';
-      container.style.opacity = '1';
-    }, 800);
   }
 }
 
-// ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
-  new PitchDeck();
-});
+document.addEventListener('DOMContentLoaded', () => new PitchDeck());
 </script>
 </body>
 </html>
